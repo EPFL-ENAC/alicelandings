@@ -1,11 +1,11 @@
-import { expect } from "chai";
+import WebMap from "@/components/WebMap.vue";
 import { shallowMount } from "@vue/test-utils";
-import HelloWorld from "@/components/HelloWorld.vue";
+import { expect } from "chai";
 
-describe("HelloWorld.vue", () => {
+describe("WebMap.vue", () => {
   it("renders props.msg when passed", () => {
     const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
+    const wrapper = shallowMount(WebMap, {
       propsData: { msg },
     });
     expect(wrapper.text()).to.include(msg);
