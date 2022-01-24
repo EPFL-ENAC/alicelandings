@@ -27,6 +27,10 @@
             :key="index"
             :geojson="item"
           ></l-geo-json>
+          <l-control-scale
+            position="bottomright"
+            :imperial="false"
+          ></l-control-scale>
         </l-map>
       </v-responsive>
     </v-col>
@@ -39,10 +43,11 @@ import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
 import "vue-class-component/hooks";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
-import { LGeoJson, LMap, LTileLayer } from "vue2-leaflet";
+import { LControlScale, LGeoJson, LMap, LTileLayer } from "vue2-leaflet";
 
 @Component({
   components: {
+    LControlScale,
     LGeoJson,
     LMap,
     LTileLayer,
