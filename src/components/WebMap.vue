@@ -3,6 +3,7 @@
     <v-col cols="6">
       <v-select
         v-model="baseLayer"
+        hide-details
         :items="baseLayerItems"
         label="Base Layer"
       ></v-select>
@@ -12,13 +13,27 @@
         accept=".geojson, application/json"
         chips
         clearable
-        label="geojson"
+        hide-details
+        label="GeoJSON"
         multiple
         show-size
-        @change="onFilesChanged"
+        @change="addGeoJsonFiles"
+      ></v-file-input>
+    </v-col>
+    <v-col cols="6">
+      <v-file-input
+        accept="image/tiff"
+        chips
+        clearable
+        hide-details
+        label="GeoTIFF"
+        multiple
+        show-size
+        @change="addGeoTiffFiles"
       ></v-file-input>
     </v-col>
     <v-col cols="12">
+      <v-progress-linear :active="loading" indeterminate></v-progress-linear>
       <v-responsive aspect-ratio="1.6">
         <l-map ref="lMap" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
@@ -39,10 +54,12 @@
 
 <script lang="ts">
 import { SelectItemObject } from "@/utils/vuetify";
+import parseGeoRaster from "georaster";
+import GeoRasterLayer from "georaster-layer-for-leaflet";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
 import "vue-class-component/hooks";
-import { Component, Ref, Vue, Watch } from "vue-property-decorator";
+import { Component, Ref, Vue } from "vue-property-decorator";
 import { LControlScale, LGeoJson, LMap, LTileLayer } from "vue2-leaflet";
 
 @Component({
@@ -79,6 +96,7 @@ export default class WebMap extends Vue {
   @Ref()
   readonly lMap!: LMap;
 
+  loading = false;
   baseLayer: BaseLayer = this.baseLayerItems[0].value;
   geoJsons: unknown[] = [];
 
@@ -94,12 +112,30 @@ export default class WebMap extends Vue {
     return this.baseLayer.attribution;
   }
 
-  @Watch("files")
-  onFilesChanged(files: File[]): void {
+  addGeoJsonFiles(files: File[]): void {
+    this.loading = true;
     Promise.all(files.map((file) => file.text().then(JSON.parse))).then(
       (values) => {
         this.geoJsons = values;
+        this.loading = false;
       }
+    );
+  }
+
+  addGeoTiffFiles(files: File[]): void {
+    this.loading = true;
+    files.forEach((file) =>
+      file
+        .arrayBuffer()
+        .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
+        .then((georaster) => {
+          const layer = new GeoRasterLayer({
+            georaster: georaster,
+          });
+          layer.addTo(this.map);
+          this.map.fitBounds(layer.getBounds());
+          this.loading = false;
+        })
     );
   }
 

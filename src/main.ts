@@ -1,4 +1,5 @@
 import "@fontsource/roboto";
+import "@mdi/font/css/materialdesignicons.min.css";
 import { Icon } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.css";
 import "leaflet/dist/leaflet.css";
