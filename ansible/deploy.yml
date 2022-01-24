@@ -1,0 +1,31 @@
+---
+- name: Deploy
+  hosts:
+    - plhebicite_webmap
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Upgrade packages
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        upgrade: "yes"
+    - name: Git checkout
+      git:
+        repo: git@github.com:EPFL-ENAC/plhebicite-webmap.git
+        dest: /opt/plhebicite-webmap
+        accept_hostkey: yes
+        version: main
+    - name: Run Docker Compose
+      community.docker.docker_compose:
+        project_src: /opt/plhebicite-webmap
+        build: yes # with the pull option
+        remove_orphans: yes
+    - name: Docker Prune
+      community.docker.docker_prune:
+        containers: yes
+        images: yes
+        networks: yes
+        volumes: yes

@@ -1,0 +1,44 @@
+---
+- name: Install
+  hosts:
+    - plhebicite_webmap
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Upgrade packages
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        upgrade: "yes"
+    - name: Install packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-pip
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+    - name: Install Docker
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+    - name: Install python package
+      pip:
+        name:
+          - docker
+          - docker-compose
+    - name: Generate SSH key
+      openssh_keypair:
+        path: ~/.ssh/id_ed25519
+        type: ed25519
