@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import L, { LeafletMouseEvent, Map } from "leaflet";
+import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
 import "vue-class-component/hooks";
 import { Component, Ref, Vue } from "vue-property-decorator";
 import { LMap, LTileLayer } from "vue2-leaflet";
@@ -44,6 +45,9 @@ export default class WebMap extends Vue {
       },
     });
     this.lMap.mapObject.addControl(new Coordinates({ position: "bottomleft" }));
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (L.control as any).BigImage().addTo(this.lMap.mapObject);
   }
 }
 </script>

@@ -1,5 +1,6 @@
 import "@fontsource/roboto";
 import { Icon } from "leaflet";
+import "leaflet.bigimage/dist/Leaflet.BigImage.min.css";
 import "leaflet/dist/leaflet.css";
 import Vue from "vue";
 import App from "./App.vue";
