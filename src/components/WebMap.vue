@@ -1,16 +1,32 @@
 <template>
   <v-row>
-    <v-col cols="12">
+    <v-col cols="6">
       <v-select
         v-model="baseLayer"
         :items="baseLayerItems"
         label="Base Layer"
       ></v-select>
     </v-col>
+    <v-col cols="6">
+      <v-file-input
+        accept=".geojson, application/json"
+        chips
+        clearable
+        label="geojson"
+        multiple
+        show-size
+        @change="onFilesChanged"
+      ></v-file-input>
+    </v-col>
     <v-col cols="12">
       <v-responsive aspect-ratio="1.6">
         <l-map ref="lMap" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+          <l-geo-json
+            v-for="(item, index) in geoJsons"
+            :key="index"
+            :geojson="item"
+          ></l-geo-json>
         </l-map>
       </v-responsive>
     </v-col>
@@ -22,11 +38,12 @@ import { SelectItemObject } from "@/utils/vuetify";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
 import "vue-class-component/hooks";
-import { Component, Ref, Vue } from "vue-property-decorator";
-import { LMap, LTileLayer } from "vue2-leaflet";
+import { Component, Ref, Vue, Watch } from "vue-property-decorator";
+import { LGeoJson, LMap, LTileLayer } from "vue2-leaflet";
 
 @Component({
   components: {
+    LGeoJson,
     LMap,
     LTileLayer,
   },
@@ -58,6 +75,7 @@ export default class WebMap extends Vue {
   readonly lMap!: LMap;
 
   baseLayer: BaseLayer = this.baseLayerItems[0].value;
+  geoJsons: unknown[] = [];
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -71,13 +89,22 @@ export default class WebMap extends Vue {
     return this.baseLayer.attribution;
   }
 
+  @Watch("files")
+  onFilesChanged(files: File[]): void {
+    Promise.all(files.map((file) => file.text().then(JSON.parse))).then(
+      (values) => {
+        this.geoJsons = values;
+      }
+    );
+  }
+
   mounted(): void {
     const Coordinates = L.Control.extend({
       onAdd: (map: Map) => {
         const container = L.DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
           container.innerHTML = `
-          Latitude/Longitude: 
+          Latitude/Longitude:
           (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
         });
         map.addEventListener("mouseout", () => {
