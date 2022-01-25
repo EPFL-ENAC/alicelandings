@@ -14,21 +14,25 @@
     </v-col>
     <v-col cols="6">
       <v-file-input
+        v-model="layerFiles"
         accept="image/tiff"
         chips
         clearable
         hide-details
-        label="GeoTIFF"
+        label="Add layer"
         multiple
         show-size
-        @change="addGeoTiffFiles"
+        @change="addLayerFiles"
       ></v-file-input>
     </v-col>
     <v-col cols="12">
       <v-progress-linear :active="loading" indeterminate></v-progress-linear>
       <v-responsive aspect-ratio="1.6">
         <l-map ref="lMap" :zoom="zoom" :center="center">
-          <l-control-layers position="topright"></l-control-layers>
+          <l-control-layers
+            position="topright"
+            :autoZIndex="false"
+          ></l-control-layers>
           <l-tile-layer
             v-for="tileProvider in tileProviders"
             :key="tileProvider.name"
@@ -37,7 +41,7 @@
             :url="tileProvider.url"
             :attribution="tileProvider.attribution"
             layer-type="base"
-          />
+          ></l-tile-layer>
           <l-control-scale
             position="bottomright"
             :imperial="false"
@@ -51,13 +55,33 @@
         </l-map>
       </v-responsive>
     </v-col>
+    <v-col cols="12">
+      <v-list>
+        <v-list-item v-for="(item, index) in layers" :key="index">
+          <v-list-item-title>
+            {{ item.name }}
+          </v-list-item-title>
+          <v-list-item-action>
+            <v-btn icon @click="deleteLayer(item)">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </v-col>
   </v-row>
 </template>
 
 <script lang="ts">
 import parseGeoRaster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
-import L, { LeafletMouseEvent, Map } from "leaflet";
+import L, {
+  Control,
+  DomUtil,
+  GridLayer,
+  LeafletMouseEvent,
+  Map,
+} from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
 import "vue-class-component/hooks";
 import { Component, Ref, Vue } from "vue-property-decorator";
@@ -105,15 +129,17 @@ export default class WebMap extends Vue {
 
   loading = false;
   geoJsons: unknown[] = [];
+  layers: MapLayer[] = [];
+  layerFiles: File[] = [];
 
   get map(): Map {
     return this.lMap.mapObject;
   }
 
   mounted(): void {
-    const Coordinates = L.Control.extend({
+    const Coordinates = Control.extend({
       onAdd: (map: Map) => {
-        const container = L.DomUtil.create("div");
+        const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
           container.innerHTML = `
           Latitude/Longitude:
@@ -132,30 +158,56 @@ export default class WebMap extends Vue {
   }
 
   addGeoJsonFiles(files: File[]): void {
-    this.loading = true;
-    Promise.all(files.map((file) => file.text().then(JSON.parse))).then(
-      (values) => {
-        this.geoJsons = values;
-        this.loading = false;
-      }
-    );
+    if (files.length > 0) {
+      this.loading = true;
+      Promise.all(files.map((file) => file.text().then(JSON.parse))).then(
+        (values) => {
+          this.geoJsons = values;
+          this.loading = false;
+        }
+      );
+    }
   }
 
-  addGeoTiffFiles(files: File[]): void {
-    this.loading = true;
-    files.forEach((file) =>
-      file
-        .arrayBuffer()
-        .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
-        .then((georaster) => {
-          const layer = new GeoRasterLayer({
-            georaster: georaster,
+  addLayerFiles(files: File[]): void {
+    if (files.length > 0) {
+      this.loading = true;
+      const layerPromises: Promise<MapLayer>[] = files.map((file) => {
+        switch (file.type) {
+          case "image/tiff":
+            return file
+              .arrayBuffer()
+              .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
+              .then((georaster) => ({
+                name: file.name,
+                layer: new GeoRasterLayer({
+                  georaster: georaster,
+                }),
+              }));
+          default:
+            return Promise.reject(
+              `unsupported type ${file.type} for file ${file.name}`
+            );
+        }
+      });
+      Promise.all(layerPromises)
+        .then((layers) => {
+          layers.forEach((layer) => {
+            layer.layer.addTo(this.map);
+            layer.layer.bringToFront();
+            this.layers.push(layer);
           });
-          layer.addTo(this.map);
-          this.map.fitBounds(layer.getBounds());
-          this.loading = false;
         })
-    );
+        .finally(() => {
+          this.loading = false;
+          this.layerFiles = [];
+        });
+    }
+  }
+
+  deleteLayer(layer: MapLayer): void {
+    this.map.removeLayer(layer.layer);
+    this.layers = this.layers.filter((l) => l !== layer);
   }
 }
 
@@ -164,6 +216,11 @@ interface TileProvider {
   visible: boolean;
   attribution: string;
   url: string;
+}
+
+interface MapLayer {
+  name: string;
+  layer: GridLayer;
 }
 </script>
 
