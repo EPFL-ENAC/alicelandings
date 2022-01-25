@@ -15,7 +15,7 @@
     <v-col cols="6">
       <v-file-input
         v-model="layerFiles"
-        accept="image/tiff"
+        accept="application/x-zip-compressed, image/tiff"
         chips
         clearable
         hide-details
@@ -73,6 +73,7 @@
 </template>
 
 <script lang="ts">
+import geojson from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
 import L, {
@@ -83,6 +84,7 @@ import L, {
   Map,
 } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
+import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
 import { Component, Ref, Vue } from "vue-property-decorator";
 import {
@@ -184,6 +186,17 @@ export default class WebMap extends Vue {
                   georaster: georaster,
                 }),
               }));
+          case "application/x-zip-compressed":
+            return file
+              .arrayBuffer()
+              .then((arrayBuffer) => parseZip(arrayBuffer))
+              .then((geojson) => {
+                console.log(geojson);
+                return {
+                  name: file.name,
+                  layer: L.geoJSON(geojson as geojson.GeoJsonObject),
+                };
+              });
           default:
             return Promise.reject(
               `unsupported type ${file.type} for file ${file.name}`
