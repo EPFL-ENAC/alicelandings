@@ -1,21 +1,18 @@
 <template>
   <v-row>
-    <v-col cols="12">
+    <v-col cols="9">
       <v-file-input
         v-model="layerFiles"
         accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
         chips
         clearable
-        hide-details
         label="Add layer"
         multiple
         show-size
         @change="addLayerFiles"
       ></v-file-input>
-    </v-col>
-    <v-col cols="12">
       <v-progress-linear :active="loading" indeterminate></v-progress-linear>
-      <v-responsive aspect-ratio="1.6">
+      <v-responsive aspect-ratio="1.8">
         <l-map ref="lMap" :zoom="zoom" :center="center">
           <l-control-layers
             position="topright"
@@ -38,7 +35,8 @@
         </l-map>
       </v-responsive>
     </v-col>
-    <v-col cols="12">
+    <v-col cols="3">
+      <h2>Layers</h2>
       <v-list>
         <v-list-item v-for="(item, index) in layers" :key="index">
           <v-list-item-title>
@@ -88,8 +86,8 @@ import {
   },
 })
 export default class WebMap extends Vue {
-  readonly zoom = 15;
-  readonly center = [46.51725, 6.56885];
+  readonly zoom = 12;
+  readonly center = [46.2044, 6.1432];
   readonly tileProviders: TileProvider[] = [
     {
       name: "OpenStreetMap",
