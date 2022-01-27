@@ -1,21 +1,9 @@
 <template>
   <v-row>
-    <v-col cols="6">
-      <v-file-input
-        accept=".geojson, application/json"
-        chips
-        clearable
-        hide-details
-        label="GeoJSON"
-        multiple
-        show-size
-        @change="addGeoJsonFiles"
-      ></v-file-input>
-    </v-col>
-    <v-col cols="6">
+    <v-col cols="12">
       <v-file-input
         v-model="layerFiles"
-        accept="application/x-zip-compressed, image/tiff"
+        accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
         chips
         clearable
         hide-details
@@ -47,11 +35,6 @@
             :imperial="false"
           ></l-control-scale>
           <l-control-zoom position="bottomright"></l-control-zoom>
-          <l-geo-json
-            v-for="(item, index) in geoJsons"
-            :key="index"
-            :geojson="item"
-          ></l-geo-json>
         </l-map>
       </v-responsive>
     </v-col>
@@ -91,7 +74,6 @@ import {
   LControlLayers,
   LControlScale,
   LControlZoom,
-  LGeoJson,
   LMap,
   LTileLayer,
 } from "vue2-leaflet";
@@ -101,7 +83,6 @@ import {
     LControlLayers,
     LControlScale,
     LControlZoom,
-    LGeoJson,
     LMap,
     LTileLayer,
   },
@@ -130,7 +111,6 @@ export default class WebMap extends Vue {
   readonly lMap!: LMap;
 
   loading = false;
-  geoJsons: unknown[] = [];
   layers: MapLayer[] = [];
   layerFiles: File[] = [];
 
@@ -159,18 +139,6 @@ export default class WebMap extends Vue {
     (L.control as any).BigImage().addTo(this.map);
   }
 
-  addGeoJsonFiles(files: File[]): void {
-    if (files.length > 0) {
-      this.loading = true;
-      Promise.all(files.map((file) => file.text().then(JSON.parse))).then(
-        (values) => {
-          this.geoJsons = values;
-          this.loading = false;
-        }
-      );
-    }
-  }
-
   addLayerFiles(files: File[]): void {
     if (files.length > 0) {
       this.loading = true;
@@ -190,18 +158,26 @@ export default class WebMap extends Vue {
             return file
               .arrayBuffer()
               .then((arrayBuffer) => parseZip(arrayBuffer))
-              .then((geojson) => {
-                console.log(geojson);
-                return {
-                  name: file.name,
-                  layer: L.geoJSON(geojson as geojson.GeoJsonObject),
-                };
-              });
-          default:
-            return Promise.reject(
-              `unsupported type ${file.type} for file ${file.name}`
-            );
+              .then((geojson) => ({
+                name: file.name,
+                layer: L.geoJSON(geojson as geojson.GeoJsonObject),
+              }));
         }
+        const extension = file.name.split(".").pop();
+        switch (extension) {
+          case "geojson":
+          case "json":
+            return file
+              .text()
+              .then(JSON.parse)
+              .then((json) => ({
+                name: file.name,
+                layer: L.geoJSON(json),
+              }));
+        }
+        return Promise.reject(
+          `unsupported type ${file.type} for file ${file.name}`
+        );
       });
       Promise.all(layerPromises)
         .then((layers) => {
