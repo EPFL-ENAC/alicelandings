@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <web-map></web-map>
   </v-container>
 </template>

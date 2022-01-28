@@ -19,13 +19,15 @@
             :autoZIndex="false"
           ></l-control-layers>
           <l-tile-layer
-            v-for="tileProvider in tileProviders"
-            :key="tileProvider.name"
-            :name="tileProvider.name"
-            :visible="tileProvider.visible"
-            :url="tileProvider.url"
-            :attribution="tileProvider.attribution"
+            v-for="item in tileProviders"
+            :key="item.name"
+            :attribution="item.attribution"
             layer-type="base"
+            :name="item.name"
+            :options="item.options"
+            :subdomains="item.subdomains"
+            :url="item.url"
+            :visible="item.visible"
           ></l-tile-layer>
           <l-control-scale
             position="bottomright"
@@ -42,6 +44,11 @@
           <v-list-item-title>
             {{ item.name }}
           </v-list-item-title>
+          <v-list-item-action>
+            <v-btn icon @click="moveLayerToFront(item)">
+              <v-icon>mdi-flip-to-front</v-icon>
+            </v-btn>
+          </v-list-item-action>
           <v-list-item-action>
             <v-btn icon @click="deleteLayer(item)">
               <v-icon>mdi-delete</v-icon>
@@ -86,9 +93,9 @@ import {
   },
 })
 export default class WebMap extends Vue {
-  readonly zoom = 12;
+  readonly zoom = 10;
   readonly center = [46.2044, 6.1432];
-  readonly tileProviders: TileProvider[] = [
+  readonly tileProviders: TileLayerProps[] = [
     {
       name: "OpenStreetMap",
       visible: true,
@@ -97,11 +104,24 @@ export default class WebMap extends Vue {
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     },
     {
+      // https://api3.geo.admin.ch/services/sdiservices.html#wmts
       name: "swisstopo",
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+      subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
+    },
+    {
+      // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+      name: "SITG",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
+      options: {
+        maxZoom: 11,
+      },
+      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
     },
   ];
 
@@ -192,16 +212,28 @@ export default class WebMap extends Vue {
     }
   }
 
+  moveLayerToFront(layer: MapLayer): void {
+    layer.layer.bringToFront();
+  }
+
   deleteLayer(layer: MapLayer): void {
     this.map.removeLayer(layer.layer);
     this.layers = this.layers.filter((l) => l !== layer);
   }
 }
 
-interface TileProvider {
+/**
+ * https://vue2-leaflet.netlify.app/components/LTileLayer.html#props
+ * https://leafletjs.com/reference.html#tilelayer
+ */
+interface TileLayerProps {
+  attribution: string;
   name: string;
   visible: boolean;
-  attribution: string;
+  subdomains?: string | string[];
+  options?: {
+    maxZoom?: number;
+  };
   url: string;
 }
 
