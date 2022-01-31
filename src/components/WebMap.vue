@@ -40,17 +40,22 @@
     <v-col cols="3">
       <h2>Layers</h2>
       <v-list>
-        <v-list-item v-for="(item, index) in layers" :key="index">
+        <v-list-item
+          v-for="(item, index) in layers"
+          :key="index"
+          :color="item.color.base"
+          input-value="true"
+        >
           <v-list-item-title>
             {{ item.name }}
           </v-list-item-title>
           <v-list-item-action>
-            <v-btn icon @click="moveLayerToFront(item)">
+            <v-btn icon @click="moveLayerToFront(item, index)">
               <v-icon>mdi-flip-to-front</v-icon>
             </v-btn>
           </v-list-item-action>
           <v-list-item-action>
-            <v-btn icon @click="deleteLayer(item)">
+            <v-btn icon @click="deleteLayer(item, index)">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
           </v-list-item-action>
@@ -61,9 +66,11 @@
 </template>
 
 <script lang="ts">
+import { ALL_COLORS } from "@/utils/vuetify";
+import interpolate from "color-interpolate";
 import geojson from "geojson";
 import parseGeoRaster from "georaster";
-import GeoRasterLayer from "georaster-layer-for-leaflet";
+import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import L, {
   Control,
   DomUtil,
@@ -72,6 +79,7 @@ import L, {
   Map,
 } from "leaflet";
 import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
+import _ from "lodash";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
 import { Component, Ref, Vue } from "vue-property-decorator";
@@ -82,6 +90,7 @@ import {
   LMap,
   LTileLayer,
 } from "vue2-leaflet";
+import colors, { Color } from "vuetify/lib/util/colors";
 
 @Component({
   components: {
@@ -158,6 +167,8 @@ export default class WebMap extends Vue {
   }
 
   addLayerFiles(files: File[]): void {
+    const color: Color = _.sample(ALL_COLORS) ?? colors.blue;
+    const colormap = interpolate([color.lighten5, color.darken4]);
     if (files.length > 0) {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = files.map((file) => {
@@ -166,17 +177,29 @@ export default class WebMap extends Vue {
             return file
               .arrayBuffer()
               .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
-              .then((georaster) => ({
-                name: file.name,
-                layer: new GeoRasterLayer({
-                  georaster: georaster,
-                }),
-              }));
+              .then((georaster: ExtendedGeoRaster) => {
+                return {
+                  color: color,
+                  name: file.name,
+                  layer: new GeoRasterLayer({
+                    georaster: georaster,
+                    pixelValuesToColorFn: (values) => {
+                      if (values[0] === 0) {
+                        return colors.shades.transparent;
+                      }
+                      const value =
+                        (values[0] - georaster.mins[0]) / georaster.ranges[0];
+                      return colormap(value);
+                    },
+                  }),
+                };
+              });
           case "application/x-zip-compressed":
             return file
               .arrayBuffer()
               .then((arrayBuffer) => parseZip(arrayBuffer))
               .then((geojson) => ({
+                color: color,
                 name: file.name,
                 layer: L.geoJSON(geojson as geojson.GeoJsonObject),
               }));
@@ -189,6 +212,7 @@ export default class WebMap extends Vue {
               .text()
               .then(JSON.parse)
               .then((json) => ({
+                color: color,
                 name: file.name,
                 layer: L.geoJSON(json),
               }));
@@ -212,13 +236,14 @@ export default class WebMap extends Vue {
     }
   }
 
-  moveLayerToFront(layer: MapLayer): void {
+  moveLayerToFront(layer: MapLayer, index: number): void {
     layer.layer.bringToFront();
+    this.layers.unshift(...this.layers.splice(index, 1));
   }
 
-  deleteLayer(layer: MapLayer): void {
+  deleteLayer(layer: MapLayer, index: number): void {
     this.map.removeLayer(layer.layer);
-    this.layers = this.layers.filter((l) => l !== layer);
+    this.layers.splice(index, 1);
   }
 }
 
@@ -240,6 +265,13 @@ interface TileLayerProps {
 interface MapLayer {
   name: string;
   layer: GridLayer;
+  color: Color;
+}
+
+interface ExtendedGeoRaster extends GeoRaster {
+  mins: number[];
+  maxs: number[];
+  ranges: number[];
 }
 </script>
 
