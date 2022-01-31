@@ -78,7 +78,7 @@ import L, {
   LeafletMouseEvent,
   Map,
 } from "leaflet";
-import "leaflet.bigimage/dist/Leaflet.BigImage.min.js";
+import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import _ from "lodash";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
@@ -108,9 +108,12 @@ export default class WebMap extends Vue {
     {
       name: "OpenStreetMap",
       visible: true,
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      options: {
+        maxZoom: 19,
+      },
     },
     {
       // https://api3.geo.admin.ch/services/sdiservices.html#wmts
@@ -120,6 +123,9 @@ export default class WebMap extends Vue {
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
       url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
       subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
+      options: {
+        maxZoom: 19,
+      },
     },
     {
       // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
@@ -127,10 +133,10 @@ export default class WebMap extends Vue {
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
+      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
       options: {
         maxZoom: 11,
       },
-      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
     },
   ];
 
@@ -163,7 +169,16 @@ export default class WebMap extends Vue {
     this.map.addControl(new Coordinates({ position: "bottomleft" }));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (L.control as any).BigImage().addTo(this.map);
+    (L.control as any).browserPrint().addTo(this.map);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (L.Control as any).BrowserPrint.Utils.registerLayer(
+      GeoRasterLayer,
+      "GeoRasterLayer",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function (layer: any) {
+        return new GeoRasterLayer(layer.options);
+      }
+    );
   }
 
   addLayerFiles(files: File[]): void {
