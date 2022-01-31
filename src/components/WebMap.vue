@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="9">
+    <v-col cols="8">
       <v-file-input
         v-model="layerFiles"
         accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
@@ -13,7 +13,12 @@
       ></v-file-input>
       <v-progress-linear :active="loading" indeterminate></v-progress-linear>
       <v-responsive aspect-ratio="1.8">
-        <l-map ref="lMap" :zoom="zoom" :center="center">
+        <l-map
+          ref="lMap"
+          :zoom="zoom"
+          :center="center"
+          :options="{ zoomControl: false }"
+        >
           <l-control-layers
             position="topright"
             :autoZIndex="false"
@@ -37,15 +42,21 @@
         </l-map>
       </v-responsive>
     </v-col>
-    <v-col cols="3">
+    <v-col cols="4">
       <h2>Layers</h2>
       <v-list>
         <v-list-item
           v-for="(item, index) in layers"
           :key="index"
           :color="item.color.base"
-          input-value="true"
+          :input-value="layerActives[index]"
         >
+          <v-list-item-action>
+            <v-checkbox
+              v-model="layerActives[index]"
+              :color="item.color.base"
+            ></v-checkbox>
+          </v-list-item-action>
           <v-list-item-title>
             {{ item.name }}
           </v-list-item-title>
@@ -79,10 +90,10 @@ import L, {
   Map,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
-import _ from "lodash";
+import { sample } from "lodash";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
-import { Component, Ref, Vue } from "vue-property-decorator";
+import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import {
   LControlLayers,
   LControlScale,
@@ -146,6 +157,7 @@ export default class WebMap extends Vue {
   loading = false;
   layers: MapLayer[] = [];
   layerFiles: File[] = [];
+  layerActives: boolean[] = [];
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -181,9 +193,17 @@ export default class WebMap extends Vue {
     );
   }
 
+  @Watch("layerActives")
+  onLayerActivesChanged(actives: boolean[]): void {
+    actives.forEach((active, index) => {
+      const opacity = active ? 1 : 0;
+      this.layers[index].layer.setOpacity(opacity);
+    });
+  }
+
   addLayerFiles(files: File[]): void {
-    const color: Color = _.sample(ALL_COLORS) ?? colors.blue;
-    const colormap = interpolate([color.lighten5, color.darken4]);
+    const color: Color = sample(ALL_COLORS) ?? colors.blue;
+    const palette = interpolate([color.lighten5, color.darken4]);
     if (files.length > 0) {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = files.map((file) => {
@@ -204,7 +224,7 @@ export default class WebMap extends Vue {
                       }
                       const value =
                         (values[0] - georaster.mins[0]) / georaster.ranges[0];
-                      return colormap(value);
+                      return palette(value);
                     },
                   }),
                 };
@@ -242,6 +262,7 @@ export default class WebMap extends Vue {
             layer.layer.addTo(this.map);
             layer.layer.bringToFront();
             this.layers.push(layer);
+            this.layerActives.push(true);
           });
         })
         .finally(() => {
@@ -254,11 +275,13 @@ export default class WebMap extends Vue {
   moveLayerToFront(layer: MapLayer, index: number): void {
     layer.layer.bringToFront();
     this.layers.unshift(...this.layers.splice(index, 1));
+    this.layerActives.unshift(...this.layerActives.splice(index, 1));
   }
 
   deleteLayer(layer: MapLayer, index: number): void {
     this.map.removeLayer(layer.layer);
     this.layers.splice(index, 1);
+    this.layerActives.splice(index, 1);
   }
 }
 
@@ -278,9 +301,9 @@ interface TileLayerProps {
 }
 
 interface MapLayer {
+  color: Color;
   name: string;
   layer: GridLayer;
-  color: Color;
 }
 
 interface ExtendedGeoRaster extends GeoRaster {
