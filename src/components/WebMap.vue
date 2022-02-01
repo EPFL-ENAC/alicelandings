@@ -1,18 +1,8 @@
 <template>
   <v-row>
     <v-col cols="8">
-      <v-file-input
-        v-model="layerFiles"
-        accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
-        chips
-        clearable
-        label="Add layer"
-        multiple
-        show-size
-        @change="addLayerFiles"
-      ></v-file-input>
       <v-progress-linear :active="loading" indeterminate></v-progress-linear>
-      <v-responsive aspect-ratio="1.8">
+      <v-responsive aspect-ratio="1.5">
         <l-map
           ref="lMap"
           :zoom="zoom"
@@ -44,6 +34,16 @@
     </v-col>
     <v-col cols="4">
       <h2>Layers</h2>
+      <v-file-input
+        v-model="layerFiles"
+        accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
+        chips
+        clearable
+        label="Add layer"
+        multiple
+        show-size
+        @change="addExternalLayers"
+      ></v-file-input>
       <v-list>
         <v-list-item
           v-for="(item, index) in layers"
@@ -78,6 +78,7 @@
 
 <script lang="ts">
 import { ALL_COLORS } from "@/utils/vuetify";
+import axios from "axios";
 import interpolate from "color-interpolate";
 import geojson from "geojson";
 import parseGeoRaster from "georaster";
@@ -93,7 +94,7 @@ import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import { sample } from "lodash";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
-import { Component, Ref, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import {
   LControlLayers,
   LControlScale,
@@ -154,6 +155,9 @@ export default class WebMap extends Vue {
   @Ref()
   readonly lMap!: LMap;
 
+  @Prop({ default: () => [] })
+  readonly items!: string[];
+
   loading = false;
   layers: MapLayer[] = [];
   layerFiles: File[] = [];
@@ -193,6 +197,37 @@ export default class WebMap extends Vue {
     );
   }
 
+  @Watch("items")
+  onItemsChanged(): void {
+    const newIds = new Set(this.items);
+    this.layers.forEach((layer, index) => {
+      if (layer.internalId !== undefined && !newIds.has(layer.internalId)) {
+        this.deleteLayer(layer, index);
+      }
+    });
+    const oldIds = new Set(
+      this.layers
+        .map((layer) => layer.internalId)
+        .filter((id): id is string => id !== undefined)
+    );
+    const newItems = this.items.filter((item) => !oldIds.has(item));
+    if (newItems.length > 0) {
+      this.loading = true;
+      Promise.all(
+        newItems.map((item) =>
+          axios.get(item, { responseType: "blob" }).then((response) => {
+            return {
+              internalId: item,
+              file: new File([response.data], item.split("/").pop() ?? item, {
+                type: response.headers["content-type"].split(";")[0],
+              }),
+            };
+          })
+        )
+      ).then((files) => this.addLayerFiles(files));
+    }
+  }
+
   @Watch("layerActives")
   onLayerActivesChanged(actives: boolean[]): void {
     actives.forEach((active, index) => {
@@ -201,21 +236,30 @@ export default class WebMap extends Vue {
     });
   }
 
-  addLayerFiles(files: File[]): void {
-    const color: Color = sample(ALL_COLORS) ?? colors.blue;
-    const palette = interpolate([color.lighten5, color.darken4]);
+  addExternalLayers(files: File[]): void {
+    this.addLayerFiles(
+      files.map((file) => ({
+        file: file,
+      }))
+    );
+  }
+
+  addLayerFiles(files: LayerFile[]): void {
     if (files.length > 0) {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = files.map((file) => {
-        switch (file.type) {
+        const color: Color = sample(ALL_COLORS) ?? colors.blue;
+        const palette = interpolate([color.lighten5, color.darken4]);
+        switch (file.file.type) {
           case "image/tiff":
-            return file
+            return file.file
               .arrayBuffer()
               .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
               .then((georaster: ExtendedGeoRaster) => {
                 return {
+                  name: file.file.name,
                   color: color,
-                  name: file.name,
+                  internalId: file.internalId,
                   layer: new GeoRasterLayer({
                     georaster: georaster,
                     pixelValuesToColorFn: (values) => {
@@ -231,30 +275,32 @@ export default class WebMap extends Vue {
                 };
               });
           case "application/x-zip-compressed":
-            return file
+            return file.file
               .arrayBuffer()
               .then((arrayBuffer) => parseZip(arrayBuffer))
               .then((geojson) => ({
+                name: file.file.name,
                 color: color,
-                name: file.name,
+                internalId: file.internalId,
                 layer: L.geoJSON(geojson as geojson.GeoJsonObject),
               }));
         }
-        const extension = file.name.split(".").pop();
+        const extension = file.file.name.split(".").pop();
         switch (extension) {
           case "geojson":
           case "json":
-            return file
+            return file.file
               .text()
               .then(JSON.parse)
               .then((json) => ({
+                name: file.file.name,
                 color: color,
-                name: file.name,
+                internalId: file.internalId,
                 layer: L.geoJSON(json),
               }));
         }
         return Promise.reject(
-          `unsupported type ${file.type} for file ${file.name}`
+          `unsupported type ${file.file.type} for file ${file.file.name}`
         );
       });
       Promise.all(layerPromises)
@@ -262,8 +308,8 @@ export default class WebMap extends Vue {
           layers.forEach((layer) => {
             layer.layer.addTo(this.map);
             layer.layer.bringToFront();
-            this.layers.push(layer);
-            this.layerActives.push(true);
+            this.layers.unshift(layer);
+            this.layerActives.unshift(true);
           });
         })
         .finally(() => {
@@ -301,9 +347,15 @@ interface TileLayerProps {
   url: string;
 }
 
+interface LayerFile {
+  internalId?: string;
+  file: File;
+}
+
 interface MapLayer {
-  color: Color;
   name: string;
+  color: Color;
+  internalId?: string;
   layer: GridLayer;
 }
 

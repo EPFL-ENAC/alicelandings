@@ -34,3 +34,11 @@ export const ALL_COLORS: Color[] = [
   colors.orange,
   colors.deepOrange,
 ];
+
+export interface TreeviewItem<V = string> {
+  id: string;
+  name: string;
+  value: V;
+  children?: TreeviewItem<V>[];
+  disabled?: boolean;
+}
