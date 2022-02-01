@@ -1,5 +1,6 @@
 <template>
-  <v-container fluid>
+  <v-container>
+    <h1>Home</h1>
     <web-map></web-map>
   </v-container>
 </template>

@@ -219,13 +219,14 @@ export default class WebMap extends Vue {
                   layer: new GeoRasterLayer({
                     georaster: georaster,
                     pixelValuesToColorFn: (values) => {
-                      if (values[0] === 0) {
+                      if (georaster.mins[0] === 0 && values[0] === 0) {
                         return colors.shades.transparent;
                       }
                       const value =
                         (values[0] - georaster.mins[0]) / georaster.ranges[0];
                       return palette(value);
                     },
+                    resolution: 128,
                   }),
                 };
               });
