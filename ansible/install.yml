@@ -21,6 +21,7 @@
           - gnupg
           - lsb-release
           - python3-pip
+          - git-lfs
     - name: Add Docker GPG key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
