@@ -31,7 +31,7 @@
         </v-list>
       </v-col>
       <v-col class="flex-grow-1 flex-shrink-0">
-        <web-map :items="layerUrls"></web-map>
+        <web-map :dems="dems" :items="layerUrls"></web-map>
       </v-col>
     </v-row>
   </v-container>
@@ -49,6 +49,10 @@ import { Component, Vue } from "vue-property-decorator";
 })
 export default class Plhebicite extends Vue {
   readonly rootUrl = process.env.BASE_URL;
+  readonly dems: string[] = [
+    "04_DELTA_dem_tampon_1500.tif",
+    "07_MD_dem_tampon_1500.tif",
+  ].map((filename) => `${this.rootUrl}data/${filename}`);
   readonly categories: Category[] = [
     {
       name: "Affective Mapping of Vernier",
@@ -67,10 +71,6 @@ export default class Plhebicite extends Vue {
         {
           name: "04 Archipels, Delta",
           children: [
-            {
-              name: "dem_tampon",
-              url: "04_DELTA_dem_tampon_1500.tif",
-            },
             {
               name: "Voices",
             },
@@ -92,10 +92,6 @@ export default class Plhebicite extends Vue {
         {
           name: "06 Jeux de pistes",
           children: [
-            {
-              name: "dem_tampon",
-              url: "07_MD_dem_tampon_1500.tif",
-            },
             {
               name: "Viewshed",
               url: "07_MD_viewshed_analysis_1000.tif",
@@ -166,7 +162,7 @@ export default class Plhebicite extends Vue {
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
       .filter((layer) => layer.url)
-      .map((layer) => this.rootUrl + "data/" + layer.url);
+      .map((layer) => `${this.rootUrl}data/${layer.url}`);
   }
 
   getTreeviewItems(layers: Layer[], prefix = ""): TreeviewItem<Layer>[] {

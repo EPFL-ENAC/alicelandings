@@ -80,6 +80,7 @@
 import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
+import { identify } from "geoblaze";
 import geojson from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
@@ -93,6 +94,7 @@ import L, {
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import { sample } from "lodash";
 import { parseZip } from "shpjs";
+import { WGStoLV95 } from "swiss-projection";
 import "vue-class-component/hooks";
 import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import {
@@ -157,11 +159,14 @@ export default class WebMap extends Vue {
 
   @Prop({ default: () => [] })
   readonly items!: string[];
+  @Prop({ default: () => [] })
+  readonly dems!: string[];
 
   loading = false;
   layers: MapLayer[] = [];
   layerFiles: File[] = [];
   layerActives: boolean[] = [];
+  georasters: GeoRaster[] = [];
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -172,9 +177,17 @@ export default class WebMap extends Vue {
       onAdd: (map: Map) => {
         const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
+          const altitude: number | undefined = this.georasters
+            .flatMap((georaster) => {
+              const latlng = WGStoLV95([e.latlng.lng, e.latlng.lat]);
+              return identify(georaster, latlng);
+            })
+            .find((value) => value !== 0);
           container.innerHTML = `
-          Latitude/Longitude:
-          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
+          Lat/Lng/Alt:
+          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)}; ${
+            altitude?.toFixed(0) ?? "?"
+          })`;
         });
         map.addEventListener("mouseout", () => {
           container.innerHTML = "";
@@ -195,6 +208,19 @@ export default class WebMap extends Vue {
         return new GeoRasterLayer(layer.options);
       }
     );
+
+    this.onDemsChanged();
+  }
+
+  @Watch("dems")
+  onDemsChanged(): void {
+    this.georasters = [];
+    this.dems.forEach((dem) => {
+      axios
+        .get(dem, { responseType: "arraybuffer" })
+        .then((response) => parseGeoRaster(response.data))
+        .then((georaster: GeoRaster) => this.georasters.push(georaster));
+    });
   }
 
   @Watch("items")
@@ -369,5 +395,8 @@ interface ExtendedGeoRaster extends GeoRaster {
 <style scoped>
 .leaflet-container {
   z-index: 0;
+}
+.leaflet-grab {
+  cursor: crosshair;
 }
 </style>
