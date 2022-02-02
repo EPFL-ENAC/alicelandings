@@ -68,6 +68,10 @@ export default class Plhebicite extends Vue {
           name: "04 Archipels, Delta",
           children: [
             {
+              name: "dem_tampon",
+              url: "04_DELTA_dem_tampon_1500.tif",
+            },
+            {
               name: "Voices",
             },
             {
@@ -78,6 +82,7 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Viewshed",
+              url: "04_DELTA_viewshed_analysis_1000.tif",
             },
           ],
         },
