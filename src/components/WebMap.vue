@@ -57,9 +57,21 @@
               :color="item.color.base"
             ></v-checkbox>
           </v-list-item-action>
-          <v-list-item-title>
-            {{ item.name }}
-          </v-list-item-title>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ item.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle
+              v-if="item.colorScale"
+              class="d-flex justify-space-between"
+              :style="{
+                backgroundImage: `linear-gradient(to right, ${item.colorScale.colorMin}, ${item.colorScale.colorMax})`,
+              }"
+            >
+              <span>{{ item.colorScale.valueMin }}</span>
+              <span>{{ item.colorScale.valueMax }}</span>
+            </v-list-item-subtitle>
+          </v-list-item-content>
           <v-list-item-action>
             <v-btn icon @click="moveLayerToFront(item, index)">
               <v-icon>mdi-flip-to-front</v-icon>
@@ -87,6 +99,7 @@ import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import L, {
   Control,
   DomUtil,
+  GeoJSON,
   GridLayer,
   LeafletMouseEvent,
   Map,
@@ -256,7 +269,10 @@ export default class WebMap extends Vue {
   onLayerActivesChanged(actives: boolean[]): void {
     actives.forEach((active, index) => {
       const opacity = active ? 1 : 0;
-      this.layers[index].layer.setOpacity(opacity);
+      const layer = this.layers[index].layer;
+      if (layer instanceof GridLayer) {
+        layer.setOpacity(opacity);
+      }
     });
   }
 
@@ -273,13 +289,16 @@ export default class WebMap extends Vue {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = files.map((file) => {
         const color: Color = sample(ALL_COLORS) ?? colors.blue;
-        const palette = interpolate([color.lighten5, color.darken4]);
         switch (file.file.type) {
           case "image/tiff":
             return file.file
               .arrayBuffer()
               .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
               .then((georaster: ExtendedGeoRaster) => {
+                const colorMin = color.lighten5;
+                const colorMax = color.darken4;
+                const palette = interpolate([colorMin, colorMax]);
+                const noDataZero = georaster.mins[0] === 0;
                 return {
                   name: file.file.name,
                   color: color,
@@ -287,7 +306,7 @@ export default class WebMap extends Vue {
                   layer: new GeoRasterLayer({
                     georaster: georaster,
                     pixelValuesToColorFn: (values) => {
-                      if (georaster.mins[0] === 0 && values[0] === 0) {
+                      if (noDataZero && values[0] === 0) {
                         return colors.shades.transparent;
                       }
                       const value =
@@ -296,6 +315,12 @@ export default class WebMap extends Vue {
                     },
                     resolution: 128,
                   }),
+                  colorScale: {
+                    colorMin: colorMin,
+                    colorMax: colorMax,
+                    valueMin: georaster.mins[0],
+                    valueMax: georaster.maxs[0],
+                  },
                 };
               });
           case "application/x-zip-compressed":
@@ -379,8 +404,14 @@ interface LayerFile {
 interface MapLayer {
   name: string;
   color: Color;
+  layer: GridLayer | GeoJSON;
   internalId?: string;
-  layer: GridLayer;
+  colorScale?: {
+    colorMin: string;
+    colorMax: string;
+    valueMin: number;
+    valueMax: number;
+  };
 }
 
 interface ExtendedGeoRaster extends GeoRaster {
