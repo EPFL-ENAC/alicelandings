@@ -1,6 +1,16 @@
 <template>
   <v-container fluid>
     <v-row>
+      <v-col>
+        <h1>An Atlas of Vernier Mobility Landscapes</h1>
+        <p class="text-subtitle-1">
+          An affordance-based and affective reading of the Commune of Vernier,
+          Geneva
+        </p>
+        <v-divider></v-divider>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col class="flex-grow-0 flex-shrink-1">
         <v-list dense>
           <v-list-group
@@ -26,10 +36,19 @@
               :items="getTreeviewItems(item.layers)"
               return-object
               selectable
-            ></v-treeview>
+            >
+              <template v-slot:append="{ item, leaf, selected }">
+                <template v-if="!item.disabled && leaf && selected">
+                  <v-btn icon @click="moveItemToFront(item)">
+                    <v-icon>mdi-flip-to-front</v-icon>
+                  </v-btn>
+                </template>
+              </template>
+            </v-treeview>
           </v-list-group>
         </v-list>
       </v-col>
+      <v-divider vertical></v-divider>
       <v-col class="flex-grow-1 flex-shrink-0">
         <web-map :dems="dems" :items="layerUrls"></web-map>
       </v-col>
@@ -165,14 +184,17 @@ export default class Plhebicite extends Vue {
       .map((layer) => `${this.rootUrl}data/${layer.url}`);
   }
 
-  getTreeviewItems(layers: Layer[], prefix = ""): TreeviewItem<Layer>[] {
+  getTreeviewItems(
+    layers: Layer[],
+    parents: Layer[] = []
+  ): TreeviewItem<Layer>[] {
     return layers.map((layer) => {
-      const id = `${prefix}/${layer.name}`;
+      const parentLayers = [...parents, layer];
       const children = layer.children
-        ? this.getTreeviewItems(layer.children, id)
+        ? this.getTreeviewItems(layer.children, parentLayers)
         : undefined;
       return {
-        id: id,
+        id: parentLayers.map((parent) => parent.name).join("/"),
         name: layer.name,
         value: layer,
         children: children,
@@ -180,6 +202,11 @@ export default class Plhebicite extends Vue {
           !layer.url && (children?.every((child) => child.disabled) ?? true),
       };
     });
+  }
+
+  moveItemToFront(item: TreeviewItem<Layer>): void {
+    // TODO
+    console.log(item);
   }
 }
 
