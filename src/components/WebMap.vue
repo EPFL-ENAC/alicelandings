@@ -177,12 +177,10 @@ export default class WebMap extends Vue {
       onAdd: (map: Map) => {
         const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
+          const latlng = WGStoLV95([e.latlng.lng, e.latlng.lat]);
           const altitude: number | undefined = this.georasters
-            .flatMap((georaster) => {
-              const latlng = WGStoLV95([e.latlng.lng, e.latlng.lat]);
-              return identify(georaster, latlng);
-            })
-            .find((value) => value !== 0);
+            .flatMap((georaster) => identify(georaster, latlng))
+            .find((value) => value); // defined && !== 0
           container.innerHTML = `
           Lat/Lng/Alt:
           (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)}; ${
