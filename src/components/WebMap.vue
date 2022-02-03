@@ -5,9 +5,9 @@
       <v-responsive aspect-ratio="1.5">
         <l-map
           ref="lMap"
-          :zoom="zoom"
           :center="center"
           :options="{ zoomControl: false }"
+          :zoom="zoom"
         >
           <l-control-layers
             position="topright"
@@ -155,6 +155,14 @@ export default class WebMap extends Vue {
       },
     },
     {
+      name: "None",
+      url: "",
+      visible: false,
+      options: {
+        maxZoom: 25,
+      },
+    },
+    {
       // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
       name: "SITG",
       visible: false,
@@ -194,11 +202,14 @@ export default class WebMap extends Vue {
           const altitude: number | undefined = this.georasters
             .flatMap((georaster) => identify(georaster, latlng))
             .find((value) => value); // defined && !== 0
-          container.innerHTML = `
-          Lat/Lng/Alt:
-          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)}; ${
-            altitude?.toFixed(0) ?? "?"
-          })`;
+          const positionText = `Lat/Lon:
+          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
+          container.innerHTML =
+            altitude !== undefined
+              ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
+                  "<br>"
+                )
+              : positionText;
         });
         map.addEventListener("mouseout", () => {
           container.innerHTML = "";
@@ -230,7 +241,9 @@ export default class WebMap extends Vue {
       axios
         .get(dem, { responseType: "arraybuffer" })
         .then((response) => parseGeoRaster(response.data))
-        .then((georaster: GeoRaster) => this.georasters.push(georaster));
+        .then((georaster: GeoRaster) => {
+          this.georasters.push(georaster);
+        });
     });
   }
 
@@ -386,7 +399,7 @@ export default class WebMap extends Vue {
  * https://leafletjs.com/reference.html#tilelayer
  */
 interface TileLayerProps {
-  attribution: string;
+  attribution?: string;
   name: string;
   visible: boolean;
   subdomains?: string | string[];
@@ -423,6 +436,7 @@ interface ExtendedGeoRaster extends GeoRaster {
 
 <style scoped>
 .leaflet-container {
+  background-color: unset;
   z-index: 0;
 }
 .leaflet-grab {
