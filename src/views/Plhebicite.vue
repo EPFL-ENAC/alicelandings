@@ -50,16 +50,16 @@
       </v-col>
       <v-divider vertical></v-divider>
       <v-col class="flex-grow-1 flex-shrink-0">
-        <web-map :dems="dems" :items="layerUrls"></web-map>
+        <web-map ref="webMap" :dems="dems" :items="mapItems"></web-map>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import WebMap from "@/components/WebMap.vue";
-import { TreeviewItem } from "@/utils/vuetify";
-import { Component, Vue } from "vue-property-decorator";
+import WebMap, { MapItem } from "@/components/WebMap.vue";
+import { randomColor, TreeviewItem } from "@/utils/vuetify";
+import { Component, Ref, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -95,6 +95,7 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Trajectory",
+              url: "INT_05_PARCOURS.geojson",
             },
             {
               name: "Constellation",
@@ -173,15 +174,25 @@ export default class Plhebicite extends Vue {
     },
   ];
 
+  @Ref()
+  readonly webMap!: WebMap;
+
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
 
-  get layerUrls(): string[] {
+  get mapItems(): MapItem[] {
     return this.selectedTreeviewItems
       .flat()
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
       .filter((layer) => layer.url)
-      .map((layer) => `${this.rootUrl}data/${layer.url}`);
+      .map((layer) => {
+        const id = `${this.rootUrl}data/${layer.url}`;
+        return {
+          id: id,
+          asset: id,
+          color: randomColor(),
+        };
+      });
   }
 
   getTreeviewItems(
@@ -205,8 +216,8 @@ export default class Plhebicite extends Vue {
   }
 
   moveItemToFront(item: TreeviewItem<Layer>): void {
-    // TODO
-    console.log(item);
+    const id = `${this.rootUrl}data/${item.value.url}`;
+    this.webMap.moveLayerToFront(id);
   }
 }
 

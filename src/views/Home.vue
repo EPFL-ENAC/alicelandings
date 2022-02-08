@@ -1,17 +1,17 @@
 <template>
   <v-container>
     <h1>Home</h1>
-    <web-map></web-map>
+    <control-web-map></control-web-map>
   </v-container>
 </template>
 
 <script lang="ts">
-import WebMap from "@/components/WebMap.vue";
+import ControlWebMap from "@/components/ControlWebMap.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
-    WebMap,
+    ControlWebMap,
   },
 })
 export default class Home extends Vue {}

@@ -1,91 +1,34 @@
 <template>
-  <v-row>
-    <v-col cols="8">
-      <v-progress-linear :active="loading" indeterminate></v-progress-linear>
-      <v-responsive aspect-ratio="1.5">
-        <l-map
-          ref="lMap"
-          :center="center"
-          :options="{ zoomControl: false }"
-          :zoom="zoom"
-        >
-          <l-control-layers
-            position="topright"
-            :autoZIndex="false"
-          ></l-control-layers>
-          <l-tile-layer
-            v-for="item in tileProviders"
-            :key="item.name"
-            :attribution="item.attribution"
-            layer-type="base"
-            :name="item.name"
-            :options="item.options"
-            :subdomains="item.subdomains"
-            :url="item.url"
-            :visible="item.visible"
-          ></l-tile-layer>
-          <l-control-scale
-            position="bottomright"
-            :imperial="false"
-          ></l-control-scale>
-          <l-control-zoom position="bottomright"></l-control-zoom>
-        </l-map>
-      </v-responsive>
-    </v-col>
-    <v-col cols="4">
-      <h2>Layers</h2>
-      <v-file-input
-        v-model="layerFiles"
-        accept="application/json, application/x-zip-compressed, image/tiff, .geojson"
-        chips
-        clearable
-        label="Add layer"
-        multiple
-        show-size
-        @change="addExternalLayers"
-      ></v-file-input>
-      <v-list>
-        <v-list-item
-          v-for="(item, index) in layers"
-          :key="index"
-          :color="item.color.base"
-          :input-value="layerActives[index]"
-        >
-          <v-list-item-action>
-            <v-checkbox
-              v-model="layerActives[index]"
-              :color="item.color.base"
-            ></v-checkbox>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ item.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle
-              v-if="item.colorScale"
-              class="d-flex justify-space-between"
-              :style="{
-                backgroundImage: `linear-gradient(to right, ${item.colorScale.colorMin}, ${item.colorScale.colorMax})`,
-              }"
-            >
-              <span>{{ item.colorScale.valueMin }}</span>
-              <span>{{ item.colorScale.valueMax }}</span>
-            </v-list-item-subtitle>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn icon @click="moveLayerToFront(item, index)">
-              <v-icon>mdi-flip-to-front</v-icon>
-            </v-btn>
-          </v-list-item-action>
-          <v-list-item-action>
-            <v-btn icon @click="deleteLayer(item, index)">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-    </v-col>
-  </v-row>
+  <v-responsive aspect-ratio="1.5">
+    <v-progress-linear :active="loading" indeterminate></v-progress-linear>
+    <l-map
+      ref="lMap"
+      :center="center"
+      :options="{ zoomControl: false }"
+      :zoom="zoom"
+    >
+      <l-control-layers
+        position="topright"
+        :autoZIndex="false"
+      ></l-control-layers>
+      <l-tile-layer
+        v-for="item in tileProviders"
+        :key="item.name"
+        :attribution="item.attribution"
+        layer-type="base"
+        :name="item.name"
+        :options="item.options"
+        :subdomains="item.subdomains"
+        :url="item.url"
+        :visible="item.visible"
+      ></l-tile-layer>
+      <l-control-scale
+        position="bottomright"
+        :imperial="false"
+      ></l-control-scale>
+      <l-control-zoom position="bottomright"></l-control-zoom>
+    </l-map>
+  </v-responsive>
 </template>
 
 <script lang="ts">
@@ -179,15 +122,14 @@ export default class WebMap extends Vue {
   readonly lMap!: LMap;
 
   @Prop({ default: () => [] })
-  readonly items!: string[];
+  readonly items!: MapItem[];
   @Prop({ default: () => [] })
   readonly dems!: string[];
 
   loading = false;
+  fileLayers: FileLayer[] = [];
   layers: MapLayer[] = [];
-  layerFiles: File[] = [];
-  layerActives: boolean[] = [];
-  georasters: GeoRaster[] = [];
+  demGeorasters: GeoRaster[] = [];
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -199,7 +141,7 @@ export default class WebMap extends Vue {
         const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
           const latlng = WGStoLV95([e.latlng.lng, e.latlng.lat]);
-          const altitude: number | undefined = this.georasters
+          const altitude: number | undefined = this.demGeorasters
             .flatMap((georaster) => identify(georaster, latlng))
             .find((value) => value); // defined && !== 0
           const positionText = `Lat/Lon:
@@ -236,75 +178,71 @@ export default class WebMap extends Vue {
 
   @Watch("dems")
   onDemsChanged(): void {
-    this.georasters = [];
+    this.demGeorasters = [];
     this.dems.forEach((dem) => {
       axios
         .get(dem, { responseType: "arraybuffer" })
         .then((response) => parseGeoRaster(response.data))
         .then((georaster: GeoRaster) => {
-          this.georasters.push(georaster);
+          this.demGeorasters.push(georaster);
         });
     });
   }
 
   @Watch("items")
   onItemsChanged(): void {
-    const newIds = new Set(this.items);
+    const promises: Promise<FileLayer>[] = this.items.map((item) => {
+      if (typeof item.asset === "string") {
+        const url: string = item.asset;
+        return axios.get(url, { responseType: "blob" }).then((response) => ({
+          id: url,
+          file: new File([response.data], url.split("/").pop() ?? url, {
+            type: response.headers["content-type"].split(";")[0],
+          }),
+          color: item.color,
+        }));
+      } else {
+        return Promise.resolve({
+          id: item.asset.name,
+          file: item.asset,
+          color: item.color,
+        });
+      }
+    });
+    Promise.all(promises).then((layers) => (this.fileLayers = layers));
+  }
+
+  @Watch("fileLayers")
+  onFileLayersChanged(): void {
+    const newIds: Set<string> = new Set(
+      this.fileLayers.map((layer) => layer.id)
+    );
     this.layers.forEach((layer, index) => {
-      if (layer.internalId !== undefined && !newIds.has(layer.internalId)) {
+      if (layer.id !== undefined && !newIds.has(layer.id)) {
         this.deleteLayer(layer, index);
       }
     });
-    const oldIds = new Set(
+    const oldIds: Set<string> = new Set(
       this.layers
-        .map((layer) => layer.internalId)
+        .map((layer) => layer.id)
         .filter((id): id is string => id !== undefined)
     );
-    const newItems = this.items.filter((item) => !oldIds.has(item));
-    if (newItems.length > 0) {
-      this.loading = true;
-      Promise.all(
-        newItems.map((item) =>
-          axios.get(item, { responseType: "blob" }).then((response) => {
-            return {
-              internalId: item,
-              file: new File([response.data], item.split("/").pop() ?? item, {
-                type: response.headers["content-type"].split(";")[0],
-              }),
-            };
-          })
-        )
-      ).then((files) => this.addLayerFiles(files));
+    const newFileLayers: FileLayer[] = this.fileLayers.filter(
+      (layer) => !oldIds.has(layer.id)
+    );
+    if (newFileLayers.length > 0) {
+      this.addLayers(newFileLayers);
     }
   }
 
-  @Watch("layerActives")
-  onLayerActivesChanged(actives: boolean[]): void {
-    actives.forEach((active, index) => {
-      const opacity = active ? 1 : 0;
-      const layer = this.layers[index].layer;
-      if (layer instanceof GridLayer) {
-        layer.setOpacity(opacity);
-      }
-    });
-  }
-
-  addExternalLayers(files: File[]): void {
-    this.addLayerFiles(
-      files.map((file) => ({
-        file: file,
-      }))
-    );
-  }
-
-  addLayerFiles(files: LayerFile[]): void {
-    if (files.length > 0) {
+  addLayers(layers: FileLayer[]): void {
+    if (layers.length > 0) {
       this.loading = true;
-      const layerPromises: Promise<MapLayer>[] = files.map((file) => {
+      const layerPromises: Promise<MapLayer>[] = layers.map((layer) => {
         const color: Color = sample(ALL_COLORS) ?? colors.blue;
-        switch (file.file.type) {
+        switch (layer.file.type) {
           case "image/tiff":
-            return file.file
+            return layer.file
               .arrayBuffer()
               .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
               .then((georaster: ExtendedGeoRaster) => {
@@ -313,9 +251,9 @@ export default class WebMap extends Vue {
                 const palette = interpolate([colorMin, colorMax]);
                 const noDataZero = georaster.mins[0] === 0;
                 return {
-                  name: file.file.name,
+                  id: layer.id,
+                  name: layer.file.name,
                   color: color,
-                  internalId: file.internalId,
                   layer: new GeoRasterLayer({
                     georaster: georaster,
                     pixelValuesToColorFn: (values) => {
@@ -337,32 +275,40 @@ export default class WebMap extends Vue {
                 };
               });
           case "application/x-zip-compressed":
-            return file.file
+            return layer.file
               .arrayBuffer()
               .then((arrayBuffer) => parseZip(arrayBuffer))
               .then((geojson) => ({
-                name: file.file.name,
+                id: layer.id,
+                name: layer.file.name,
                 color: color,
-                internalId: file.internalId,
-                layer: L.geoJSON(geojson as geojson.GeoJsonObject),
+                layer: L.geoJSON(geojson as geojson.GeoJsonObject, {
+                  style: {
+                    color: color.base,
+                  },
+                }),
               }));
         }
-        const extension = file.file.name.split(".").pop();
+        const extension = layer.file.name.split(".").pop();
         switch (extension) {
           case "geojson":
           case "json":
-            return file.file
+            return layer.file
               .text()
               .then(JSON.parse)
               .then((json) => ({
-                name: file.file.name,
+                id: layer.id,
+                name: layer.file.name,
                 color: color,
-                internalId: file.internalId,
-                layer: L.geoJSON(json),
+                layer: L.geoJSON(json, {
+                  style: {
+                    color: color.base,
+                  },
+                }),
               }));
         }
         return Promise.reject(
-          `unsupported type ${file.file.type} for file ${file.file.name}`
+          `unsupported type ${layer.file.type} for file ${layer.file.name}`
         );
       });
       Promise.all(layerPromises)
@@ -371,27 +317,57 @@ export default class WebMap extends Vue {
             layer.layer.addTo(this.map);
             layer.layer.bringToFront();
             this.layers.unshift(layer);
-            this.layerActives.unshift(true);
           });
         })
         .finally(() => {
           this.loading = false;
-          this.layerFiles = [];
         });
     }
   }
 
-  moveLayerToFront(layer: MapLayer, index: number): void {
+  public moveLayerToFront(id: string): void {
+    const [layer, index] = this.getLayer(id);
     layer.layer.bringToFront();
     this.layers.unshift(...this.layers.splice(index, 1));
-    this.layerActives.unshift(...this.layerActives.splice(index, 1));
   }
 
-  deleteLayer(layer: MapLayer, index: number): void {
+  public deleteLayerId(id: string): void {
+    const [layer, index] = this.getLayer(id);
+    this.deleteLayer(layer, index);
+  }
+
+  private deleteLayer(layer: MapLayer, index: number): void {
     this.map.removeLayer(layer.layer);
     this.layers.splice(index, 1);
-    this.layerActives.splice(index, 1);
   }
+
+  private getLayer(id: string): [MapLayer, number] {
+    const index = this.layers.findIndex((layer) => layer.id === id);
+    if (index < 0) {
+      throw new Error(`Layer ${id} not found`);
+    }
+    const layer = this.layers[index];
+    return [layer, index];
+  }
+}
+
+export interface MapItem {
+  id: string;
+  asset: string | File;
+  color: Color;
+}
+
+export interface MapLayer {
+  id: string;
+  name: string;
+  color: Color;
+  layer: GridLayer | GeoJSON;
+  colorScale?: {
+    colorMin: string;
+    colorMax: string;
+    valueMin: number;
+    valueMax: number;
+  };
 }
 
 /**
@@ -409,22 +385,10 @@ interface TileLayerProps {
   url: string;
 }
 
-interface LayerFile {
-  internalId?: string;
+interface FileLayer {
+  id: string;
   file: File;
-}
-
-interface MapLayer {
-  name: string;
   color: Color;
-  layer: GridLayer | GeoJSON;
-  internalId?: string;
-  colorScale?: {
-    colorMin: string;
-    colorMax: string;
-    valueMin: number;
-    valueMax: number;
-  };
 }
 
 interface ExtendedGeoRaster extends GeoRaster {

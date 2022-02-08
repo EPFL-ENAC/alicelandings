@@ -1,3 +1,4 @@
+import { sample } from "lodash";
 import colors, { Color } from "vuetify/lib/util/colors";
 
 // https://vuetifyjs.com/en/api/v-select/#props-items
@@ -41,4 +42,8 @@ export interface TreeviewItem<V = string> {
   value: V;
   children?: TreeviewItem<V>[];
   disabled?: boolean;
+}
+
+export function randomColor(): Color {
+  return sample(ALL_COLORS) ?? colors.blue;
 }
