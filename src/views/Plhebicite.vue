@@ -76,7 +76,7 @@ export default class Plhebicite extends Vue {
     {
       name: "Affective Mapping of Vernier",
       description:
-        "Definition of the affective mappings, how they were created and what they can mean to our understanding of space.",
+        "The Affective Mappings series offers an alternative way of representing urban lived space in the commune of Vernier. Based on fifteen walk-along interviews done with neighbours of Vernier, these maps attempt to draw these citizens’ affective engagements with their everyday environments highlighting perceptions, landscapes and experience instead of abstract administrative lines or symbols. By acknowledging the lived space of a city in maps that can be collectively shared, discussed and transformed, we can expand our urban imaginaries and improve how we plan and design our cities.",
       layers: [
         {
           name: "01 La fôret tropicale",
@@ -138,7 +138,7 @@ export default class Plhebicite extends Vue {
     {
       name: "Atlas of Mobility Landscapes",
       description:
-        "Definition of the atlas of mobility landscapes, how they have been created and what they can mean to our understanding of space and the role of active mobility in our everyday experience and attachment to a place.",
+        "The Atlas of Mobility Landscapes is a collection of citizen testimonies, documents and images gathered around the experience of walking and cycling in Vernier. Mobility is much more than connecting point A to point B, it is mostly defined by the experience of the journey. Because of that, mobility is an extraordinary point of entrance into the relations between everyday practices and our surrounding environment. The collection is organized according to X large themes and X sub-themes describing the lived experience of the commune of Vernier. The user can navigate the map freely to understand the relationship between different environmental features of the commune and collective imaginaries and perceptions. We believe that making available all these documents in an online and open visualization tool will help acknowledge the importance of these often hidden qualities of space, and how they can encourage more inclusive discussions about the city and its potential futures.",
       layers: [
         {
           name: "Place attachment & spatial reach",
