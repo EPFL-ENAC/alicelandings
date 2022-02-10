@@ -49,6 +49,7 @@ import L, {
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import { sample } from "lodash";
+import { lookup } from "mime-types";
 import { parseZip } from "shpjs";
 import { WGStoLV95 } from "swiss-projection";
 import "vue-class-component/hooks";
@@ -194,13 +195,16 @@ export default class WebMap extends Vue {
     const promises: Promise<FileLayer>[] = this.items.map((item) => {
       if (typeof item.asset === "string") {
         const url: string = item.asset;
-        return axios.get(url, { responseType: "blob" }).then((response) => ({
-          id: url,
-          file: new File([response.data], url.split("/").pop() ?? url, {
-            type: response.headers["content-type"].split(";")[0],
-          }),
-          color: item.color,
-        }));
+        return axios.get(url, { responseType: "blob" }).then((response) => {
+          const mimeType = lookup(url);
+          return {
+            id: url,
+            file: new File([response.data], url.split("/").pop() ?? url, {
+              type: mimeType || undefined,
+            }),
+            color: item.color,
+          };
+        });
       } else {
         return Promise.resolve({
           id: item.asset.name,
