@@ -4,6 +4,7 @@
     <l-map
       ref="lMap"
       :center="center"
+      :crs="crs"
       :options="{ zoomControl: false }"
       :zoom="zoom"
     >
@@ -32,11 +33,11 @@
 </template>
 
 <script lang="ts">
+import { EPSG_2056 } from "@/utils/proj4";
 import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
-import geojson from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import L, {
@@ -46,12 +47,15 @@ import L, {
   GridLayer,
   LeafletMouseEvent,
   Map,
+  Proj,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import { sample } from "lodash";
 import { lookup } from "mime-types";
+import proj4 from "proj4";
+import "proj4leaflet";
+import { Proj4GeoJSONFeature } from "proj4leaflet";
 import { parseZip } from "shpjs";
-import { WGStoLV95 } from "swiss-projection";
 import "vue-class-component/hooks";
 import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import {
@@ -73,29 +77,39 @@ import colors, { Color } from "vuetify/lib/util/colors";
   },
 })
 export default class WebMap extends Vue {
-  readonly zoom = 10;
+  readonly zoom = 18;
   readonly center = [46.2044, 6.1432];
+  readonly crs = new Proj.CRS("EPSG:2056", EPSG_2056, {
+    resolutions: [
+      4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250,
+      1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5, 0.25,
+      0.1,
+    ],
+    origin: [2420000, 1350000],
+  });
   readonly tileProviders: TileLayerProps[] = [
     {
-      name: "OpenStreetMap",
+      // https://api3.geo.admin.ch/services/sdiservices.html#wmts
+      name: "swisstopo-carte",
       visible: true,
       attribution:
-        '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
+      subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
       options: {
-        maxZoom: 19,
+        maxZoom: 27,
       },
     },
     {
       // https://api3.geo.admin.ch/services/sdiservices.html#wmts
-      name: "swisstopo",
+      name: "swisstopo-photo",
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
       subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
       options: {
-        maxZoom: 19,
+        maxZoom: 28,
       },
     },
     {
@@ -103,7 +117,7 @@ export default class WebMap extends Vue {
       url: "",
       visible: false,
       options: {
-        maxZoom: 25,
+        maxZoom: 28,
       },
     },
     {
@@ -136,14 +150,18 @@ export default class WebMap extends Vue {
     return this.lMap.mapObject;
   }
 
+  created(): void {
+    proj4.defs("urn:ogc:def:crs:EPSG::2056", EPSG_2056);
+  }
+
   mounted(): void {
     const Coordinates = Control.extend({
       onAdd: (map: Map) => {
         const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
-          const latlng = WGStoLV95([e.latlng.lng, e.latlng.lat]);
+          const point = this.crs.project(e.latlng);
           const altitude: number | undefined = this.demGeorasters
-            .flatMap((georaster) => identify(georaster, latlng))
+            .flatMap((georaster) => identify(georaster, [point.x, point.y]))
             .find((value) => value); // defined && !== 0
           const positionText = `Lat/Lon:
           (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
@@ -286,7 +304,7 @@ export default class WebMap extends Vue {
                 id: layer.id,
                 name: layer.file.name,
                 color: color,
-                layer: L.geoJSON(geojson as geojson.GeoJsonObject, {
+                layer: Proj.geoJson(geojson as unknown as Proj4GeoJSONFeature, {
                   style: {
                     color: color.base,
                   },
@@ -304,7 +322,7 @@ export default class WebMap extends Vue {
                 id: layer.id,
                 name: layer.file.name,
                 color: color,
-                layer: L.geoJSON(json, {
+                layer: Proj.geoJson(json, {
                   style: {
                     color: color.base,
                   },
