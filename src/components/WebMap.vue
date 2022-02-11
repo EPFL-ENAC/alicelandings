@@ -5,7 +5,7 @@
       ref="lMap"
       :center="center"
       :crs="crs"
-      :options="{ zoomControl: false }"
+      :options="mapOptions"
       :zoom="zoom"
     >
       <l-control-layers
@@ -13,7 +13,7 @@
         :autoZIndex="false"
       ></l-control-layers>
       <l-tile-layer
-        v-for="item in tileProviders"
+        v-for="item in baseTileLayers"
         :key="item.name"
         :attribution="item.attribution"
         layer-type="base"
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056 } from "@/utils/proj4";
+import { EPSG_2056, sitgCrs, swisstopoCrs } from "@/utils/geo";
 import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -42,12 +42,17 @@ import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import L, {
   Control,
+  CRS,
   DomUtil,
   GeoJSON,
   GridLayer,
+  Layer,
+  LayerEvent,
   LeafletMouseEvent,
   Map,
+  MapOptions,
   Proj,
+  TileLayerOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import { sample } from "lodash";
@@ -77,39 +82,81 @@ import colors, { Color } from "vuetify/lib/util/colors";
   },
 })
 export default class WebMap extends Vue {
-  readonly zoom = 18;
+  readonly mapOptions: MapOptions = {
+    zoomControl: false,
+  };
+  readonly zoom = 5;
   readonly center = [46.2044, 6.1432];
-  readonly crs = new Proj.CRS("EPSG:2056", EPSG_2056, {
-    resolutions: [
-      4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250,
-      1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5, 0.25,
-      0.1,
-    ],
-    origin: [2420000, 1350000],
-  });
-  readonly tileProviders: TileLayerProps[] = [
+  readonly baseTileLayers: TileLayerProps[] = [
     {
-      // https://api3.geo.admin.ch/services/sdiservices.html#wmts
-      name: "swisstopo-carte",
+      name: "SITG",
       visible: true,
       attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
+        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
+      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
       options: {
-        maxZoom: 27,
+        maxZoom: 11,
+        crs: sitgCrs,
       },
     },
     {
-      // https://api3.geo.admin.ch/services/sdiservices.html#wmts
+      name: "swisstopo-landeskarte-farbe",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/2056/{z}/{x}/{y}.png",
+      subdomains: "0123456789",
+      options: {
+        maxZoom: 27,
+        crs: swisstopoCrs,
+      },
+    },
+    {
+      name: "swisstopo-landeskarte-grau",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/2056/{z}/{x}/{y}.png",
+      subdomains: "0123456789",
+      options: {
+        maxZoom: 27,
+        crs: swisstopoCrs,
+      },
+    },
+    {
+      name: "swisstopo-pixelkarte-farbe",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
+      subdomains: "0123456789",
+      options: {
+        maxZoom: 27,
+        crs: swisstopoCrs,
+      },
+    },
+    {
+      name: "swisstopo-pixelkarte-grau",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/2056/{z}/{x}/{y}.jpeg",
+      subdomains: "0123456789",
+      options: {
+        maxZoom: 27,
+        crs: swisstopoCrs,
+      },
+    },
+    {
       name: "swisstopo-photo",
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
       url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: "0123456789", // https://api3.geo.admin.ch/services/sdiservices.html#gettile
+      subdomains: "0123456789",
       options: {
         maxZoom: 28,
+        crs: swisstopoCrs,
       },
     },
     {
@@ -118,17 +165,6 @@ export default class WebMap extends Vue {
       visible: false,
       options: {
         maxZoom: 28,
-      },
-    },
-    {
-      // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
-      name: "SITG",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
-      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
-      options: {
-        maxZoom: 11,
       },
     },
   ];
@@ -145,6 +181,9 @@ export default class WebMap extends Vue {
   fileLayers: FileLayer[] = [];
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
+  crs: CRS =
+    this.baseTileLayers.find((layer) => layer.visible)?.options?.crs ??
+    swisstopoCrs;
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -179,7 +218,11 @@ export default class WebMap extends Vue {
       },
     });
     this.map.addControl(new Coordinates({ position: "bottomleft" }));
-
+    this.map.on("baselayerchange", (e: LayerEvent) => {
+      this.crs =
+        (e.layer as Layer & { options: BaseTileLayerOptions }).options.crs ??
+        this.crs;
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (L.control as any).browserPrint().addTo(this.map);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -394,18 +437,18 @@ export interface MapLayer {
 
 /**
  * https://vue2-leaflet.netlify.app/components/LTileLayer.html#props
- * https://leafletjs.com/reference.html#tilelayer
  */
 interface TileLayerProps {
   attribution?: string;
   name: string;
   visible: boolean;
   subdomains?: string | string[];
-  options?: {
-    maxZoom?: number;
-  };
+  // https://leafletjs.com/reference.html#tilelayer
+  options?: BaseTileLayerOptions;
   url: string;
 }
+
+type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
 
 interface FileLayer {
   id: string;
