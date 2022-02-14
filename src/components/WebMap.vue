@@ -1,5 +1,5 @@
 <template>
-  <v-responsive aspect-ratio="1.5">
+  <div class="full-height" style="min-height: 200px">
     <v-progress-linear :active="loading" indeterminate></v-progress-linear>
     <l-map
       ref="lMap"
@@ -29,7 +29,7 @@
       ></l-control-scale>
       <l-control-zoom position="bottomright"></l-control-zoom>
     </l-map>
-  </v-responsive>
+  </div>
 </template>
 
 <script lang="ts">

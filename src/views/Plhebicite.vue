@@ -1,59 +1,78 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col>
+  <div class="d-flex flex-column full-height">
+    <div>
+      <div class="ma-4">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
         <p class="text-subtitle-1">
           An affordance-based and affective reading of the Commune of Vernier,
           Geneva
         </p>
-        <v-divider></v-divider>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="flex-grow-0 flex-shrink-1">
-        <v-list dense>
-          <v-list-group
-            v-for="(item, index) in categories"
-            :key="index"
-            color
-            no-action
-            :value="index === 0"
+      </div>
+      <v-divider></v-divider>
+    </div>
+    <div class="flex-grow-1 d-flex flex-row">
+      <v-list dense max-width="350">
+        <v-list-group
+          v-for="(item, index) in categories"
+          :key="index"
+          color
+          no-action
+          :value="index === 0"
+        >
+          <template v-slot:activator>
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-black">
+                {{ item.name }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </template>
+          <p class="mx-4 text-caption text-justify">
+            {{ item.description }}
+          </p>
+          <v-treeview
+            v-model="selectedTreeviewItems[index]"
+            dense
+            :items="getTreeviewItems(item.layers)"
+            return-object
+            selectable
           >
-            <template v-slot:activator>
-              <v-list-item-content>
-                <v-list-item-title class="font-weight-black">
-                  {{ item.name }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </template>
-            <p class="mx-4 text-caption text-justify">
-              {{ item.description }}
-            </p>
-            <v-treeview
-              v-model="selectedTreeviewItems[index]"
-              dense
-              :items="getTreeviewItems(item.layers)"
-              return-object
-              selectable
-            >
-              <template v-slot:append="{ item, leaf, selected }">
-                <template v-if="!item.disabled && leaf && selected">
-                  <v-btn icon @click="moveItemToFront(item)">
-                    <v-icon>mdi-flip-to-front</v-icon>
-                  </v-btn>
-                </template>
+            <template v-slot:append="{ item, leaf, selected }">
+              <template v-if="!item.disabled && leaf && selected">
+                <v-btn icon @click="moveItemToFront(item)">
+                  <v-icon>mdi-flip-to-front</v-icon>
+                </v-btn>
               </template>
-            </v-treeview>
-          </v-list-group>
-        </v-list>
-      </v-col>
+            </template>
+          </v-treeview>
+        </v-list-group>
+      </v-list>
       <v-divider vertical></v-divider>
-      <v-col class="flex-grow-1 flex-shrink-0">
+      <div class="flex-grow-1 d-flex flex-column">
         <web-map ref="webMap" :dems="dems" :items="mapItems"></web-map>
-      </v-col>
-    </v-row>
-  </v-container>
+        <v-divider></v-divider>
+        <div class="d-flex flex-row">
+          <div class="flex-even ma-2">
+            <h4>Left Legend</h4>
+            <p>
+              On the left legend we have information about the active layers on
+              the left column plus the color and symbol legend of what we are
+              seeing. There are two legends, one for AffMaps, another for Atlas.
+            </p>
+          </div>
+          <v-divider vertical></v-divider>
+          <div class="flex-even ma-2">
+            <h4>Right Legend</h4>
+            <p>
+              On the Right Legend we have the information about the elements the
+              user clicks on the map. Consider in the building of the table to
+              create a column of attributes for all elements (for instance for
+              the constellation elements, an explanation)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -233,3 +252,18 @@ interface Layer {
   children?: Layer[];
 }
 </script>
+
+<style lang="scss" scoped>
+.v-divider {
+  border-color: black !important;
+  z-index: 1;
+}
+
+.flex-even {
+  flex: 1 1 0;
+}
+
+.v-list {
+  padding: 0;
+}
+</style>
