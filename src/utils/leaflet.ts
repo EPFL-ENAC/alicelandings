@@ -38,7 +38,10 @@ export const sitgCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {
   ),
 });
 
-const select = xpath.useNamespaces({ se: "http://www.opengis.net/se" });
+const select = xpath.useNamespaces({
+  ogc: "http://www.opengis.net/ogc",
+  se: "http://www.opengis.net/se",
+});
 // https://github.com/orfon/Leaflet.SLD/blob/master/leaflet.sld.js
 const attributeNameMapping = new Map<string, keyof PathOptions>([
   ["fill", "fillColor"],
@@ -50,6 +53,34 @@ const attributeNameMapping = new Map<string, keyof PathOptions>([
   ["stroke-opacity", "opacity"],
   ["stroke-width", "weight"],
 ]);
+const operatorMapping = new Map<string, Operator>([
+  ["PropertyIsEqualTo", "eq"],
+  ["PropertyIsGreaterThan", "gt"],
+  ["PropertyIsGreaterThanOrEqualTo", "ge"],
+  ["PropertyIsLessThan", "lt"],
+  ["PropertyIsLessThanOrEqualTo", "le"],
+  ["PropertyIsNotEqualTo", "ne"],
+]);
+
+interface Rule {
+  condition?: {
+    filterUnion: "and" | "or";
+    filters: Filter[];
+  };
+  options: PathOptions;
+}
+
+interface Filter {
+  property: string;
+  literal: number;
+  operator: Operator;
+}
+
+type Operator = "eq" | "gt" | "ge" | "lt" | "le" | "ne";
+
+const operatorExpression = Array.from(operatorMapping.keys())
+  .map((name) => `./*/ogc:${name}`)
+  .join(" | ");
 
 export function getStyle(
   style?: string,
@@ -57,17 +88,106 @@ export function getStyle(
 ): PathOptions | StyleFunction | undefined {
   if (style) {
     const doc = new DOMParser().parseFromString(style);
-    const nodes: Element[] = select("//se:SvgParameter", doc) as Element[];
-    const options: PathOptions = Object.fromEntries(
-      nodes
-        .map((node) => {
-          const name = node.getAttribute("name");
-          const key = name ? attributeNameMapping.get(name) : undefined;
-          return [key, node.firstChild?.nodeValue ?? undefined];
-        })
-        .filter((entry) => entry[0] !== undefined)
-    );
-    return options;
+    const ruleNodes = select("//se:Rule", doc) as Node[];
+    const rules: Rule[] = ruleNodes.map((ruleNode) => {
+      const options: PathOptions = Object.fromEntries(
+        (select("./*/*/se:SvgParameter", ruleNode) as Element[])
+          .map((node) => {
+            const name = node.getAttribute("name");
+            const key = name ? attributeNameMapping.get(name) : undefined;
+            return [key, node.firstChild?.nodeValue ?? undefined];
+          })
+          .filter((entry) => entry[0] !== undefined)
+      );
+      const filterNode = select("./ogc:Filter", ruleNode, true) as
+        | Element
+        | undefined;
+      if (filterNode) {
+        const filters: Filter[] = (
+          select(operatorExpression, filterNode) as Element[]
+        ).map((node) => {
+          const property = (
+            select("./ogc:PropertyName/text()", node, true) as Text | undefined
+          )?.nodeValue;
+          const literal = Number(
+            (select("./ogc:Literal/text()", node, true) as Text | undefined)
+              ?.nodeValue
+          );
+          if (!property) {
+            throw "Expected property";
+          }
+          const operator = operatorMapping.get(node.localName);
+          if (!operator) {
+            throw `Unknown operator ${node.localName}`;
+          }
+          return {
+            property: property,
+            literal: literal,
+            operator: operator,
+          };
+        });
+        if (select("./ogc:And", filterNode, true)) {
+          return {
+            condition: {
+              filterUnion: "and",
+              filters: filters,
+            },
+            options: options,
+          };
+        }
+        if (select("./ogc:Or", filterNode, true)) {
+          return {
+            condition: {
+              filterUnion: "or",
+              filters: filters,
+            },
+            options: options,
+          };
+        }
+      }
+      return {
+        options: options,
+      };
+    });
+    return (feature) => {
+      if (!feature) {
+        return {};
+      }
+      return (
+        rules.find((rule) => {
+          const condition = rule.condition;
+          if (!condition) {
+            return true;
+          }
+          return condition.filters
+            .map((filter) => {
+              const property = feature.properties[filter.property];
+              switch (filter.operator) {
+                case "eq":
+                  return property == filter.literal;
+                case "gt":
+                  return property > filter.literal;
+                case "ge":
+                  return property >= filter.literal;
+                case "lt":
+                  return property < filter.literal;
+                case "le":
+                  return property <= filter.literal;
+                case "ne":
+                  return property != filter.literal;
+              }
+            })
+            .reduce((a, b) => {
+              switch (condition.filterUnion) {
+                case "and":
+                  return a && b;
+                case "or":
+                  return a || b;
+              }
+            });
+        })?.options ?? {}
+      );
+    };
   } else if (color) {
     return {
       color: color.base,
