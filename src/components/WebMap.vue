@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056, sitgCrs, swisstopoCrs } from "@/utils/geo";
+import { EPSG_2056, EPSG_21781, sitgCrs, swisstopoCrs } from "@/utils/geo";
 import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -192,6 +192,7 @@ export default class WebMap extends Vue {
   created(): void {
     proj4.defs("urn:ogc:def:crs:EPSG::2056", EPSG_2056);
     proj4.defs("OGC:CRS84", proj4.defs("EPSG:4326"));
+    proj4.defs("EPSG:21781", EPSG_21781);
   }
 
   mounted(): void {

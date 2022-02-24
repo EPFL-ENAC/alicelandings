@@ -110,14 +110,19 @@ export default class Plhebicite extends Vue {
           name: "05 Delta & Archipels",
           children: [
             {
-              name: "Voices in",
-              url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_IN.geojson",
-              popupKey: "Text Conte",
-            },
-            {
-              name: "Voices out",
-              url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_OUT.geojson",
-              popupKey: "Text Content",
+              name: "Voices",
+              children: [
+                {
+                  name: "In",
+                  url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_IN.geojson",
+                  popupKey: "Text Conte",
+                },
+                {
+                  name: "Out",
+                  url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_OUT.geojson",
+                  popupKey: "Text Content",
+                },
+              ],
             },
             {
               name: "Trajectories",
@@ -177,6 +182,30 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "Mobility Experiences",
+          children: [
+            {
+              name: "Codes",
+              url: "ATLAS/MOBILITY_EXPERIENCES/codes/05_07_MOBILITY_EXPERIENCES_CODES.geojson",
+            },
+            {
+              name: "Overlay",
+              children: [
+                {
+                  name: "Network",
+                  url: "ATLAS/MOBILITY_EXPERIENCES/overlay/1_network/MOBILITY_EXPERIENCES_OVERLAY_1.geojson",
+                },
+                {
+                  name: "Signs",
+                  url: "ATLAS/MOBILITY_EXPERIENCES/overlay/2_signs/MOBILITY_EXPERIENCES_OVERLAY_2.geojson",
+                },
+              ],
+            },
+            {
+              name: "Voices",
+              url: "ATLAS/MOBILITY_EXPERIENCES/voices/05_07_MOBILITY_EXPERIENCES_VOICES.geojson",
+              popupKey: "Text Conte",
+            },
+          ],
         },
         {
           name: "Non Visual Dimensions",
