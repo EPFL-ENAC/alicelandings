@@ -178,7 +178,7 @@ export default class WebMap extends Vue {
   readonly dems!: string[];
 
   loading = false;
-  fileLayers: FileLayer[] = [];
+  fileLayers: MapFileLayer[] = [];
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
   crs: CRS =
@@ -255,30 +255,27 @@ export default class WebMap extends Vue {
 
   @Watch("items")
   onItemsChanged(): void {
-    const promises: Promise<FileLayer>[] = this.items.map((item) => {
-      if (typeof item.asset === "string") {
-        const url: string = item.asset;
-        return axios.get(url, { responseType: "blob" }).then((response) => {
-          const mimeType = lookup(url);
-          return {
-            id: url,
-            file: new File([response.data], url.split("/").pop() ?? url, {
-              type: mimeType || undefined,
-            }),
-            color: item.color,
-            popupKey: item.popupKey,
-          };
-        });
-      } else {
-        return Promise.resolve({
-          id: item.asset.name,
-          file: item.asset,
-          color: item.color,
-          popupKey: item.popupKey,
-        });
-      }
+    const promises: Promise<MapFileLayer>[] = this.items.map(async (item) => {
+      const file = await this.getFile(item);
+      return {
+        ...item,
+        file: file,
+      };
     });
     Promise.all(promises).then((layers) => (this.fileLayers = layers));
+  }
+
+  private async getFile(item: MapItem): Promise<File> {
+    if (typeof item.asset === "string") {
+      const url: string = item.asset;
+      const response = await axios.get(url, { responseType: "blob" });
+      const mimeType = lookup(url);
+      return new File([response.data], url.split("/").pop() ?? url, {
+        type: mimeType || undefined,
+      });
+    } else {
+      return Promise.resolve(item.asset);
+    }
   }
 
   @Watch("fileLayers")
@@ -296,7 +293,7 @@ export default class WebMap extends Vue {
         .map((layer) => layer.id)
         .filter((id): id is string => id !== undefined)
     );
-    const newFileLayers: FileLayer[] = this.fileLayers.filter(
+    const newFileLayers: MapFileLayer[] = this.fileLayers.filter(
       (layer) => !oldIds.has(layer.id)
     );
     if (newFileLayers.length > 0) {
@@ -304,7 +301,7 @@ export default class WebMap extends Vue {
     }
   }
 
-  addLayers(layers: FileLayer[]): void {
+  addLayers(layers: MapFileLayer[]): void {
     if (layers.length > 0) {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = layers.map((layer) => {
@@ -383,7 +380,7 @@ export default class WebMap extends Vue {
   }
 
   private getGeoJsonLayer(
-    layer: FileLayer,
+    layer: MapFileLayer,
     color: Color,
     json: Proj4GeoJSONFeature
   ) {
@@ -470,12 +467,9 @@ interface TileLayerProps {
 
 type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
 
-interface FileLayer {
-  id: string;
+type MapFileLayer = MapItem & {
   file: File;
-  color: Color;
-  popupKey?: string;
-}
+};
 
 interface ExtendedGeoRaster extends GeoRaster {
   mins: number[];
