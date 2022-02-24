@@ -241,14 +241,22 @@ export default class Plhebicite extends Vue {
       .flatMap((layer) => layer.children ?? [layer])
       .filter((layer) => layer.url)
       .map((layer) => {
-        const id = `${this.rootUrl}data/${layer.url}`;
+        const id = this.getAbsoluteUrl(layer.url);
+        const style = id?.endsWith(".geojson")
+          ? id.replace(/\.[^/.]+$/, ".sld")
+          : undefined;
         return {
           id: id,
           asset: id,
           color: randomColor(),
           popupKey: layer.popupKey,
+          styleUrl: style,
         };
       });
+  }
+
+  private getAbsoluteUrl(dataUrl?: string): string {
+    return `${this.rootUrl}data/${dataUrl}`;
   }
 
   getTreeviewItems(

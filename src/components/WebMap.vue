@@ -33,7 +33,13 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056, EPSG_21781, sitgCrs, swisstopoCrs } from "@/utils/geo";
+import {
+  EPSG_2056,
+  EPSG_21781,
+  getStyle,
+  sitgCrs,
+  swisstopoCrs,
+} from "@/utils/leaflet";
 import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -256,25 +262,31 @@ export default class WebMap extends Vue {
   @Watch("items")
   onItemsChanged(): void {
     const promises: Promise<MapFileLayer>[] = this.items.map(async (item) => {
-      const file = await this.getFile(item);
+      const file = await this.getFile(item.asset);
+      const style = item.styleUrl
+        ? await (
+            await axios.get(item.styleUrl, { responseType: "text" })
+          ).data
+        : undefined;
       return {
         ...item,
         file: file,
-      };
+        style: style,
+      } as MapFileLayer;
     });
     Promise.all(promises).then((layers) => (this.fileLayers = layers));
   }
 
-  private async getFile(item: MapItem): Promise<File> {
-    if (typeof item.asset === "string") {
-      const url: string = item.asset;
+  private async getFile(input: string | File): Promise<File> {
+    if (typeof input === "string") {
+      const url: string = input;
       const response = await axios.get(url, { responseType: "blob" });
       const mimeType = lookup(url);
       return new File([response.data], url.split("/").pop() ?? url, {
         type: mimeType || undefined,
       });
     } else {
-      return Promise.resolve(item.asset);
+      return Promise.resolve(input);
     }
   }
 
@@ -399,9 +411,7 @@ export default class WebMap extends Vue {
             }
           }
         },
-        style: {
-          color: color.base,
-        },
+        style: getStyle(layer.style, color),
       }),
     };
   }
@@ -437,6 +447,7 @@ export interface MapItem {
   asset: string | File;
   color: Color;
   popupKey?: string;
+  styleUrl?: string;
 }
 
 export interface MapLayer {
@@ -469,6 +480,7 @@ type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
 
 type MapFileLayer = MapItem & {
   file: File;
+  style?: string;
 };
 
 interface ExtendedGeoRaster extends GeoRaster {
