@@ -107,21 +107,28 @@ export default class Plhebicite extends Vue {
           name: "03 La famille italienne",
         },
         {
-          name: "04 Archipels, Delta",
+          name: "05 Delta & Archipels",
           children: [
             {
-              name: "Voices",
+              name: "Voices in",
+              url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_IN.geojson",
+              popupKey: "Text Conte",
             },
             {
-              name: "Trajectory",
-              url: "INT_05_PARCOURS.geojson",
+              name: "Voices out",
+              url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_OUT.geojson",
+              popupKey: "Text Content",
+            },
+            {
+              name: "Trajectories",
+              url: "INTERVIEW/05_DELTA/trajectories/05_DELTA_TRAJECTORIES.geojson",
             },
             {
               name: "Constellation",
             },
             {
-              name: "Viewshed",
-              url: "04_DELTA_viewshed_analysis_1000.tif",
+              name: "Horizons",
+              url: "INTERVIEW/05_DELTA/horizons/05_DELTA_HORIZONS.tif",
             },
           ],
         },
@@ -210,6 +217,7 @@ export default class Plhebicite extends Vue {
           id: id,
           asset: id,
           color: randomColor(),
+          popupKey: layer.popupKey,
         };
       });
   }
@@ -249,6 +257,7 @@ interface Category {
 interface Layer {
   name: string;
   url?: string;
+  popupKey?: string;
   children?: Layer[];
 }
 </script>

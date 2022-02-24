@@ -191,6 +191,7 @@ export default class WebMap extends Vue {
 
   created(): void {
     proj4.defs("urn:ogc:def:crs:EPSG::2056", EPSG_2056);
+    proj4.defs("OGC:CRS84", proj4.defs("EPSG:4326"));
   }
 
   mounted(): void {
@@ -264,6 +265,7 @@ export default class WebMap extends Vue {
               type: mimeType || undefined,
             }),
             color: item.color,
+            popupKey: item.popupKey,
           };
         });
       } else {
@@ -271,6 +273,7 @@ export default class WebMap extends Vue {
           id: item.asset.name,
           file: item.asset,
           color: item.color,
+          popupKey: item.popupKey,
         });
       }
     });
@@ -343,16 +346,13 @@ export default class WebMap extends Vue {
             return layer.file
               .arrayBuffer()
               .then((arrayBuffer) => parseZip(arrayBuffer))
-              .then((geojson) => ({
-                id: layer.id,
-                name: layer.file.name,
-                color: color,
-                layer: Proj.geoJson(geojson as unknown as Proj4GeoJSONFeature, {
-                  style: {
-                    color: color.base,
-                  },
-                }),
-              }));
+              .then((geojson) =>
+                this.getGeoJsonLayer(
+                  layer,
+                  color,
+                  geojson as unknown as Proj4GeoJSONFeature
+                )
+              );
         }
         const extension = layer.file.name.split(".").pop();
         switch (extension) {
@@ -361,16 +361,7 @@ export default class WebMap extends Vue {
             return layer.file
               .text()
               .then(JSON.parse)
-              .then((json) => ({
-                id: layer.id,
-                name: layer.file.name,
-                color: color,
-                layer: Proj.geoJson(json, {
-                  style: {
-                    color: color.base,
-                  },
-                }),
-              }));
+              .then((json) => this.getGeoJsonLayer(layer, color, json));
         }
         return Promise.reject(
           `unsupported type ${layer.file.type} for file ${layer.file.name}`
@@ -388,6 +379,33 @@ export default class WebMap extends Vue {
           this.loading = false;
         });
     }
+  }
+
+  private getGeoJsonLayer(
+    layer: FileLayer,
+    color: Color,
+    json: Proj4GeoJSONFeature
+  ) {
+    return {
+      id: layer.id,
+      name: layer.file.name,
+      color: color,
+      layer: Proj.geoJson(json, {
+        onEachFeature: (feature, l) => {
+          if (layer.popupKey && feature.properties) {
+            const property = feature.properties[layer.popupKey];
+            if (property) {
+              l.bindPopup(property);
+              l.on("mouseover", () => l.openPopup());
+              l.on("mouseout", () => l.closePopup());
+            }
+          }
+        },
+        style: {
+          color: color.base,
+        },
+      }),
+    };
   }
 
   public moveLayerToFront(id: string): void {
@@ -420,6 +438,7 @@ export interface MapItem {
   id: string;
   asset: string | File;
   color: Color;
+  popupKey?: string;
 }
 
 export interface MapLayer {
@@ -454,6 +473,7 @@ interface FileLayer {
   id: string;
   file: File;
   color: Color;
+  popupKey?: string;
 }
 
 interface ExtendedGeoRaster extends GeoRaster {
