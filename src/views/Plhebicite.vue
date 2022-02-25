@@ -145,7 +145,6 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Viewshed",
-              url: "07_MD_viewshed_analysis_1000.tif",
             },
           ],
         },
