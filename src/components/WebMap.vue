@@ -6,7 +6,7 @@
       :center="center"
       :crs="crs"
       :options="mapOptions"
-      :zoom="zoom"
+      :zoom.sync="syncedZoom"
     >
       <l-control-layers
         position="topright"
@@ -69,7 +69,14 @@ import "proj4leaflet";
 import { Proj4GeoJSONFeature } from "proj4leaflet";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
-import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  PropSync,
+  Ref,
+  Vue,
+  Watch,
+} from "vue-property-decorator";
 import {
   LControlLayers,
   LControlScale,
@@ -92,7 +99,6 @@ export default class WebMap extends Vue {
   readonly mapOptions: MapOptions = {
     zoomControl: false,
   };
-  readonly zoom = 5;
   readonly center = [46.2044, 6.1432];
   readonly baseTileLayers: TileLayerProps[] = [
     {
@@ -183,6 +189,8 @@ export default class WebMap extends Vue {
   readonly items!: MapItem[];
   @Prop({ default: () => [] })
   readonly dems!: string[];
+  @PropSync("zoom", { type: Number, default: 5 })
+  syncedZoom!: number;
 
   loading = false;
   fileLayers: MapFileLayer[] = [];

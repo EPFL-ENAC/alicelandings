@@ -11,44 +11,52 @@
       <v-divider></v-divider>
     </div>
     <div class="flex-grow-1 d-flex flex-row">
-      <v-list dense max-width="350">
-        <v-list-group
-          v-for="(item, index) in categories"
-          :key="index"
-          color
-          no-action
-          :value="index === 0"
-        >
-          <template v-slot:activator>
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-black">
-                {{ item.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </template>
-          <p class="mx-4 text-caption text-justify">
-            {{ item.description }}
-          </p>
-          <v-treeview
-            v-model="selectedTreeviewItems[index]"
-            dense
-            :items="getTreeviewItems(item.layers)"
-            return-object
-            selectable
+      <div class="d-flex flex-column">
+        <v-list dense max-width="350">
+          <v-list-group
+            v-for="(item, index) in categories"
+            :key="index"
+            color
+            no-action
+            :value="index === 0"
           >
-            <template v-slot:append="{ item, leaf, selected }">
-              <template v-if="!item.disabled && leaf && selected">
-                <v-btn icon @click="moveItemToFront(item)">
-                  <v-icon>mdi-flip-to-front</v-icon>
-                </v-btn>
-              </template>
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title class="font-weight-black">
+                  {{ item.name }}
+                </v-list-item-title>
+              </v-list-item-content>
             </template>
-          </v-treeview>
-        </v-list-group>
-      </v-list>
+            <p class="mx-4 text-caption text-justify">
+              {{ item.description }}
+            </p>
+            <v-treeview
+              v-model="selectedTreeviewItems[index]"
+              dense
+              :items="getTreeviewItems(item.layers)"
+              return-object
+              selectable
+            >
+              <template v-slot:append="{ item, leaf, selected }">
+                <template v-if="!item.disabled && leaf && selected">
+                  <v-btn icon @click="moveItemToFront(item)">
+                    <v-icon>mdi-flip-to-front</v-icon>
+                  </v-btn>
+                </template>
+              </template>
+            </v-treeview>
+          </v-list-group>
+        </v-list>
+        <span class="mx-4">Zoom level: {{ zoom }}</span>
+      </div>
       <v-divider vertical></v-divider>
       <div class="flex-grow-1 d-flex flex-column">
-        <web-map ref="webMap" :dems="dems" :items="mapItems"></web-map>
+        <web-map
+          ref="webMap"
+          :dems="dems"
+          :items="mapItems"
+          :zoom.sync="zoom"
+        ></web-map>
         <v-divider></v-divider>
         <div class="d-flex flex-row">
           <div class="flex-even ma-2">
@@ -231,6 +239,7 @@ export default class Plhebicite extends Vue {
   @Ref()
   readonly webMap!: WebMap;
 
+  zoom = 5;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
 
   get mapItems(): MapItem[] {
