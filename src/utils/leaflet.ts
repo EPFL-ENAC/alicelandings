@@ -1,4 +1,14 @@
-import { Bounds, CRS, PathOptions, Proj, StyleFunction } from "leaflet";
+import { Feature, Point } from "geojson";
+import {
+  Bounds,
+  circleMarker,
+  CRS,
+  LatLng,
+  Layer,
+  PathOptions,
+  Proj,
+  StyleFunction,
+} from "leaflet";
 import "proj4leaflet";
 import { Color } from "vuetify/lib/util/colors";
 import { DOMParser } from "xmldom";
@@ -90,14 +100,9 @@ export function getStyle(
     const doc = new DOMParser().parseFromString(style);
     const ruleNodes = select("//se:Rule", doc) as Node[];
     const rules: Rule[] = ruleNodes.map((ruleNode) => {
-      const options: PathOptions = Object.fromEntries(
-        (select("./*/*/se:SvgParameter", ruleNode) as Element[])
-          .map((node) => {
-            const name = node.getAttribute("name");
-            const key = name ? attributeNameMapping.get(name) : undefined;
-            return [key, node.firstChild?.nodeValue ?? undefined];
-          })
-          .filter((entry) => entry[0] !== undefined)
+      const options: PathOptions = getPathOptions(
+        "./*/*/se:SvgParameter",
+        ruleNode
       );
       const filterNode = select("./ogc:Filter", ruleNode, true) as
         | Element
@@ -106,15 +111,13 @@ export function getStyle(
         const filters: Filter[] = (
           select(operatorExpression, filterNode) as Element[]
         ).map((node) => {
-          const property = (
-            select("./ogc:PropertyName/text()", node, true) as Text | undefined
-          )?.nodeValue;
-          const literal = Number(
-            (select("./ogc:Literal/text()", node, true) as Text | undefined)
-              ?.nodeValue
-          );
+          const property = getText("./ogc:PropertyName", node);
+          const literal = getNumber("./ogc:Literal", node);
           if (!property) {
-            throw "Expected property";
+            throw "Expected ogc:PropertyName";
+          }
+          if (!literal) {
+            throw "Expected ogc:Literal";
           }
           const operator = operatorMapping.get(node.localName);
           if (!operator) {
@@ -192,7 +195,55 @@ export function getStyle(
     return {
       color: color.base,
     };
-  } else {
-    return undefined;
   }
+  return undefined;
+}
+
+function getText(expression: string, node: Node): string | undefined {
+  return (
+    (select(expression + "/text()", node, true) as Text | undefined)
+      ?.nodeValue ?? undefined
+  );
+}
+
+function getNumber(expression: string, node: Node): number | undefined {
+  const text = getText(expression, node);
+  return text === undefined ? undefined : Number(text);
+}
+
+function getPathOptions(expression: string, node: Node): PathOptions {
+  return Object.fromEntries(
+    (select(expression, node) as Element[])
+      .map((element) => {
+        const name = element.getAttribute("name");
+        const key = name ? attributeNameMapping.get(name) : undefined;
+        return [key, element.firstChild?.nodeValue ?? undefined];
+      })
+      .filter((entry) => entry[0] !== undefined)
+  );
+}
+
+type PointToLayer = (geoJsonPoint: Feature<Point>, latlng: LatLng) => Layer;
+
+export function getPointToLayer(style?: string): PointToLayer | undefined {
+  if (style) {
+    const doc = new DOMParser().parseFromString(style);
+    // TODO: rule filter ?
+    const graphicNode = select("//se:Graphic", doc, true) as Node;
+    if (graphicNode) {
+      const options: PathOptions = getPathOptions(
+        "./*/*/se:SvgParameter",
+        graphicNode
+      );
+      switch (getText("./se:Mark/se:WellKnownName", graphicNode)) {
+        case "circle":
+          return (_, latlng) =>
+            circleMarker(latlng, {
+              ...options,
+              radius: getNumber("./se:Size", graphicNode),
+            });
+      }
+    }
+  }
+  return undefined;
 }

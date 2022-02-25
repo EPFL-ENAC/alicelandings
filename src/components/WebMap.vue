@@ -36,6 +36,7 @@
 import {
   EPSG_2056,
   EPSG_21781,
+  getPointToLayer,
   getStyle,
   sitgCrs,
   swisstopoCrs,
@@ -412,6 +413,7 @@ export default class WebMap extends Vue {
           }
         },
         style: getStyle(layer.style, color),
+        pointToLayer: getPointToLayer(layer.style),
       }),
     };
   }
