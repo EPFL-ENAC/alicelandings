@@ -12,42 +12,46 @@
     </div>
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
-        <v-list dense max-width="350">
-          <v-list-group
-            v-for="(item, index) in categories"
-            :key="index"
-            color
-            no-action
-            :value="index === 0"
-          >
-            <template v-slot:activator>
-              <v-list-item-content>
-                <v-list-item-title class="font-weight-black">
-                  {{ item.name }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </template>
-            <p class="mx-4 text-caption text-justify">
-              {{ item.description }}
-            </p>
-            <v-treeview
-              v-model="selectedTreeviewItems[index]"
-              dense
-              :items="getTreeviewItems(item.layers)"
-              return-object
-              selectable
+        <div class="flex-even">
+          <v-list dense max-width="350" max-height="100%">
+            <v-list-group
+              v-for="(item, index) in categories"
+              :key="index"
+              color
+              no-action
+              :value="index === 0"
             >
-              <template v-slot:append="{ item, leaf, selected }">
-                <template v-if="!item.disabled && leaf && selected">
-                  <v-btn icon @click="moveItemToFront(item)">
-                    <v-icon>mdi-flip-to-front</v-icon>
-                  </v-btn>
-                </template>
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title class="font-weight-black">
+                    {{ item.name }}
+                  </v-list-item-title>
+                </v-list-item-content>
               </template>
-            </v-treeview>
-          </v-list-group>
-        </v-list>
-        <span class="mx-4">Zoom level: {{ zoom }}</span>
+              <p class="mx-4 text-caption text-justify">
+                {{ item.description }}
+              </p>
+              <v-treeview
+                v-model="selectedTreeviewItems[index]"
+                dense
+                :items="getTreeviewItems(item.layers)"
+                return-object
+                selectable
+              >
+                <template v-slot:append="{ item, leaf, selected }">
+                  <template v-if="!item.disabled && leaf && selected">
+                    <v-btn icon @click="moveItemToFront(item)">
+                      <v-icon>mdi-flip-to-front</v-icon>
+                    </v-btn>
+                  </template>
+                </template>
+              </v-treeview>
+            </v-list-group>
+          </v-list>
+        </div>
+        <span class="mx-4 flex-grow-0">Zoom level: {{ zoom }}</span>
+        <v-divider></v-divider>
+        <v-btn class="flex-grow-0" text>About</v-btn>
       </div>
       <v-divider vertical></v-divider>
       <div class="flex-grow-1 d-flex flex-column">
@@ -314,9 +318,11 @@ interface Layer {
 
 .flex-even {
   flex: 1 1 0;
+  min-height: 0;
 }
 
 .v-list {
   padding: 0;
+  overflow-y: auto;
 }
 </style>
