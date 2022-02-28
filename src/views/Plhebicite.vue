@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import WebMap, { MapItem } from "@/components/WebMap.vue";
-import { randomColor, TreeviewItem } from "@/utils/vuetify";
+import { TreeviewItem } from "@/utils/vuetify";
 import { Component, Ref, Vue } from "vue-property-decorator";
 
 @Component({
@@ -256,7 +256,6 @@ export default class Plhebicite extends Vue {
         return {
           id: id,
           asset: id,
-          color: randomColor(),
           popupKey: layer.popupKey,
           styleUrl: style,
         };

@@ -10,7 +10,6 @@ import {
   StyleFunction,
 } from "leaflet";
 import "proj4leaflet";
-import { Color } from "vuetify/lib/util/colors";
 import { DOMParser } from "xmldom";
 import xpath from "xpath";
 
@@ -93,8 +92,7 @@ const operatorExpression = Array.from(operatorMapping.keys())
   .join(" | ");
 
 export function getStyle(
-  style?: string,
-  color?: Color
+  style?: string
 ): PathOptions | StyleFunction | undefined {
   if (style) {
     const doc = new DOMParser().parseFromString(style);
@@ -190,10 +188,6 @@ export function getStyle(
             });
         })?.options ?? {}
       );
-    };
-  } else if (color) {
-    return {
-      color: color.base,
     };
   }
   return undefined;

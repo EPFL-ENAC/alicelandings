@@ -41,7 +41,6 @@ import {
   sitgCrs,
   swisstopoCrs,
 } from "@/utils/leaflet";
-import { ALL_COLORS } from "@/utils/vuetify";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
@@ -62,7 +61,6 @@ import L, {
   TileLayerOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
-import { sample } from "lodash";
 import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
@@ -326,39 +324,48 @@ export default class WebMap extends Vue {
     if (layers.length > 0) {
       this.loading = true;
       const layerPromises: Promise<MapLayer>[] = layers.map((layer) => {
-        const color: Color = sample(ALL_COLORS) ?? colors.blue;
+        const color: Color | undefined = layer.color;
         switch (layer.file.type) {
           case "image/tiff":
             return layer.file
               .arrayBuffer()
               .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
               .then((georaster: ExtendedGeoRaster) => {
-                const colorMin = color.lighten5;
-                const colorMax = color.darken4;
-                const palette = interpolate([colorMin, colorMax]);
-                const noDataZero = georaster.mins[0] === 0;
+                if (color && georaster.mins[0] === 0) {
+                  georaster.noDataValue = 0;
+                }
+                const colorScale: ColorScale | undefined = color
+                  ? {
+                      colorMin: color.lighten5,
+                      colorMax: color.darken4,
+                      valueMin: georaster.mins[0],
+                      valueMax: georaster.maxs[0],
+                    }
+                  : undefined;
                 return {
                   id: layer.id,
                   name: layer.file.name,
                   color: color,
                   layer: new GeoRasterLayer({
                     georaster: georaster,
-                    pixelValuesToColorFn: (values) => {
-                      if (noDataZero && values[0] === 0) {
-                        return colors.shades.transparent;
-                      }
-                      const value =
-                        (values[0] - georaster.mins[0]) / georaster.ranges[0];
-                      return palette(value);
-                    },
+                    pixelValuesToColorFn: colorScale
+                      ? (values) => {
+                          if (values[0] === georaster.noDataValue) {
+                            return colors.shades.transparent;
+                          }
+                          const palette = interpolate([
+                            colorScale.colorMin,
+                            colorScale.colorMax,
+                          ]);
+                          const value =
+                            (values[0] - georaster.mins[0]) /
+                            georaster.ranges[0];
+                          return palette(value);
+                        }
+                      : undefined,
                     resolution: 128,
                   }),
-                  colorScale: {
-                    colorMin: colorMin,
-                    colorMax: colorMax,
-                    valueMin: georaster.mins[0],
-                    valueMax: georaster.maxs[0],
-                  },
+                  colorScale: colorScale,
                 };
               });
           case "application/x-zip-compressed":
@@ -368,8 +375,8 @@ export default class WebMap extends Vue {
               .then((geojson) =>
                 this.getGeoJsonLayer(
                   layer,
-                  color,
-                  geojson as unknown as Proj4GeoJSONFeature
+                  geojson as unknown as Proj4GeoJSONFeature,
+                  color
                 )
               );
         }
@@ -380,7 +387,7 @@ export default class WebMap extends Vue {
             return layer.file
               .text()
               .then(JSON.parse)
-              .then((json) => this.getGeoJsonLayer(layer, color, json));
+              .then((json) => this.getGeoJsonLayer(layer, json, color));
         }
         return Promise.reject(
           `unsupported type ${layer.file.type} for file ${layer.file.name}`
@@ -402,9 +409,9 @@ export default class WebMap extends Vue {
 
   private getGeoJsonLayer(
     layer: MapFileLayer,
-    color: Color,
-    json: Proj4GeoJSONFeature
-  ) {
+    json: Proj4GeoJSONFeature,
+    color?: Color
+  ): MapLayer {
     return {
       id: layer.id,
       name: layer.file.name,
@@ -420,7 +427,7 @@ export default class WebMap extends Vue {
             }
           }
         },
-        style: getStyle(layer.style, color),
+        style: getStyle(layer.style),
         pointToLayer: getPointToLayer(layer.style),
       }),
     };
@@ -455,7 +462,7 @@ export default class WebMap extends Vue {
 export interface MapItem {
   id: string;
   asset: string | File;
-  color: Color;
+  color?: Color;
   popupKey?: string;
   styleUrl?: string;
 }
@@ -463,14 +470,16 @@ export interface MapItem {
 export interface MapLayer {
   id: string;
   name: string;
-  color: Color;
   layer: GridLayer | GeoJSON;
-  colorScale?: {
-    colorMin: string;
-    colorMax: string;
-    valueMin: number;
-    valueMax: number;
-  };
+  color?: Color;
+  colorScale?: ColorScale;
+}
+
+interface ColorScale {
+  colorMin: string;
+  colorMax: string;
+  valueMin: number;
+  valueMax: number;
 }
 
 /**
