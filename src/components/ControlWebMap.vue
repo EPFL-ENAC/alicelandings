@@ -107,7 +107,7 @@ export default class ControlWebMap extends Vue {
   }
 
   deleteLayer(id: string): void {
-    this.$refs.webMap.deleteLayerId(id);
+    this.$refs.webMap.deleteLayer(id);
   }
 }
 </script>

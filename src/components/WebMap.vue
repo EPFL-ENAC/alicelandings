@@ -61,6 +61,7 @@ import L, {
   TileLayerOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
+import { clone } from "lodash";
 import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
@@ -299,19 +300,16 @@ export default class WebMap extends Vue {
 
   @Watch("fileLayers")
   onFileLayersChanged(): void {
+    const layers = clone(this.layers);
     const newIds: Set<string> = new Set(
       this.fileLayers.map((layer) => layer.id)
     );
-    this.layers.forEach((layer, index) => {
-      if (layer.id !== undefined && !newIds.has(layer.id)) {
-        this.deleteLayer(layer, index);
+    const oldIds: Set<string> = new Set(layers.map((layer) => layer.id));
+    layers.forEach((layer) => {
+      if (!newIds.has(layer.id)) {
+        this.deleteLayer(layer.id);
       }
     });
-    const oldIds: Set<string> = new Set(
-      this.layers
-        .map((layer) => layer.id)
-        .filter((id): id is string => id !== undefined)
-    );
     const newFileLayers: MapFileLayer[] = this.fileLayers.filter(
       (layer) => !oldIds.has(layer.id)
     );
@@ -439,12 +437,8 @@ export default class WebMap extends Vue {
     this.layers.unshift(...this.layers.splice(index, 1));
   }
 
-  public deleteLayerId(id: string): void {
+  public deleteLayer(id: string): void {
     const [layer, index] = this.getLayer(id);
-    this.deleteLayer(layer, index);
-  }
-
-  private deleteLayer(layer: MapLayer, index: number): void {
     this.map.removeLayer(layer.layer);
     this.layers.splice(index, 1);
   }
