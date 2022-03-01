@@ -89,8 +89,10 @@
 
 <script lang="ts">
 import WebMap, { MapItem } from "@/components/WebMap.vue";
+import { Metadata } from "@/models/qgis";
 import { TreeviewItem } from "@/utils/vuetify";
-import { Component, Ref, Vue } from "vue-property-decorator";
+import axios from "axios";
+import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -142,6 +144,7 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
+              url: "INTERVIEW/05_DELTA/constellation/metadata.json",
             },
             {
               name: "Horizons",
@@ -245,25 +248,46 @@ export default class Plhebicite extends Vue {
 
   zoom = 5;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
+  mapItems: MapItem[] = [];
 
-  get mapItems(): MapItem[] {
-    return this.selectedTreeviewItems
+  @Watch("selectedTreeviewItems")
+  onSelectedTreeviewItemsChanged(): void {
+    const promises: Promise<MapItem>[] = this.selectedTreeviewItems
       .flat()
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
       .filter((layer) => layer.url)
-      .map((layer) => {
-        const id = this.getAbsoluteUrl(layer.url);
-        const style = id?.endsWith(".geojson")
-          ? id.replace(/\.[^/.]+$/, ".sld")
-          : undefined;
-        return {
-          id: id,
-          asset: id,
-          popupKey: layer.popupKey,
-          styleUrl: style,
-        };
+      .map(async (layer) => {
+        const absoluteUrl = this.getAbsoluteUrl(layer.url);
+        if (absoluteUrl.endsWith("metadata.json")) {
+          const metadata = await axios
+            .get<Metadata>(absoluteUrl)
+            .then((response) => response.data);
+          const prefix = absoluteUrl.replace("metadata.json", "");
+          return {
+            id: absoluteUrl,
+            children: metadata.layers.map((layer) => ({
+              asset: prefix + layer.geojson,
+              styleUrl: prefix + layer.sld,
+            })),
+          };
+        } else {
+          const style = absoluteUrl?.endsWith(".geojson")
+            ? absoluteUrl.replace(/\.[^/.]+$/, ".sld")
+            : undefined;
+          return {
+            id: absoluteUrl,
+            children: [
+              {
+                asset: absoluteUrl,
+                popupKey: layer.popupKey,
+                styleUrl: style,
+              },
+            ],
+          };
+        }
       });
+    Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
   }
 
   private getAbsoluteUrl(dataUrl?: string): string {

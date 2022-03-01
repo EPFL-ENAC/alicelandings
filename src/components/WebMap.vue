@@ -54,6 +54,7 @@ import L, {
   GridLayer,
   Layer,
   LayerEvent,
+  LayerGroup,
   LeafletMouseEvent,
   Map,
   MapOptions,
@@ -192,7 +193,7 @@ export default class WebMap extends Vue {
   syncedZoom!: number;
 
   loading = false;
-  fileLayers: MapFileLayer[] = [];
+  fileLayers: MapFileItem[] = [];
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
   crs: CRS =
@@ -269,18 +270,26 @@ export default class WebMap extends Vue {
 
   @Watch("items")
   onItemsChanged(): void {
-    const promises: Promise<MapFileLayer>[] = this.items.map(async (item) => {
-      const file = await this.getFile(item.asset);
-      const style = item.styleUrl
-        ? await (
-            await axios.get(item.styleUrl, { responseType: "text" })
-          ).data
-        : undefined;
+    const promises: Promise<MapFileItem>[] = this.items.map(async (item) => {
+      const children = await Promise.all(
+        item.children.map(async (child) => {
+          const file = await this.getFile(child.asset);
+          const style = child.styleUrl
+            ? await (
+                await axios.get(child.styleUrl, { responseType: "text" })
+              ).data
+            : undefined;
+          return {
+            ...child,
+            file: file,
+            style: style,
+          } as SingleMapFileItem;
+        })
+      );
       return {
-        ...item,
-        file: file,
-        style: style,
-      } as MapFileLayer;
+        id: item.id,
+        children: children,
+      };
     });
     Promise.all(promises).then((layers) => (this.fileLayers = layers));
   }
@@ -310,92 +319,29 @@ export default class WebMap extends Vue {
         this.deleteLayer(layer.id);
       }
     });
-    const newFileLayers: MapFileLayer[] = this.fileLayers.filter(
+    const newFileItems: MapFileItem[] = this.fileLayers.filter(
       (layer) => !oldIds.has(layer.id)
     );
-    if (newFileLayers.length > 0) {
-      this.addLayers(newFileLayers);
-    }
-  }
-
-  addLayers(layers: MapFileLayer[]): void {
-    if (layers.length > 0) {
+    if (newFileItems.length > 0) {
       this.loading = true;
-      const layerPromises: Promise<MapLayer>[] = layers.map((layer) => {
-        const color: Color | undefined = layer.color;
-        switch (layer.file.type) {
-          case "image/tiff":
-            return layer.file
-              .arrayBuffer()
-              .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
-              .then((georaster: ExtendedGeoRaster) => {
-                if (color && georaster.mins[0] === 0) {
-                  georaster.noDataValue = 0;
-                }
-                const colorScale: ColorScale | undefined = color
-                  ? {
-                      colorMin: color.lighten5,
-                      colorMax: color.darken4,
-                      valueMin: georaster.mins[0],
-                      valueMax: georaster.maxs[0],
-                    }
-                  : undefined;
-                return {
-                  id: layer.id,
-                  name: layer.file.name,
-                  color: color,
-                  layer: new GeoRasterLayer({
-                    georaster: georaster,
-                    pixelValuesToColorFn: colorScale
-                      ? (values) => {
-                          if (values[0] === georaster.noDataValue) {
-                            return colors.shades.transparent;
-                          }
-                          const palette = interpolate([
-                            colorScale.colorMin,
-                            colorScale.colorMax,
-                          ]);
-                          const value =
-                            (values[0] - georaster.mins[0]) /
-                            georaster.ranges[0];
-                          return palette(value);
-                        }
-                      : undefined,
-                    resolution: 128,
-                  }),
-                  colorScale: colorScale,
-                };
-              });
-          case "application/x-zip-compressed":
-            return layer.file
-              .arrayBuffer()
-              .then((arrayBuffer) => parseZip(arrayBuffer))
-              .then((geojson) =>
-                this.getGeoJsonLayer(
-                  layer,
-                  geojson as unknown as Proj4GeoJSONFeature,
-                  color
-                )
-              );
+      const layerPromises: Promise<MapLayer>[] = newFileItems.map(
+        async (item) => {
+          const layers = await Promise.all(
+            item.children.map(this.getLeafletLayer)
+          );
+          return {
+            id: item.id,
+            name: item.id,
+            layerGroup: new LayerGroup(layers),
+            layers: layers,
+          };
         }
-        const extension = layer.file.name.split(".").pop();
-        switch (extension) {
-          case "geojson":
-          case "json":
-            return layer.file
-              .text()
-              .then(JSON.parse)
-              .then((json) => this.getGeoJsonLayer(layer, json, color));
-        }
-        return Promise.reject(
-          `unsupported type ${layer.file.type} for file ${layer.file.name}`
-        );
-      });
+      );
       Promise.all(layerPromises)
         .then((layers) => {
           layers.forEach((layer) => {
-            layer.layer.addTo(this.map);
-            layer.layer.bringToFront();
+            layer.layerGroup.addTo(this.map);
+            layer.layers.forEach((layer) => layer.bringToFront());
             this.layers.unshift(layer);
           });
         })
@@ -405,41 +351,101 @@ export default class WebMap extends Vue {
     }
   }
 
+  async getLeafletLayer(item: SingleMapFileItem): Promise<LeafletLayer> {
+    const color: Color | undefined = item.color;
+    switch (item.file.type) {
+      case "image/tiff":
+        return item.file
+          .arrayBuffer()
+          .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
+          .then((georaster: ExtendedGeoRaster) => {
+            if (color && georaster.mins[0] === 0) {
+              georaster.noDataValue = 0;
+            }
+            const colorScale: ColorScale | undefined = color
+              ? {
+                  colorMin: color.lighten5,
+                  colorMax: color.darken4,
+                  valueMin: georaster.mins[0],
+                  valueMax: georaster.maxs[0],
+                }
+              : undefined;
+            return new GeoRasterLayer({
+              georaster: georaster,
+              pixelValuesToColorFn: colorScale
+                ? (values) => {
+                    if (values[0] === georaster.noDataValue) {
+                      return colors.shades.transparent;
+                    }
+                    const palette = interpolate([
+                      colorScale.colorMin,
+                      colorScale.colorMax,
+                    ]);
+                    const value =
+                      (values[0] - georaster.mins[0]) / georaster.ranges[0];
+                    return palette(value);
+                  }
+                : undefined,
+              resolution: 128,
+            });
+          });
+      case "application/x-zip-compressed":
+        return item.file
+          .arrayBuffer()
+          .then((arrayBuffer) => parseZip(arrayBuffer))
+          .then((geojson) =>
+            this.getGeoJsonLayer(
+              item,
+              geojson as unknown as Proj4GeoJSONFeature
+            )
+          );
+    }
+    const extension = item.file.name.split(".").pop();
+    switch (extension) {
+      case "geojson":
+      case "json":
+        return item.file
+          .text()
+          .then(JSON.parse)
+          .then((json) => this.getGeoJsonLayer(item, json));
+    }
+    return Promise.reject(
+      `unsupported type ${item.file.type} for file ${item.file.name}`
+    );
+  }
+
   private getGeoJsonLayer(
-    layer: MapFileLayer,
-    json: Proj4GeoJSONFeature,
-    color?: Color
-  ): MapLayer {
-    return {
-      id: layer.id,
-      name: layer.file.name,
-      color: color,
-      layer: Proj.geoJson(json, {
-        onEachFeature: (feature, l) => {
-          if (layer.popupKey && feature.properties) {
-            const property = feature.properties[layer.popupKey];
-            if (property) {
-              l.bindPopup(property);
-              l.on("mouseover", () => l.openPopup());
-              l.on("mouseout", () => l.closePopup());
+    layer: SingleMapFileItem,
+    json: Proj4GeoJSONFeature
+  ): LeafletLayer {
+    const popupKey = layer.popupKey;
+    return Proj.geoJson(json, {
+      onEachFeature: popupKey
+        ? (feature, l) => {
+            if (feature.properties) {
+              const property = feature.properties[popupKey];
+              if (property) {
+                l.bindPopup(property);
+                l.on("mouseover", () => l.openPopup());
+                l.on("mouseout", () => l.closePopup());
+              }
             }
           }
-        },
-        style: getStyle(layer.style),
-        pointToLayer: getPointToLayer(layer.style),
-      }),
-    };
+        : undefined,
+      style: getStyle(layer.style),
+      pointToLayer: getPointToLayer(layer.style),
+    });
   }
 
   public moveLayerToFront(id: string): void {
     const [layer, index] = this.getLayer(id);
-    layer.layer.bringToFront();
+    layer.layers.forEach((layer) => layer.bringToFront());
     this.layers.unshift(...this.layers.splice(index, 1));
   }
 
   public deleteLayer(id: string): void {
     const [layer, index] = this.getLayer(id);
-    this.map.removeLayer(layer.layer);
+    this.map.removeLayer(layer.layerGroup);
     this.layers.splice(index, 1);
   }
 
@@ -453,8 +459,12 @@ export default class WebMap extends Vue {
   }
 }
 
-export interface MapItem {
+export interface MapItem<C = SingleMapItem> {
   id: string;
+  children: C[];
+}
+
+interface SingleMapItem {
   asset: string | File;
   color?: Color;
   popupKey?: string;
@@ -464,10 +474,11 @@ export interface MapItem {
 export interface MapLayer {
   id: string;
   name: string;
-  layer: GridLayer | GeoJSON;
-  color?: Color;
-  colorScale?: ColorScale;
+  layerGroup: LayerGroup;
+  layers: LeafletLayer[];
 }
+
+type LeafletLayer = GridLayer | GeoJSON;
 
 interface ColorScale {
   colorMin: string;
@@ -491,10 +502,12 @@ interface TileLayerProps {
 
 type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
 
-type MapFileLayer = MapItem & {
+type SingleMapFileItem = SingleMapItem & {
   file: File;
   style?: string;
 };
+
+type MapFileItem = MapItem<SingleMapFileItem>;
 
 interface ExtendedGeoRaster extends GeoRaster {
   mins: number[];
