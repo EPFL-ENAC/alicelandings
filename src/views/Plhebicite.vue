@@ -153,13 +153,35 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
-          name: "05 Dreyfus est un chien",
+          name: "06 Dreyfus est un chien",
         },
         {
-          name: "06 Jeux de pistes",
+          name: "07 Croisière",
           children: [
             {
-              name: "Viewshed",
+              name: "Constellation",
+              url: "INTERVIEW/07_CROISIERE/constellation/metadata.json",
+            },
+            {
+              name: "Horizons",
+              url: "INTERVIEW/07_CROISIERE/horizons/07_CROISIERE_HORIZONS.tif",
+            },
+            {
+              name: "Trajectories",
+              url: "INTERVIEW/07_CROISIERE/trajectories/07_CROISIERE_TRAJECTORIES.geojson",
+            },
+            {
+              name: "Voices",
+              children: [
+                {
+                  name: "In",
+                  url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_IN.geojson",
+                },
+                {
+                  name: "Out",
+                  url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_OUT.geojson",
+                },
+              ],
             },
           ],
         },
