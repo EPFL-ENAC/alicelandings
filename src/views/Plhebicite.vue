@@ -302,8 +302,8 @@ export default class Plhebicite extends Vue {
             children: [
               {
                 asset: absoluteUrl,
-                popupKey: layer.popupKey,
                 styleUrl: style,
+                popupKey: layer.popupKey,
               },
             ],
           };

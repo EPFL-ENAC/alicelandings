@@ -5,6 +5,7 @@ import {
   CRS,
   LatLng,
   Layer,
+  marker,
   PathOptions,
   Proj,
   StyleFunction,
@@ -236,6 +237,25 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
               ...options,
               radius: getNumber("./se:Size", graphicNode),
             });
+      }
+    }
+    const textSymbolizerNode = select("//se:TextSymbolizer", doc, true) as Node;
+    if (textSymbolizerNode) {
+      const property = getText(
+        "./se:Label/ogc:PropertyName",
+        textSymbolizerNode
+      );
+      if (property) {
+        return (geoJsonPoint, latlng) => {
+          const properties = geoJsonPoint.properties;
+          if (properties) {
+            return marker(latlng).bindTooltip(properties[property], {
+              permanent: true,
+            });
+          } else {
+            return marker(latlng);
+          }
+        };
       }
     }
   }
