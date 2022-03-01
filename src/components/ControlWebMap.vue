@@ -19,14 +19,10 @@
         <v-list-item
           v-for="(item, index) in layers"
           :key="index"
-          :color="item.color.base"
           :input-value="layerActives[index]"
         >
           <v-list-item-action>
-            <v-checkbox
-              v-model="layerActives[index]"
-              :color="item.color.base"
-            ></v-checkbox>
+            <v-checkbox v-model="layerActives[index]"></v-checkbox>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
@@ -83,8 +79,12 @@ export default class ControlWebMap extends Vue {
   get mapItems(): MapItem[] {
     return this.layerFiles.map((file) => ({
       id: file.name,
-      asset: file,
-      color: randomColor(),
+      children: [
+        {
+          asset: file,
+          color: randomColor(),
+        },
+      ],
     }));
   }
 
@@ -107,6 +107,7 @@ export default class ControlWebMap extends Vue {
   }
 
   deleteLayer(id: string): void {
+    this.layerFiles = this.layerFiles.filter((file) => file.name != id);
     this.$refs.webMap.deleteLayer(id);
   }
 }
