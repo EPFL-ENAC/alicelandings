@@ -207,7 +207,7 @@ function getNumber(expression: string, node: Node): number | undefined {
 }
 
 function getPathOptions(expression: string, node: Node): PathOptions {
-  return Object.fromEntries(
+  const pathOptions: PathOptions = Object.fromEntries(
     (select(expression, node) as Element[])
       .map((element) => {
         const name = element.getAttribute("name");
@@ -216,6 +216,10 @@ function getPathOptions(expression: string, node: Node): PathOptions {
       })
       .filter((entry) => entry[0] !== undefined)
   );
+  if (pathOptions.fillColor && pathOptions.fillOpacity === undefined) {
+    pathOptions.fillOpacity = 1;
+  }
+  return pathOptions;
 }
 
 type PointToLayer = (geoJsonPoint: Feature<Point>, latlng: LatLng) => Layer;
