@@ -1,7 +1,9 @@
 <template>
   <v-row>
     <v-col cols="8">
-      <web-map ref="webMap" :items="mapItems"></web-map>
+      <v-responsive aspect-ratio="1">
+        <web-map ref="webMap" :items="mapItems"></web-map>
+      </v-responsive>
     </v-col>
     <v-col cols="4">
       <h2>Layers</h2>

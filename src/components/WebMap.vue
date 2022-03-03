@@ -318,30 +318,20 @@ export default class WebMap extends Vue {
     );
     if (newFileItems.length > 0) {
       this.loading = true;
-      const layerPromises: Promise<MapLayer>[] = newFileItems.map(
-        async (item) => {
-          const layers = await Promise.all(
-            item.children.map(this.getLeafletLayer)
+      const promises: Promise<void>[] = newFileItems.map(async (item) => {
+        const layerGroup: LayerGroup = new LayerGroup();
+        item.children
+          .map(this.getLeafletLayer)
+          .forEach((promise) =>
+            promise.then((layer) => layerGroup.addLayer(layer))
           );
-          return {
-            id: item.id,
-            name: item.id,
-            layerGroup: new LayerGroup(layers),
-            layers: layers,
-          };
-        }
-      );
-      Promise.all(layerPromises)
-        .then((layers) => {
-          layers.forEach((layer) => {
-            layer.layerGroup.addTo(this.map);
-            layer.layers.forEach((layer) => layer.bringToFront());
-            this.layers.unshift(layer);
-          });
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+        this.map.addLayer(layerGroup);
+        const mapLayer = new MapLayer(item.id, item.id, layerGroup);
+        this.layers.unshift(mapLayer);
+      });
+      Promise.allSettled(promises).finally(() => {
+        this.loading = false;
+      });
     }
   }
 
@@ -465,11 +455,16 @@ interface SingleMapItem {
   styleUrl?: string;
 }
 
-export interface MapLayer {
-  id: string;
-  name: string;
-  layerGroup: LayerGroup;
-  layers: LeafletLayer[];
+export class MapLayer {
+  constructor(
+    public id: string,
+    public name: string,
+    public layerGroup: LayerGroup
+  ) {}
+
+  get layers(): LeafletLayer[] {
+    return this.layerGroup.getLayers() as LeafletLayer[];
+  }
 }
 
 type LeafletLayer = GridLayer | GeoJSON;

@@ -27,17 +27,19 @@ const attributeNameMapping = new Map<string, keyof PathOptions>([
   ["stroke-width", "weight"],
 ]);
 const operatorMapping = new Map<string, Operator>([
-  ["PropertyIsEqualTo", "eq"],
-  ["PropertyIsGreaterThan", "gt"],
-  ["PropertyIsGreaterThanOrEqualTo", "ge"],
-  ["PropertyIsLessThan", "lt"],
-  ["PropertyIsLessThanOrEqualTo", "le"],
-  ["PropertyIsNotEqualTo", "ne"],
+  ["PropertyIsEqualTo", (p, l) => p === l],
+  ["PropertyIsGreaterThan", (p, l) => p > l],
+  ["PropertyIsGreaterThanOrEqualTo", (p, l) => p >= l],
+  ["PropertyIsLessThan", (p, l) => p < l],
+  ["PropertyIsLessThanOrEqualTo", (p, l) => p <= l],
+  ["PropertyIsNotEqualTo", (p, l) => p !== l],
 ]);
+
+type Operator = (p: number, l: number) => boolean;
 
 interface Rule {
   condition?: {
-    filterUnion: "and" | "or";
+    filterReducer: (a: boolean, b: boolean) => boolean;
     filters: Filter[];
   };
   options: PathOptions;
@@ -48,8 +50,6 @@ interface Filter {
   literal: number;
   operator: Operator;
 }
-
-type Operator = "eq" | "gt" | "ge" | "lt" | "le" | "ne";
 
 const operatorExpression = Array.from(operatorMapping.keys())
   .map((name) => `./*/ogc:${name}`)
@@ -94,7 +94,7 @@ export function getStyle(
         if (select("./ogc:And", filterNode, true)) {
           return {
             condition: {
-              filterUnion: "and",
+              filterReducer: (a, b) => a && b,
               filters: filters,
             },
             options: options,
@@ -103,7 +103,7 @@ export function getStyle(
         if (select("./ogc:Or", filterNode, true)) {
           return {
             condition: {
-              filterUnion: "or",
+              filterReducer: (a, b) => a || b,
               filters: filters,
             },
             options: options,
@@ -125,31 +125,13 @@ export function getStyle(
             return true;
           }
           return condition.filters
-            .map((filter) => {
-              const property = feature.properties[filter.property];
-              switch (filter.operator) {
-                case "eq":
-                  return property == filter.literal;
-                case "gt":
-                  return property > filter.literal;
-                case "ge":
-                  return property >= filter.literal;
-                case "lt":
-                  return property < filter.literal;
-                case "le":
-                  return property <= filter.literal;
-                case "ne":
-                  return property != filter.literal;
-              }
-            })
-            .reduce((a, b) => {
-              switch (condition.filterUnion) {
-                case "and":
-                  return a && b;
-                case "or":
-                  return a || b;
-              }
-            });
+            .map((filter) =>
+              filter.operator(
+                feature.properties[filter.property],
+                filter.literal
+              )
+            )
+            .reduce(condition.filterReducer);
         })?.options ?? {}
       );
     };
