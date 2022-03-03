@@ -33,14 +33,8 @@
 </template>
 
 <script lang="ts">
-import {
-  EPSG_2056,
-  EPSG_21781,
-  getPointToLayer,
-  getStyle,
-  sitgCrs,
-  swisstopoCrs,
-} from "@/utils/leaflet";
+import { EPSG_2056, EPSG_21781, sitgCrs, swisstopoCrs } from "@/utils/leaflet";
+import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
