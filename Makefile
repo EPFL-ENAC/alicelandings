@@ -20,3 +20,6 @@ install-prod:
 
 deploy-prod:
 	ansible-playbook ansible/deploy.yml -i ansible/inventory.ini
+
+upload-data:
+	rsync -av --delete ./public/data/ root@enacvm0080.xaas.epfl.ch:/opt/plhebicite-webmap/public/data/

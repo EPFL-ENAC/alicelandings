@@ -14,9 +14,10 @@
         upgrade: "yes"
     - name: Git checkout
       git:
-        repo: git@github.com:EPFL-ENAC/plhebicite-webmap.git
+        repo: git@github.com:EPFL-ENAC/alicelandings.git
         dest: /opt/plhebicite-webmap
         accept_hostkey: yes
+        force: yes
         version: main
     - name: Run Docker Compose
       community.docker.docker_compose:
