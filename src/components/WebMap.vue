@@ -180,14 +180,13 @@ export default class WebMap extends Vue {
   readonly lMap!: LMap;
 
   @Prop({ default: () => [] })
-  readonly items!: MapItem[];
+  readonly items!: MapGroupItem[];
   @Prop({ default: () => [] })
   readonly dems!: string[];
   @PropSync("zoom", { type: Number, default: 5 })
   syncedZoom!: number;
 
   loading = false;
-  fileLayers: MapFileItem[] = [];
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
   crs: CRS =
@@ -267,61 +266,19 @@ export default class WebMap extends Vue {
 
   @Watch("items")
   onItemsChanged(): void {
-    const promises: Promise<MapFileItem>[] = this.items.map(async (item) => {
-      const children = await Promise.all(
-        item.children.map(async (child) => {
-          const file = await this.getFile(child.asset);
-          const style = child.styleUrl
-            ? await (
-                await axios.get(child.styleUrl, { responseType: "text" })
-              ).data
-            : undefined;
-          return {
-            ...child,
-            file: file,
-            style: style,
-          } as SingleMapFileItem;
-        })
-      );
-      return {
-        id: item.id,
-        children: children,
-      };
-    });
-    Promise.all(promises).then((layers) => (this.fileLayers = layers));
-  }
-
-  private async getFile(input: string | File): Promise<File> {
-    if (typeof input === "string") {
-      const url: string = input;
-      const response = await axios.get(url, { responseType: "blob" });
-      const mimeType = lookup(url);
-      return new File([response.data], url.split("/").pop() ?? url, {
-        type: mimeType || undefined,
-      });
-    } else {
-      return Promise.resolve(input);
-    }
-  }
-
-  @Watch("fileLayers")
-  onFileLayersChanged(): void {
-    const layers = clone(this.layers);
-    const newIds: Set<string> = new Set(
-      this.fileLayers.map((layer) => layer.id)
-    );
-    const oldIds: Set<string> = new Set(layers.map((layer) => layer.id));
-    layers.forEach((layer) => {
+    const newIds: Set<string> = new Set(this.items.map((item) => item.id));
+    const oldIds: Set<string> = new Set(this.layers.map((layer) => layer.id));
+    clone(this.layers).forEach((layer) => {
       if (!newIds.has(layer.id)) {
         this.deleteLayer(layer.id);
       }
     });
-    const newFileItems: MapFileItem[] = this.fileLayers.filter(
+    const newItems: MapGroupItem[] = this.items.filter(
       (layer) => !oldIds.has(layer.id)
     );
-    if (newFileItems.length > 0) {
+    if (newItems.length > 0) {
       this.loading = true;
-      const promises: Promise<void>[] = newFileItems.map(async (item) => {
+      const promises: Promise<void>[] = newItems.map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
         item.children
           .map(this.getLeafletLayer)
@@ -338,46 +295,45 @@ export default class WebMap extends Vue {
     }
   }
 
-  async getLeafletLayer(item: SingleMapFileItem): Promise<LeafletLayer> {
+  async getLeafletLayer(item: MapItem): Promise<LeafletLayer> {
+    const mimeType = item.mimeType;
+    const filename = item.filename;
     const color: Color | undefined = item.color;
-    switch (item.file.type) {
+    switch (mimeType) {
       case "image/tiff":
-        return item.file
-          .arrayBuffer()
-          .then((arrayBuffer) => parseGeoRaster(arrayBuffer))
-          .then((georaster: ExtendedGeoRaster) => {
-            if (color && georaster.mins[0] === 0) {
-              georaster.noDataValue = 0;
-            }
-            const colorScale: ColorScale | undefined = color
-              ? {
-                  colorMin: color.lighten5,
-                  colorMax: color.darken4,
-                  valueMin: georaster.mins[0],
-                  valueMax: georaster.maxs[0],
-                }
-              : undefined;
-            return new GeoRasterLayer({
-              georaster: georaster,
-              pixelValuesToColorFn: colorScale
-                ? (values) => {
-                    if (values[0] === georaster.noDataValue) {
-                      return colors.shades.transparent;
-                    }
-                    const palette = interpolate([
-                      colorScale.colorMin,
-                      colorScale.colorMax,
-                    ]);
-                    const value =
-                      (values[0] - georaster.mins[0]) / georaster.ranges[0];
-                    return palette(value);
+        return item.geoRaster().then((georaster: ExtendedGeoRaster) => {
+          if (color && georaster.mins[0] === 0) {
+            georaster.noDataValue = 0;
+          }
+          const colorScale: ColorScale | undefined = color
+            ? {
+                colorMin: color.lighten5,
+                colorMax: color.darken4,
+                valueMin: georaster.mins[0],
+                valueMax: georaster.maxs[0],
+              }
+            : undefined;
+          return new GeoRasterLayer({
+            georaster: georaster,
+            pixelValuesToColorFn: colorScale
+              ? (values) => {
+                  if (values[0] === georaster.noDataValue) {
+                    return colors.shades.transparent;
                   }
-                : undefined,
-              resolution: 128,
-            });
+                  const palette = interpolate([
+                    colorScale.colorMin,
+                    colorScale.colorMax,
+                  ]);
+                  const value =
+                    (values[0] - georaster.mins[0]) / georaster.ranges[0];
+                  return palette(value);
+                }
+              : undefined,
+            resolution: 128,
           });
+        });
       case "application/x-zip-compressed":
-        return item.file
+        return item
           .arrayBuffer()
           .then((arrayBuffer) => parseZip(arrayBuffer))
           .then((geojson) =>
@@ -387,25 +343,21 @@ export default class WebMap extends Vue {
             )
           );
     }
-    const extension = item.file.name.split(".").pop();
+    const extension = filename.split(".").pop();
     switch (extension) {
       case "geojson":
       case "json":
-        return item.file
-          .text()
-          .then(JSON.parse)
-          .then((json) => this.getGeoJsonLayer(item, json));
+        return item.json().then((json) => this.getGeoJsonLayer(item, json));
     }
-    return Promise.reject(
-      `unsupported type ${item.file.type} for file ${item.file.name}`
-    );
+    return Promise.reject(`unsupported type ${mimeType} for file ${filename}`);
   }
 
-  private getGeoJsonLayer(
-    layer: SingleMapFileItem,
+  private async getGeoJsonLayer(
+    item: MapItem,
     json: Proj4GeoJSONFeature
-  ): LeafletLayer {
-    const popupKey = layer.popupKey;
+  ): Promise<LeafletLayer> {
+    const popupKey = item.popupKey;
+    const style: string | undefined = await item.style();
     return Proj.geoJson(json, {
       onEachFeature: popupKey
         ? (feature, l) => {
@@ -419,8 +371,8 @@ export default class WebMap extends Vue {
             }
           }
         : undefined,
-      style: getStyle(layer.style),
-      pointToLayer: getPointToLayer(layer.style),
+      style: getStyle(style),
+      pointToLayer: getPointToLayer(style),
     });
   }
 
@@ -446,16 +398,102 @@ export default class WebMap extends Vue {
   }
 }
 
-export interface MapItem<C = SingleMapItem> {
+export interface MapGroupItem {
   id: string;
-  children: C[];
+  children: MapItem[];
 }
 
-interface SingleMapItem {
-  asset: string | File;
+interface MapItemOption {
   color?: Color;
   popupKey?: string;
   styleUrl?: string;
+}
+
+abstract class MapItem {
+  constructor(protected option?: MapItemOption) {}
+
+  get color(): Color | undefined {
+    return this.option?.color;
+  }
+
+  get popupKey(): string | undefined {
+    return this.option?.popupKey;
+  }
+
+  async style(): Promise<string | undefined> {
+    return this.option?.styleUrl
+      ? await (
+          await axios.get(this.option?.styleUrl, { responseType: "text" })
+        ).data
+      : undefined;
+  }
+
+  abstract get mimeType(): string;
+  abstract get filename(): string;
+  abstract arrayBuffer(): Promise<ArrayBuffer>;
+  abstract geoRaster(): Promise<ExtendedGeoRaster>;
+  abstract json(): Promise<Proj4GeoJSONFeature>;
+}
+
+export class FileMapItem extends MapItem {
+  constructor(public file: File, option?: MapItemOption) {
+    super(option);
+  }
+
+  get mimeType(): string {
+    return this.file.type;
+  }
+
+  get filename(): string {
+    return this.file.name;
+  }
+
+  arrayBuffer(): Promise<ArrayBuffer> {
+    return this.file.arrayBuffer();
+  }
+
+  async geoRaster(): Promise<ExtendedGeoRaster> {
+    const arrayBuffer: ArrayBuffer = await this.file.arrayBuffer();
+    return parseGeoRaster(arrayBuffer);
+  }
+
+  async json(): Promise<Proj4GeoJSONFeature> {
+    const text = await this.file.text();
+    return JSON.parse(text);
+  }
+}
+
+export class UrlMapItem extends MapItem {
+  constructor(public url: string, option?: MapItemOption) {
+    super(option);
+  }
+
+  get mimeType(): string {
+    const type = lookup(this.url);
+    return type ? type : "";
+  }
+
+  get filename(): string {
+    return this.url;
+  }
+
+  async arrayBuffer(): Promise<ArrayBuffer> {
+    const response = await axios.get(this.url, {
+      responseType: "arraybuffer",
+    });
+    return response.data;
+  }
+
+  geoRaster(): Promise<ExtendedGeoRaster> {
+    return parseGeoRaster(this.url);
+  }
+
+  async json(): Promise<Proj4GeoJSONFeature> {
+    const response = await axios.get(this.url, {
+      responseType: "json",
+    });
+    return response.data;
+  }
 }
 
 export class MapLayer {
@@ -493,13 +531,6 @@ interface TileLayerProps {
 }
 
 type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
-
-type SingleMapFileItem = SingleMapItem & {
-  file: File;
-  style?: string;
-};
-
-type MapFileItem = MapItem<SingleMapFileItem>;
 
 interface ExtendedGeoRaster extends GeoRaster {
   mins: number[];

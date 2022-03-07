@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import WebMap, { MapItem } from "@/components/WebMap.vue";
+import WebMap, { MapGroupItem, UrlMapItem } from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
@@ -269,11 +269,11 @@ export default class Plhebicite extends Vue {
 
   zoom = 5;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
-  mapItems: MapItem[] = [];
+  mapItems: MapGroupItem[] = [];
 
   @Watch("selectedTreeviewItems")
   onSelectedTreeviewItemsChanged(): void {
-    const promises: Promise<MapItem>[] = this.selectedTreeviewItems
+    const promises: Promise<MapGroupItem>[] = this.selectedTreeviewItems
       .flat()
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
@@ -287,10 +287,12 @@ export default class Plhebicite extends Vue {
           const prefix = absoluteUrl.replace("metadata.json", "");
           return {
             id: absoluteUrl,
-            children: metadata.layers.map((layer) => ({
-              asset: prefix + layer.geojson,
-              styleUrl: prefix + layer.sld,
-            })),
+            children: metadata.layers.map(
+              (layer) =>
+                new UrlMapItem(prefix + layer.geojson, {
+                  styleUrl: prefix + layer.sld,
+                })
+            ),
           };
         } else {
           const style = absoluteUrl?.endsWith(".geojson")
@@ -299,11 +301,10 @@ export default class Plhebicite extends Vue {
           return {
             id: absoluteUrl,
             children: [
-              {
-                asset: absoluteUrl,
+              new UrlMapItem(absoluteUrl, {
                 styleUrl: style,
                 popupKey: layer.popupKey,
-              },
+              }),
             ],
           };
         }

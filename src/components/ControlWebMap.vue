@@ -58,7 +58,11 @@
 </template>
 
 <script lang="ts">
-import WebMap, { MapItem, MapLayer } from "@/components/WebMap.vue";
+import WebMap, {
+  FileMapItem,
+  MapGroupItem,
+  MapLayer,
+} from "@/components/WebMap.vue";
 import { randomColor } from "@/utils/vuetify";
 import "vue-class-component/hooks";
 import { Component, Vue } from "vue-property-decorator";
@@ -78,15 +82,10 @@ export default class ControlWebMap extends Vue {
   layerActives: boolean[] = [];
   webMap: WebMap | null = null;
 
-  get mapItems(): MapItem[] {
+  get mapItems(): MapGroupItem[] {
     return this.layerFiles.map((file) => ({
       id: file.name,
-      children: [
-        {
-          asset: file,
-          color: randomColor(),
-        },
-      ],
+      children: [new FileMapItem(file, { color: randomColor() })],
     }));
   }
 
