@@ -100,11 +100,10 @@ import { Component, Ref, Vue, Watch } from "vue-property-decorator";
   },
 })
 export default class Plhebicite extends Vue {
-  readonly rootUrl = process.env.BASE_URL;
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
-  ].map((filename) => `${this.rootUrl}data/${filename}`);
+  ].map((filename) => this.getAbsoluteUrl(filename));
   readonly categories: Category[] = [
     {
       name: "Affective Mapping of Vernier",
@@ -313,7 +312,7 @@ export default class Plhebicite extends Vue {
   }
 
   private getAbsoluteUrl(dataUrl?: string): string {
-    return `${this.rootUrl}data/${dataUrl}`;
+    return `${location.origin}${process.env.BASE_URL}data/${dataUrl}`;
   }
 
   getTreeviewItems(
@@ -337,7 +336,7 @@ export default class Plhebicite extends Vue {
   }
 
   moveItemToFront(item: TreeviewItem<Layer>): void {
-    const id = `${this.rootUrl}data/${item.value.url}`;
+    const id = this.getAbsoluteUrl(item.value.url);
     this.webMap.moveLayerToFront(id);
   }
 }

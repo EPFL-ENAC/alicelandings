@@ -210,17 +210,23 @@ export default class WebMap extends Vue {
         const container = DomUtil.create("div");
         map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
           const point = this.crs.project(e.latlng);
-          const altitude: number | undefined = this.demGeorasters
-            .flatMap((georaster) => identify(georaster, [point.x, point.y]))
-            .find((value) => value); // defined && !== 0
+          const altitudePromise: Promise<number | undefined> = Promise.all(
+            this.demGeorasters.map((georaster) =>
+              identify(georaster, [point.x, point.y])
+            )
+          ).then((altitudes) => {
+            return altitudes.flat().find((value) => value); // defined && !== 0
+          });
           const positionText = `Lat/Lon:
           (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
-          container.innerHTML =
-            altitude !== undefined
-              ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
-                  "<br>"
-                )
-              : positionText;
+          altitudePromise.then((altitude) => {
+            container.innerHTML =
+              altitude !== undefined
+                ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
+                    "<br>"
+                  )
+                : positionText;
+          });
         });
         map.addEventListener("mouseout", () => {
           container.innerHTML = "";
@@ -253,12 +259,9 @@ export default class WebMap extends Vue {
   onDemsChanged(): void {
     this.demGeorasters = [];
     this.dems.forEach((dem) => {
-      axios
-        .get(dem, { responseType: "arraybuffer" })
-        .then((response) => parseGeoRaster(response.data))
-        .then((georaster: GeoRaster) => {
-          this.demGeorasters.push(georaster);
-        });
+      parseGeoRaster(dem).then((georaster: GeoRaster) => {
+        this.demGeorasters.push(georaster);
+      });
     });
   }
 
