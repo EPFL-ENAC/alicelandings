@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dense>
-      <v-app-bar-title>Plhebicite</v-app-bar-title>
+      <v-app-bar-title>Alice Landings</v-app-bar-title>
       <v-tabs>
         <v-tab to="/">Home</v-tab>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
