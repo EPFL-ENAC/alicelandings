@@ -153,21 +153,51 @@ function getNumber(expression: string, node: Node): number | undefined {
 
 function getPathOptions(expression: string, node: Node): PathOptions {
   const pathOptions: PathOptions = Object.fromEntries(
-    (select(expression, node) as Element[])
-      .map((element) => {
-        const name = element.getAttribute("name");
-        const key = name ? attributeNameMapping.get(name) : undefined;
-        return [key, element.firstChild?.nodeValue ?? undefined];
-      })
-      .filter((entry) => entry[0] !== undefined)
+    (select(expression, node) as Element[]).flatMap((element) => {
+      const name = element.getAttribute("name");
+      const key = name ? attributeNameMapping.get(name) : undefined;
+      if (key) {
+        const value = element.firstChild?.nodeValue ?? undefined;
+        return [[key, castValue(key, value)]];
+      } else {
+        return [];
+      }
+    })
   );
   if (pathOptions.fillColor && pathOptions.fillOpacity === undefined) {
     pathOptions.fillOpacity = 1;
+  }
+  if (pathOptions.dashArray) {
+    pathOptions.dashArray = (pathOptions.dashArray as number[]).map(
+      (v) => v * (pathOptions.weight ?? 3) // https://leafletjs.com/SlavaUkraini/reference.html#path-weight
+    );
   }
   return pathOptions;
 }
 
 type PointToLayer = (geoJsonPoint: Feature<Point>, latlng: LatLng) => Layer;
+
+function ratio(value?: number): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  } else {
+    return value / 2.5;
+  }
+}
+
+function castValue(key: keyof PathOptions, value?: string): unknown {
+  if (value === undefined) {
+    return undefined;
+  }
+  switch (key) {
+    case "dashArray":
+      return value.split(" ").map((item) => Number(item));
+    case "weight":
+      return Number(value);
+    default:
+      return value;
+  }
+}
 
 export function getPointToLayer(style?: string): PointToLayer | undefined {
   if (style) {
@@ -184,7 +214,7 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
           return (_, latlng) =>
             circleMarker(latlng, {
               ...options,
-              radius: getNumber("./se:Size", graphicNode),
+              radius: ratio(getNumber("./se:Size", graphicNode)),
             });
       }
     }
