@@ -1,12 +1,17 @@
 import { Feature, Point } from "geojson";
-import {
+import L, {
   circleMarker,
   LatLng,
   Layer,
+  LeafletEvent,
+  LeafletEventHandlerFn,
   marker,
   PathOptions,
+  Pattern,
+  PatternCircle,
   StyleFunction,
 } from "leaflet";
+import "leaflet.pattern";
 import "proj4leaflet";
 import { DOMParser } from "xmldom";
 import xpath from "xpath";
@@ -55,17 +60,20 @@ const operatorExpression = Array.from(operatorMapping.keys())
   .map((name) => `./*/ogc:${name}`)
   .join(" | ");
 
-export function getStyle(
-  style?: string
-): PathOptions | StyleFunction | undefined {
+export function getStyle(style?: string): {
+  style?: PathOptions | StyleFunction;
+  onAdd?: LeafletEventHandlerFn;
+  onRemove?: LeafletEventHandlerFn;
+} {
   if (style) {
     const doc = new DOMParser().parseFromString(style);
     const ruleNodes = select("//se:Rule", doc) as Node[];
+    const patterns: Pattern[] = [];
     const rules: Rule[] = ruleNodes.map((ruleNode) => {
-      const options: PathOptions = getPathOptions(
-        "./*/*/se:SvgParameter",
-        ruleNode
-      );
+      const { pathOptions, pattern } = getPathOptions(ruleNode);
+      if (pattern) {
+        patterns.push(pattern);
+      }
       const filterNode = select("./ogc:Filter", ruleNode, true) as
         | Element
         | undefined;
@@ -97,7 +105,7 @@ export function getStyle(
               filterReducer: (a, b) => a && b,
               filters: filters,
             },
-            options: options,
+            options: pathOptions,
           };
         }
         if (select("./ogc:Or", filterNode, true)) {
@@ -106,42 +114,56 @@ export function getStyle(
               filterReducer: (a, b) => a || b,
               filters: filters,
             },
-            options: options,
+            options: pathOptions,
           };
         }
       }
       return {
-        options: options,
+        options: pathOptions,
       };
     });
-    return (feature) => {
-      if (!feature) {
-        return {};
-      }
-      return (
-        rules.find((rule) => {
-          const condition = rule.condition;
-          if (!condition) {
-            return true;
-          }
-          return condition.filters
-            .map((filter) =>
-              filter.operator(
-                feature.properties[filter.property],
-                filter.literal
+    return {
+      style: (feature) => {
+        if (!feature) {
+          return {};
+        }
+        return (
+          rules.find((rule) => {
+            const condition = rule.condition;
+            if (!condition) {
+              return true;
+            }
+            return condition.filters
+              .map((filter) =>
+                filter.operator(
+                  feature.properties[filter.property],
+                  filter.literal
+                )
               )
-            )
-            .reduce(condition.filterReducer);
-        })?.options ?? {}
-      );
+              .reduce(condition.filterReducer);
+          })?.options ?? {}
+        );
+      },
+      onAdd: patterns
+        ? (event: LeafletEvent) => {
+            const map: L.Map = event.target._map;
+            patterns.forEach((pattern) => pattern.addTo(map));
+          }
+        : undefined,
+      onRemove: patterns
+        ? (event: LeafletEvent) => {
+            const map: L.Map = event.target._map;
+            patterns.forEach((pattern) => pattern.removeFrom(map));
+          }
+        : undefined,
     };
   }
-  return undefined;
+  return {};
 }
 
 function getText(expression: string, node: Node): string | undefined {
   return (
-    (select(expression + "/text()", node, true) as Text | undefined)
+    (select(`${expression}/text()`, node, true) as Text | undefined)
       ?.nodeValue ?? undefined
   );
 }
@@ -151,7 +173,73 @@ function getNumber(expression: string, node: Node): number | undefined {
   return text === undefined ? undefined : Number(text);
 }
 
-function getPathOptions(expression: string, node: Node): PathOptions {
+function getPathOptions(ruleNode: Node): {
+  pathOptions: PathOptions;
+  pattern?: Pattern;
+} {
+  const symbolizerNode = select(
+    "./se:PolygonSymbolizer | ./se:LineSymbolizer",
+    ruleNode,
+    true
+  ) as Node;
+  if (!symbolizerNode) {
+    // skip PointSymbolizer
+    return {
+      pathOptions: {},
+    };
+  }
+  const graphicNode = select(
+    "./se:Fill/se:GraphicFill/se:Graphic",
+    symbolizerNode,
+    true
+  ) as Node;
+  if (graphicNode) {
+    const wellKnownName = getText("./se:Mark/se:WellKnownName", graphicNode);
+    switch (wellKnownName) {
+      case "circle": {
+        const size = getNumber("./se:Size", graphicNode);
+        const shape = new PatternCircle({
+          radius: size,
+          color: getText(
+            "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke']",
+            graphicNode
+          ),
+          fillColor: getText(
+            "./se:Mark/se:Fill/se:SvgParameter[@name='fill']",
+            graphicNode
+          ),
+        });
+        const dimension = ratio(size, 3);
+        const pattern = new Pattern({
+          width: dimension,
+          height: dimension,
+        });
+        pattern.addShape(shape);
+        return {
+          pathOptions: {
+            fillPattern: pattern,
+            stroke: false,
+          },
+          pattern: pattern,
+        };
+      }
+      default:
+        throw Error(`Unknown WellKnownName ${wellKnownName}`);
+    }
+  } else {
+    return {
+      pathOptions: getSvgParameterPathOptions(
+        "./*/se:SvgParameter",
+        symbolizerNode
+      ),
+    };
+  }
+}
+
+function getSvgParameterPathOptions(
+  expression: string,
+  node: Node
+): PathOptions {
   const pathOptions: PathOptions = Object.fromEntries(
     (select(expression, node) as Element[]).flatMap((element) => {
       const name = element.getAttribute("name");
@@ -177,11 +265,11 @@ function getPathOptions(expression: string, node: Node): PathOptions {
 
 type PointToLayer = (geoJsonPoint: Feature<Point>, latlng: LatLng) => Layer;
 
-function ratio(value?: number): number | undefined {
+function ratio(value?: number, ratio = 1 / 2.5): number | undefined {
   if (value === undefined) {
     return undefined;
   } else {
-    return value / 2.5;
+    return value * ratio;
   }
 }
 
@@ -203,10 +291,14 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
   if (style) {
     const doc = new DOMParser().parseFromString(style);
     // TODO: rule filter ?
-    const graphicNode = select("//se:Graphic", doc, true) as Node;
+    const graphicNode = select(
+      "//se:PointSymbolizer/se:Graphic",
+      doc,
+      true
+    ) as Node;
     if (graphicNode) {
-      const options: PathOptions = getPathOptions(
-        "./*/*/se:SvgParameter",
+      const options: PathOptions = getSvgParameterPathOptions(
+        "./se:Mark/*/se:SvgParameter",
         graphicNode
       );
       switch (getText("./se:Mark/se:WellKnownName", graphicNode)) {

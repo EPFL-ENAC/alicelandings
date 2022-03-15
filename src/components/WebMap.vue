@@ -357,8 +357,9 @@ export default class WebMap extends Vue {
     json: Proj4GeoJSONFeature
   ): Promise<LeafletLayer> {
     const popupKey = item.popupKey;
-    const style: string | undefined = await item.style();
-    return Proj.geoJson(json, {
+    const styleText: string | undefined = await item.style();
+    const { style, onAdd, onRemove } = getStyle(styleText);
+    const geoJson = Proj.geoJson(json, {
       onEachFeature: popupKey
         ? (feature, l) => {
             if (feature.properties) {
@@ -371,9 +372,16 @@ export default class WebMap extends Vue {
             }
           }
         : undefined,
-      style: getStyle(style),
-      pointToLayer: getPointToLayer(style),
+      style: style,
+      pointToLayer: getPointToLayer(styleText),
     });
+    if (onAdd) {
+      return geoJson.on("add", onAdd);
+    }
+    if (onRemove) {
+      return geoJson.on("remove", onRemove);
+    }
+    return geoJson;
   }
 
   public moveLayerToFront(id: string): void {
