@@ -13,6 +13,7 @@ import L, {
 } from "leaflet";
 import "leaflet.pattern";
 import "proj4leaflet";
+import { colors } from "vuetify/lib";
 import { DOMParser } from "xmldom";
 import xpath from "xpath";
 
@@ -60,6 +61,11 @@ const operatorExpression = Array.from(operatorMapping.keys())
   .map((name) => `./*/ogc:${name}`)
   .join(" | ");
 
+const noOptions: PathOptions = {
+  color: colors.shades.transparent,
+  stroke: false,
+};
+
 export function getStyle(style?: string): {
   style?: PathOptions | StyleFunction;
   onAdd?: LeafletEventHandlerFn;
@@ -86,7 +92,7 @@ export function getStyle(style?: string): {
           if (!property) {
             throw "Expected ogc:PropertyName";
           }
-          if (!literal) {
+          if (literal === undefined) {
             throw "Expected ogc:Literal";
           }
           const operator = operatorMapping.get(node.localName);
@@ -125,7 +131,7 @@ export function getStyle(style?: string): {
     return {
       style: (feature) => {
         if (!feature) {
-          return {};
+          return noOptions;
         }
         return (
           rules.find((rule) => {
@@ -134,14 +140,16 @@ export function getStyle(style?: string): {
               return true;
             }
             return condition.filters
-              .map((filter) =>
-                filter.operator(
-                  feature.properties[filter.property],
-                  filter.literal
-                )
-              )
+              .map((filter) => {
+                const property = feature.properties[filter.property];
+                if (property == null) {
+                  return false;
+                } else {
+                  return filter.operator(property, filter.literal);
+                }
+              })
               .reduce(condition.filterReducer);
-          })?.options ?? {}
+          })?.options ?? noOptions
         );
       },
       onAdd: patterns
@@ -185,7 +193,7 @@ function getPathOptions(ruleNode: Node): {
   if (!symbolizerNode) {
     // skip PointSymbolizer
     return {
-      pathOptions: {},
+      pathOptions: noOptions,
     };
   }
   const graphicNode = select(

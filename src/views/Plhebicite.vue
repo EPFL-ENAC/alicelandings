@@ -111,7 +111,8 @@ export default class Plhebicite extends Vue {
         "The Affective Mappings series offers an alternative way of representing urban lived space in the commune of Vernier. Based on fifteen walk-along interviews done with neighbours of Vernier, these maps attempt to draw these citizens’ affective engagements with their everyday environments highlighting perceptions, landscapes and experience instead of abstract administrative lines or symbols. By acknowledging the lived space of a city in maps that can be collectively shared, discussed and transformed, we can expand our urban imaginaries and improve how we plan and design our cities.",
       layers: [
         {
-          name: "01 La fôret tropicale",
+          name: "00 Marco",
+          url: "grid_tot_vn_21781_v17_shp_df_weighted_20210917_MANUAL_INDEX_V3.geojson",
         },
         {
           name: "02 Ville dortoir",
@@ -146,6 +147,10 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/05_DELTA/constellation/metadata.json",
             },
             {
+              name: "Constellation - Raster",
+              url: "INTERVIEW/05_DELTA/test_05_constellation.tiff",
+            },
+            {
               name: "Horizons",
               url: "INTERVIEW/05_DELTA/horizons/05_DELTA_HORIZONS.tif",
             },
@@ -160,6 +165,10 @@ export default class Plhebicite extends Vue {
             {
               name: "Constellation",
               url: "INTERVIEW/07_CROISIERE/constellation/metadata.json",
+            },
+            {
+              name: "Constellation - Raster",
+              url: "INTERVIEW/07_CROISIERE/test_07_constellation.tiff",
             },
             {
               name: "Horizons",
