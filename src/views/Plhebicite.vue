@@ -151,6 +151,10 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/05_DELTA/test_05_constellation.tiff",
             },
             {
+              name: "Constellation - Tiling (OpenStreetMap)",
+              url: "INTERVIEW/05_DELTA/test_05_constellation/{z}/{x}/{y}.png",
+            },
+            {
               name: "Horizons",
               url: "INTERVIEW/05_DELTA/horizons/05_DELTA_HORIZONS.tif",
             },

@@ -174,6 +174,17 @@ export default class WebMap extends Vue {
         maxZoom: 28,
       },
     },
+    {
+      name: "OpenStreetMap",
+      url: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`,
+      visible: false,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      options: {
+        crs: L.CRS.EPSG3857,
+        maxZoom: 19,
+      },
+    },
   ];
 
   @Ref()
@@ -280,11 +291,9 @@ export default class WebMap extends Vue {
       this.loading = true;
       const promises: Promise<void>[] = newItems.map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
-        item.children
-          .map(this.getLeafletLayer)
-          .forEach((promise) =>
-            promise.then((layer) => layerGroup.addLayer(layer))
-          );
+        item.children.forEach((itemLayer) =>
+          itemLayer.getLayer().then((layer) => layerGroup.addLayer(layer))
+        );
         this.map.addLayer(layerGroup);
         const mapLayer = new MapLayer(item.id, item.id, layerGroup);
         this.layers.unshift(mapLayer);
@@ -293,95 +302,6 @@ export default class WebMap extends Vue {
         this.loading = false;
       });
     }
-  }
-
-  async getLeafletLayer(item: MapItem): Promise<LeafletLayer> {
-    const mimeType = item.mimeType;
-    const filename = item.filename;
-    const color: Color | undefined = item.color;
-    switch (mimeType) {
-      case "image/tiff":
-        return item.geoRaster().then((georaster: ExtendedGeoRaster) => {
-          if (color && georaster.mins[0] === 0) {
-            georaster.noDataValue = 0;
-          }
-          const colorScale: ColorScale | undefined = color
-            ? {
-                colorMin: color.lighten5,
-                colorMax: color.darken4,
-                valueMin: georaster.mins[0],
-                valueMax: georaster.maxs[0],
-              }
-            : undefined;
-          return new GeoRasterLayer({
-            georaster: georaster,
-            pixelValuesToColorFn: colorScale
-              ? (values) => {
-                  if (values[0] === georaster.noDataValue) {
-                    return colors.shades.transparent;
-                  }
-                  const palette = interpolate([
-                    colorScale.colorMin,
-                    colorScale.colorMax,
-                  ]);
-                  const value =
-                    (values[0] - georaster.mins[0]) / georaster.ranges[0];
-                  return palette(value);
-                }
-              : undefined,
-            resolution: 128,
-          });
-        });
-      case "application/x-zip-compressed":
-        return item
-          .arrayBuffer()
-          .then((arrayBuffer) => parseZip(arrayBuffer))
-          .then((geojson) =>
-            this.getGeoJsonLayer(
-              item,
-              geojson as unknown as Proj4GeoJSONFeature
-            )
-          );
-    }
-    const extension = filename.split(".").pop();
-    switch (extension) {
-      case "geojson":
-      case "json":
-        return item.json().then((json) => this.getGeoJsonLayer(item, json));
-    }
-    return Promise.reject(`unsupported type ${mimeType} for file ${filename}`);
-  }
-
-  private async getGeoJsonLayer(
-    item: MapItem,
-    json: Proj4GeoJSONFeature
-  ): Promise<LeafletLayer> {
-    const popupKey = item.popupKey;
-    const styleText: string | undefined = await item.style();
-    const { style, onAdd, onRemove } = getStyle(styleText);
-    const geoJson = Proj.geoJson(json, {
-      onEachFeature: popupKey
-        ? (feature, l) => {
-            if (feature.properties) {
-              const property = feature.properties[popupKey];
-              if (property) {
-                l.bindPopup(property);
-                l.on("mouseover", () => l.openPopup());
-                l.on("mouseout", () => l.closePopup());
-              }
-            }
-          }
-        : undefined,
-      style: style,
-      pointToLayer: getPointToLayer(styleText),
-    });
-    if (onAdd) {
-      return geoJson.on("add", onAdd);
-    }
-    if (onRemove) {
-      return geoJson.on("remove", onRemove);
-    }
-    return geoJson;
   }
 
   public moveLayerToFront(id: string): void {
@@ -441,6 +361,96 @@ abstract class MapItem {
   abstract arrayBuffer(): Promise<ArrayBuffer>;
   abstract geoRaster(): Promise<ExtendedGeoRaster>;
   abstract json(): Promise<Proj4GeoJSONFeature>;
+
+  private async getGeoJsonLayer(
+    json: Proj4GeoJSONFeature
+  ): Promise<LeafletLayer> {
+    const popupKey = this.popupKey;
+    const styleText: string | undefined = await this.style();
+    const { style, onAdd, onRemove } = getStyle(styleText);
+    const geoJson = Proj.geoJson(json, {
+      onEachFeature: popupKey
+        ? (feature, l) => {
+            if (feature.properties) {
+              const property = feature.properties[popupKey];
+              if (property) {
+                l.bindPopup(property);
+                l.on("mouseover", () => l.openPopup());
+                l.on("mouseout", () => l.closePopup());
+              }
+            }
+          }
+        : undefined,
+      style: style,
+      pointToLayer: getPointToLayer(styleText),
+    });
+    if (onAdd) {
+      return geoJson.on("add", onAdd);
+    }
+    if (onRemove) {
+      return geoJson.on("remove", onRemove);
+    }
+    return geoJson;
+  }
+
+  async getLayer(): Promise<LeafletLayer> {
+    const color: Color | undefined = this.color;
+    switch (this.mimeType) {
+      case "image/tiff":
+        return this.geoRaster().then((georaster: ExtendedGeoRaster) => {
+          if (color && georaster.mins[0] === 0) {
+            georaster.noDataValue = 0;
+          }
+          const colorScale: ColorScale | undefined = color
+            ? {
+                colorMin: color.lighten5,
+                colorMax: color.darken4,
+                valueMin: georaster.mins[0],
+                valueMax: georaster.maxs[0],
+              }
+            : undefined;
+          return new GeoRasterLayer({
+            georaster: georaster,
+            pixelValuesToColorFn: colorScale
+              ? (values) => {
+                  if (values[0] === georaster.noDataValue) {
+                    return colors.shades.transparent;
+                  }
+                  const palette = interpolate([
+                    colorScale.colorMin,
+                    colorScale.colorMax,
+                  ]);
+                  const value =
+                    (values[0] - georaster.mins[0]) / georaster.ranges[0];
+                  return palette(value);
+                }
+              : undefined,
+            resolution: 128,
+            resampleMethod: "nearest",
+          });
+        });
+      case "application/x-zip-compressed":
+        return this.arrayBuffer()
+          .then((arrayBuffer) => parseZip(arrayBuffer))
+          .then((geojson) =>
+            this.getGeoJsonLayer(geojson as unknown as Proj4GeoJSONFeature)
+          );
+      case "image/png":
+      case "image/jpeg":
+        return new L.TileLayer(this.filename, {
+          maxZoom: 19,
+        });
+    }
+    const extension = this.filename.split(".").pop();
+    switch (extension) {
+      case "geojson":
+      case "json":
+        return this.json().then((json) => this.getGeoJsonLayer(json));
+    }
+    return Promise.reject(
+      `unsupported type ${this.mimeType} for file ${this.filename}`
+    );
+  }
 }
 
 export class FileMapItem extends MapItem {
