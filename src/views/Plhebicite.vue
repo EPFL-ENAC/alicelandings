@@ -13,7 +13,7 @@
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
         <div class="flex-even">
-          <v-list dense max-width="350" max-height="100%">
+          <v-list dense width="350" max-height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -111,16 +111,6 @@ export default class Plhebicite extends Vue {
         "The Affective Mappings series offers an alternative way of representing urban lived space in the commune of Vernier. Based on fifteen walk-along interviews done with neighbours of Vernier, these maps attempt to draw these citizens’ affective engagements with their everyday environments highlighting perceptions, landscapes and experience instead of abstract administrative lines or symbols. By acknowledging the lived space of a city in maps that can be collectively shared, discussed and transformed, we can expand our urban imaginaries and improve how we plan and design our cities.",
       layers: [
         {
-          name: "00 Marco",
-          url: "grid_tot_vn_21781_v17_shp_df_weighted_20210917_MANUAL_INDEX_V3.geojson",
-        },
-        {
-          name: "02 Ville dortoir",
-        },
-        {
-          name: "03 La famille italienne",
-        },
-        {
           name: "05 Delta & Archipels",
           children: [
             {
@@ -151,17 +141,18 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/05_DELTA/test_05_constellation.tiff",
             },
             {
-              name: "Constellation - Tiling (OpenStreetMap)",
+              name: "Constellation - Tiling TIF (OpenStreetMap)",
               url: "INTERVIEW/05_DELTA/test_05_constellation/{z}/{x}/{y}.png",
+            },
+            {
+              name: "Constellation - Tiling PNG (OpenStreetMap)",
+              url: "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png",
             },
             {
               name: "Horizons",
               url: "INTERVIEW/05_DELTA/horizons/05_DELTA_HORIZONS.tif",
             },
           ],
-        },
-        {
-          name: "06 Dreyfus est un chien",
         },
         {
           name: "07 Croisière",
@@ -196,21 +187,6 @@ export default class Plhebicite extends Vue {
               ],
             },
           ],
-        },
-        {
-          name: "07 Au plateau des pins",
-        },
-        {
-          name: "08 Sous les pavés, la cité",
-        },
-        {
-          name: "09 Le nom des rues",
-        },
-        {
-          name: "10 Une histoire de cailloux",
-        },
-        {
-          name: "11 L’invention d’une ritournelle",
         },
       ],
     },
@@ -275,12 +251,28 @@ export default class Plhebicite extends Vue {
         },
       ],
     },
+    {
+      name: "Environmental Features",
+      description: "",
+      layers: [
+        {
+          name: "Walkability Index",
+          url: "grid_tot_vn_21781_v17_shp_df_weighted_20210917_MANUAL_INDEX_V3.geojson",
+        },
+        {
+          name: "Alice Map",
+        },
+        {
+          name: "Swisstopo",
+        },
+      ],
+    },
   ];
 
   @Ref()
   readonly webMap!: WebMap;
 
-  zoom = 5;
+  zoom = 11;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
 

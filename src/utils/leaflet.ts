@@ -18,6 +18,8 @@ export const swisstopoCrs: CRS = new Proj.CRS("EPSG:2056", EPSG_2056, {
   // TopLeftCorner
   origin: [2420000, 1350000],
 });
+// https://api3.geo.admin.ch/services/sdiservices.html#gettile
+export const swisstopoSubdomains = "0123456789";
 
 // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
 export const sitgCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {

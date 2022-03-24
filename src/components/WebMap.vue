@@ -33,7 +33,12 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056, EPSG_21781, sitgCrs, swisstopoCrs } from "@/utils/leaflet";
+import {
+  EPSG_2056,
+  EPSG_21781,
+  sitgCrs,
+  swisstopoSubdomains,
+} from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -96,50 +101,15 @@ export default class WebMap extends Vue {
   readonly center = [46.2044, 6.1432];
   readonly baseTileLayers: TileLayerProps[] = [
     {
-      name: "SITG",
+      name: "swisstopo-pixelkarte-farbe",
       visible: true,
       attribution:
-        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
-      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
-      options: {
-        maxZoom: 11,
-        crs: sitgCrs,
-      },
-    },
-    {
-      name: "swisstopo-landeskarte-farbe",
-      visible: false,
-      attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/2056/{z}/{x}/{y}.png",
-      subdomains: "0123456789",
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+      subdomains: swisstopoSubdomains,
       options: {
-        maxZoom: 27,
-        crs: swisstopoCrs,
-      },
-    },
-    {
-      name: "swisstopo-landeskarte-grau",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/2056/{z}/{x}/{y}.png",
-      subdomains: "0123456789",
-      options: {
-        maxZoom: 27,
-        crs: swisstopoCrs,
-      },
-    },
-    {
-      name: "swisstopo-pixelkarte-farbe",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: "0123456789",
-      options: {
-        maxZoom: 27,
-        crs: swisstopoCrs,
+        crs: CRS.EPSG3857,
+        maxZoom: 19,
       },
     },
     {
@@ -147,23 +117,59 @@ export default class WebMap extends Vue {
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: "0123456789",
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/3857/{z}/{x}/{y}.jpeg",
+      subdomains: swisstopoSubdomains,
       options: {
-        maxZoom: 27,
-        crs: swisstopoCrs,
+        crs: CRS.EPSG3857,
+        maxZoom: 19,
       },
     },
+    {
+      name: "swisstopo-landeskarte-farbe",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/3857/{z}/{x}/{y}.png",
+      subdomains: swisstopoSubdomains,
+      options: {
+        crs: CRS.EPSG3857,
+        maxZoom: 19,
+      },
+    },
+    {
+      name: "swisstopo-landeskarte-grau",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/3857/{z}/{x}/{y}.png",
+      subdomains: swisstopoSubdomains,
+      options: {
+        crs: CRS.EPSG3857,
+        maxZoom: 19,
+      },
+    },
+
     {
       name: "swisstopo-photo",
       visible: false,
       attribution:
         '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: "0123456789",
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/3857/{z}/{x}/{y}.jpeg",
+      subdomains: swisstopoSubdomains,
       options: {
-        maxZoom: 28,
-        crs: swisstopoCrs,
+        crs: CRS.EPSG3857,
+        maxZoom: 19, // 20
+      },
+    },
+    {
+      name: "SITG",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
+      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
+      options: {
+        crs: sitgCrs,
+        maxZoom: 11,
       },
     },
     {
@@ -171,17 +177,18 @@ export default class WebMap extends Vue {
       url: "",
       visible: false,
       options: {
-        maxZoom: 28,
+        crs: CRS.EPSG3857,
+        maxZoom: 19,
       },
     },
     {
       name: "OpenStreetMap",
-      url: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`,
       visible: false,
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      url: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`,
       options: {
-        crs: L.CRS.EPSG3857,
+        crs: CRS.EPSG3857,
         maxZoom: 19,
       },
     },
@@ -194,7 +201,7 @@ export default class WebMap extends Vue {
   readonly items!: MapGroupItem[];
   @Prop({ default: () => [] })
   readonly dems!: string[];
-  @PropSync("zoom", { type: Number, default: 5 })
+  @PropSync("zoom", { type: Number, default: 11 })
   syncedZoom!: number;
 
   loading = false;
@@ -202,7 +209,7 @@ export default class WebMap extends Vue {
   demGeorasters: GeoRaster[] = [];
   crs: CRS =
     this.baseTileLayers.find((layer) => layer.visible)?.options?.crs ??
-    swisstopoCrs;
+    CRS.EPSG3857;
 
   get map(): Map {
     return this.lMap.mapObject;
