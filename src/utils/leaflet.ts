@@ -105,5 +105,5 @@ export const tileLayerProps: Record<
 
 export interface TileLayerProp {
   urlTemplate: string;
-  options: TileLayerOptions;
+  options?: TileLayerOptions;
 }

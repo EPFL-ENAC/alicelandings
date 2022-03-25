@@ -138,23 +138,36 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/05_DELTA/trajectories/05_DELTA_TRAJECTORIES.geojson",
             },
             {
+              name: "Trajectories - PNG",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/05_DELTA/220324_test_05_trajectories/{z}/{x}/{y}.png"
+                ),
+              },
+            },
+            {
               name: "Constellation - GeoJSON",
               url: "INTERVIEW/05_DELTA/constellation/metadata.json",
             },
             {
-              name: "Constellation - Raster",
+              name: "Constellation - PNG",
               tile: {
                 urlTemplate: this.getAbsoluteUrl(
                   "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png"
                 ),
-                options: {
-                  maxZoom: 19,
-                },
               },
             },
             {
               name: "Horizons",
               url: "INTERVIEW/05_DELTA/horizons/05_DELTA_HORIZONS.tif",
+            },
+            {
+              name: "Horizons - PNG",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/05_DELTA/220324_test_05_horizons/{z}/{x}/{y}.png"
+                ),
+              },
             },
           ],
         },
@@ -166,16 +179,36 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/07_CROISIERE/constellation/metadata.json",
             },
             {
-              name: "Constellation - Raster",
-              url: "INTERVIEW/07_CROISIERE/test_07_constellation.tiff",
-            },
-            {
               name: "Horizons",
               url: "INTERVIEW/07_CROISIERE/horizons/07_CROISIERE_HORIZONS.tif",
             },
             {
               name: "Trajectories",
               url: "INTERVIEW/07_CROISIERE/trajectories/07_CROISIERE_TRAJECTORIES.geojson",
+            },
+            {
+              name: "Constellation - PNG",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/07_CROISIERE/220322_test_07_constellation/{z}/{x}/{y}.png"
+                ),
+              },
+            },
+            {
+              name: "Horizons - PNG",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png"
+                ),
+              },
+            },
+            {
+              name: "Trajectories - PNG",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/07_CROISIERE/220324_test_07_trajectories/{z}/{x}/{y}.png"
+                ),
+              },
             },
             {
               name: "Voices",
