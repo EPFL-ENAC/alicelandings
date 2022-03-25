@@ -33,12 +33,7 @@
 </template>
 
 <script lang="ts">
-import {
-  EPSG_2056,
-  EPSG_21781,
-  sitgCrs,
-  swisstopoSubdomains,
-} from "@/utils/leaflet";
+import { EPSG_2056, EPSG_21781, sitgCrs, TileLayerProp } from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -58,6 +53,7 @@ import L, {
   Map,
   MapOptions,
   Proj,
+  TileLayer,
   TileLayerOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
@@ -97,68 +93,18 @@ import colors, { Color } from "vuetify/lib/util/colors";
 export default class WebMap extends Vue {
   readonly mapOptions: MapOptions = {
     zoomControl: false,
+    minZoom: 15,
+    maxZoom: 18,
   };
-  readonly center = [46.2044, 6.1432];
+  readonly center = [46.2107, 6.0946];
   readonly baseTileLayers: TileLayerProps[] = [
     {
-      name: "swisstopo-pixelkarte-farbe",
+      name: "None",
+      url: "",
       visible: true,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
-      subdomains: swisstopoSubdomains,
       options: {
         crs: CRS.EPSG3857,
         maxZoom: 19,
-      },
-    },
-    {
-      name: "swisstopo-pixelkarte-grau",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/3857/{z}/{x}/{y}.jpeg",
-      subdomains: swisstopoSubdomains,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
-    {
-      name: "swisstopo-landeskarte-farbe",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/3857/{z}/{x}/{y}.png",
-      subdomains: swisstopoSubdomains,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
-    {
-      name: "swisstopo-landeskarte-grau",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/3857/{z}/{x}/{y}.png",
-      subdomains: swisstopoSubdomains,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
-
-    {
-      name: "swisstopo-photo",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>',
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/3857/{z}/{x}/{y}.jpeg",
-      subdomains: swisstopoSubdomains,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19, // 20
       },
     },
     {
@@ -172,27 +118,8 @@ export default class WebMap extends Vue {
         maxZoom: 11,
       },
     },
-    {
-      name: "None",
-      url: "",
-      visible: false,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
-    {
-      name: "OpenStreetMap",
-      visible: false,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      url: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
   ];
+  readonly defaultCrs = CRS.EPSG3857;
 
   @Ref()
   readonly lMap!: LMap;
@@ -209,7 +136,7 @@ export default class WebMap extends Vue {
   demGeorasters: GeoRaster[] = [];
   crs: CRS =
     this.baseTileLayers.find((layer) => layer.visible)?.options?.crs ??
-    CRS.EPSG3857;
+    this.defaultCrs;
 
   get map(): Map {
     return this.lMap.mapObject;
@@ -255,7 +182,7 @@ export default class WebMap extends Vue {
     this.map.on("baselayerchange", (e: LayerEvent) => {
       this.crs =
         (e.layer as Layer & { options: BaseTileLayerOptions }).options.crs ??
-        this.crs;
+        this.defaultCrs;
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (L.control as any).browserPrint().addTo(this.map);
@@ -442,11 +369,6 @@ abstract class MapItem {
           .then((geojson) =>
             this.getGeoJsonLayer(geojson as unknown as Proj4GeoJSONFeature)
           );
-      case "image/png":
-      case "image/jpeg":
-        return new L.TileLayer(this.filename, {
-          maxZoom: 19,
-        });
     }
     const extension = this.filename.split(".").pop();
     switch (extension) {
@@ -521,6 +443,16 @@ export class UrlMapItem extends MapItem {
   }
 }
 
+export class TileMapItem extends UrlMapItem {
+  constructor(public prop: TileLayerProp) {
+    super(prop.urlTemplate);
+  }
+
+  async getLayer(): Promise<LeafletLayer> {
+    return new TileLayer(this.prop.urlTemplate, this.prop.options);
+  }
+}
+
 export class MapLayer {
   constructor(
     public id: string,
@@ -533,7 +465,7 @@ export class MapLayer {
   }
 }
 
-type LeafletLayer = GridLayer | GeoJSON;
+type LeafletLayer = GridLayer | GeoJSON | TileLayer;
 
 interface ColorScale {
   colorMin: string;

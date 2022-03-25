@@ -42,6 +42,7 @@ export interface TreeviewItem<V = string> {
   value: V;
   children?: TreeviewItem<V>[];
   disabled?: boolean;
+  selected?: boolean;
 }
 
 export function randomColor(): Color {

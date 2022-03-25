@@ -1,4 +1,4 @@
-import { Bounds, CRS, Proj } from "leaflet";
+import { Bounds, CRS, Proj, TileLayerOptions } from "leaflet";
 import "proj4leaflet";
 
 // https://epsg.io/2056
@@ -20,6 +20,8 @@ export const swisstopoCrs: CRS = new Proj.CRS("EPSG:2056", EPSG_2056, {
 });
 // https://api3.geo.admin.ch/services/sdiservices.html#gettile
 export const swisstopoSubdomains = "0123456789";
+export const swisstopoAttribution =
+  '&copy; <a target="_blank" href="https://www.swisstopo.admin.ch/en/home.html">swisstopo</a>';
 
 // https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
 export const sitgCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {
@@ -36,3 +38,72 @@ export const sitgCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {
     [2560958.361249998, 1084235.604167315]
   ),
 });
+
+export const tileLayerProps: Record<
+  | "openStreetMap"
+  | "swisstopo_pixelkarte_farbe"
+  | "swisstopo_pixelkarte_grau"
+  | "swisstopo_landeskarte_farbe"
+  | "swisstopo_landeskarte_grau"
+  | "swisstopo_photo",
+  TileLayerProp
+> = {
+  openStreetMap: {
+    urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    options: {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    },
+  },
+  swisstopo_pixelkarte_farbe: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 19,
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_pixelkarte_grau: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/3857/{z}/{x}/{y}.jpeg",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 19,
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_landeskarte_farbe: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/3857/{z}/{x}/{y}.png",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 19,
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_landeskarte_grau: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/3857/{z}/{x}/{y}.png",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 19,
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_photo: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/3857/{z}/{x}/{y}.jpeg",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 19, // 20
+      subdomains: swisstopoSubdomains,
+    },
+  },
+};
+
+export interface TileLayerProp {
+  urlTemplate: string;
+  options: TileLayerOptions;
+}

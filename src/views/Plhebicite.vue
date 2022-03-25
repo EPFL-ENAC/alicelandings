@@ -88,8 +88,13 @@
 </template>
 
 <script lang="ts">
-import WebMap, { MapGroupItem, UrlMapItem } from "@/components/WebMap.vue";
+import WebMap, {
+  MapGroupItem,
+  TileMapItem,
+  UrlMapItem,
+} from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
+import { TileLayerProp, tileLayerProps } from "@/utils/leaflet";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
@@ -133,20 +138,19 @@ export default class Plhebicite extends Vue {
               url: "INTERVIEW/05_DELTA/trajectories/05_DELTA_TRAJECTORIES.geojson",
             },
             {
-              name: "Constellation",
+              name: "Constellation - GeoJSON",
               url: "INTERVIEW/05_DELTA/constellation/metadata.json",
             },
             {
               name: "Constellation - Raster",
-              url: "INTERVIEW/05_DELTA/test_05_constellation.tiff",
-            },
-            {
-              name: "Constellation - Tiling TIF (OpenStreetMap)",
-              url: "INTERVIEW/05_DELTA/test_05_constellation/{z}/{x}/{y}.png",
-            },
-            {
-              name: "Constellation - Tiling PNG (OpenStreetMap)",
-              url: "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png",
+              tile: {
+                urlTemplate: this.getAbsoluteUrl(
+                  "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png"
+                ),
+                options: {
+                  maxZoom: 19,
+                },
+              },
             },
             {
               name: "Horizons",
@@ -263,7 +267,29 @@ export default class Plhebicite extends Vue {
           name: "Alice Map",
         },
         {
-          name: "Swisstopo",
+          name: "Swisstopo Pixel Farbe",
+          tile: tileLayerProps.swisstopo_pixelkarte_farbe,
+          selected: true,
+        },
+        {
+          name: "Swisstopo Pixel Grau",
+          tile: tileLayerProps.swisstopo_pixelkarte_grau,
+        },
+        {
+          name: "Swisstopo Land Farbe",
+          tile: tileLayerProps.swisstopo_landeskarte_farbe,
+        },
+        {
+          name: "Swisstopo Land Grau",
+          tile: tileLayerProps.swisstopo_landeskarte_grau,
+        },
+        {
+          name: "Swisstopo Photo",
+          tile: tileLayerProps.swisstopo_photo,
+        },
+        {
+          name: "OpenStreetMap",
+          tile: tileLayerProps.openStreetMap,
         },
       ],
     },
@@ -272,9 +298,15 @@ export default class Plhebicite extends Vue {
   @Ref()
   readonly webMap!: WebMap;
 
-  zoom = 11;
+  zoom = 15;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
+
+  created(): void {
+    this.selectedTreeviewItems = this.categories.map((category) =>
+      this.getTreeviewItems(category.layers, (layer) => !!layer.selected)
+    );
+  }
 
   @Watch("selectedTreeviewItems")
   onSelectedTreeviewItemsChanged(): void {
@@ -282,37 +314,46 @@ export default class Plhebicite extends Vue {
       .flat()
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
-      .filter((layer) => layer.url)
+      .filter((layer) => layer.url || layer.tile)
       .map(async (layer) => {
-        const absoluteUrl = this.getAbsoluteUrl(layer.url);
-        if (absoluteUrl.endsWith("metadata.json")) {
-          const metadata = await axios
-            .get<Metadata>(absoluteUrl)
-            .then((response) => response.data);
-          const prefix = absoluteUrl.replace("metadata.json", "");
-          return {
-            id: absoluteUrl,
-            children: metadata.layers.map(
-              (layer) =>
-                new UrlMapItem(prefix + layer.geojson, {
-                  styleUrl: prefix + layer.sld,
-                })
-            ),
-          };
-        } else {
-          const style = absoluteUrl?.endsWith(".geojson")
-            ? absoluteUrl.replace(/\.[^/.]+$/, ".sld")
-            : undefined;
-          return {
-            id: absoluteUrl,
-            children: [
-              new UrlMapItem(absoluteUrl, {
-                styleUrl: style,
-                popupKey: layer.popupKey,
-              }),
-            ],
-          };
+        if (layer.url) {
+          const absoluteUrl = this.getAbsoluteUrl(layer.url);
+          if (absoluteUrl.endsWith("metadata.json")) {
+            const metadata = await axios
+              .get<Metadata>(absoluteUrl)
+              .then((response) => response.data);
+            const prefix = absoluteUrl.replace("metadata.json", "");
+            return {
+              id: absoluteUrl,
+              children: metadata.layers.map(
+                (layer) =>
+                  new UrlMapItem(prefix + layer.geojson, {
+                    styleUrl: prefix + layer.sld,
+                  })
+              ),
+            };
+          } else {
+            const style = absoluteUrl?.endsWith(".geojson")
+              ? absoluteUrl.replace(/\.[^/.]+$/, ".sld")
+              : undefined;
+            return {
+              id: absoluteUrl,
+              children: [
+                new UrlMapItem(absoluteUrl, {
+                  styleUrl: style,
+                  popupKey: layer.popupKey,
+                }),
+              ],
+            };
+          }
         }
+        if (layer.tile) {
+          return {
+            id: layer.tile.urlTemplate,
+            children: [new TileMapItem(layer.tile)],
+          } as MapGroupItem;
+        }
+        throw new Error("Expected url or tile");
       });
     Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
   }
@@ -323,12 +364,13 @@ export default class Plhebicite extends Vue {
 
   getTreeviewItems(
     layers: Layer[],
+    predicate: (layer: Layer) => boolean = () => true,
     parents: Layer[] = []
   ): TreeviewItem<Layer>[] {
-    return layers.map((layer) => {
+    return layers.filter(predicate).map((layer) => {
       const parentLayers = [...parents, layer];
       const children = layer.children
-        ? this.getTreeviewItems(layer.children, parentLayers)
+        ? this.getTreeviewItems(layer.children, predicate, parentLayers)
         : undefined;
       return {
         id: parentLayers.map((parent) => parent.name).join("/"),
@@ -336,7 +378,9 @@ export default class Plhebicite extends Vue {
         value: layer,
         children: children,
         disabled:
-          !layer.url && (children?.every((child) => child.disabled) ?? true),
+          !layer.url &&
+          !layer.tile &&
+          (children?.every((child) => child.disabled) ?? true),
       };
     });
   }
@@ -357,6 +401,8 @@ interface Layer {
   name: string;
   url?: string;
   popupKey?: string;
+  tile?: TileLayerProp;
+  selected?: boolean;
   children?: Layer[];
 }
 </script>
