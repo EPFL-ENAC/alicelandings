@@ -1,15 +1,33 @@
 <template>
   <div class="d-flex flex-column full-height">
-    <div>
-      <div class="ma-4">
+    <div class="d-flex flex-row justify-space-between mx-4">
+      <div class="flex-grow-1">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
         <p class="text-subtitle-1">
           An affordance-based and affective reading of the Commune of Vernier,
           Geneva
         </p>
       </div>
-      <v-divider></v-divider>
+      <div class="flex-grow-0">
+        <a href="https://alice.epfl.ch" target="_blank">
+          <v-img
+            aspect-ratio="2"
+            contain
+            src="/logo/alice_logo2-01.png"
+            width="100px"
+          ></v-img>
+        </a>
+        <a href="https://epfl.ch" target="_blank">
+          <v-img
+            aspect-ratio="2"
+            contain
+            src="/logo/EPFL_Logo_184X53.svg"
+            width="100px"
+          ></v-img>
+        </a>
+      </div>
     </div>
+    <v-divider></v-divider>
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
         <div class="flex-even">
