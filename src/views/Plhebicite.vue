@@ -7,6 +7,7 @@
           An affordance-based and affective reading of the Commune of Vernier,
           Geneva
         </p>
+        <span>Zoom level: {{ zoom }}</span>
       </div>
       <div class="flex-grow-0">
         <a href="https://alice.epfl.ch" target="_blank">
@@ -30,7 +31,10 @@
     <v-divider></v-divider>
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
-        <div class="flex-even">
+        <div
+          class="flex-even"
+          :style="{ 'max-height': about ? '0px' : undefined }"
+        >
           <v-list dense width="350" max-height="100%">
             <v-list-group
               v-for="(item, index) in categories"
@@ -67,9 +71,63 @@
             </v-list-group>
           </v-list>
         </div>
-        <span class="mx-4 flex-grow-0">Zoom level: {{ zoom }}</span>
-        <v-divider></v-divider>
-        <v-btn class="flex-grow-0" text>About</v-btn>
+        <v-divider v-if="!about"></v-divider>
+        <v-btn v-if="!about" class="flex-grow-0" text @click="about = true">
+          About
+        </v-btn>
+        <div v-if="about" class="ma-4">
+          <v-btn class="float-right" icon color="black" @click="about = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <h2>About</h2>
+          <p>
+            To address the challenges posed by climate change to our cities, it
+            is essential to acknowledge the role the environment plays in our
+            everyday lives. However our maps tend to silence our lived
+            experience and how it both shapes and is shaped by the places we
+            move through. Consequently, planning and design processes have often
+            disregarded this and lost great opportunities to collectively shape
+            friendlier and human-oriented cities. An analysis of active mobility
+            practices in the commune of Vernier offers us the chance to create
+            alternative spatial representations to know this lived dimension. By
+            having maps able to address affective engagements, social
+            imaginaries, and collective memories, we can make our communities
+            matter more in the conversations about our cities’ future.
+          </p>
+          <h3>Affective Mappings</h3>
+          <p>
+            The Affective Mappings series offers an alternative way of
+            representing urban lived space in the commune of Vernier. Based on
+            fifteen walk-along interviews done with neighbours of Vernier, these
+            maps attempt to draw these citizens’ affective engagements with
+            their everyday environments highlighting perceptions, landscapes and
+            experience instead of abstract administrative lines or symbols. By
+            acknowledging the lived space of a city in maps that can be
+            collectively shared, discussed and transformed, we can expand our
+            urban imaginaries and improve how we plan and design our cities.
+          </p>
+          <h3>Atlas of Mobility Landscapes</h3>
+          <p>
+            The Atlas of Mobility Landscapes is a collection of citizen
+            testimonies, documents and images gathered around the experience of
+            walking and cycling in Vernier. Mobility is much more than
+            connecting point A to point B, it is mostly defined by the
+            experience of the journey. Because of that, mobility is an
+            extraordinary point of entrance into the relations between everyday
+            practices and our surrounding environment. The collection is
+            organized according to X large themes and X sub-themes describing
+            the lived experience of the commune of Vernier. The user can
+            navigate the map freely to understand the relationship between
+            different environmental features of the commune and collective
+            imaginaries and perceptions.
+          </p>
+          <p>
+            We believe that making available all these documents in an online
+            and open visualization tool will help acknowledge the importance of
+            these often hidden qualities of space, and how they can encourage
+            more inclusive discussions about the city and its potential futures.
+          </p>
+        </div>
       </div>
       <v-divider vertical></v-divider>
       <div class="flex-grow-1 d-flex flex-column">
@@ -352,6 +410,7 @@ export default class Plhebicite extends Vue {
   zoom = 15;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
+  about = false;
 
   created(): void {
     this.selectedTreeviewItems = this.categories.map((category) =>
