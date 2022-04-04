@@ -91,12 +91,6 @@ import colors, { Color } from "vuetify/lib/util/colors";
   },
 })
 export default class WebMap extends Vue {
-  readonly mapOptions: MapOptions = {
-    zoomControl: false,
-    minZoom: 15,
-    maxZoom: 18,
-  };
-  readonly center = [46.2107, 6.0946];
   readonly baseTileLayers: TileLayerProps[] = [
     {
       name: "None",
@@ -124,10 +118,16 @@ export default class WebMap extends Vue {
   @Ref()
   readonly lMap!: LMap;
 
-  @Prop({ default: () => [] })
-  readonly items!: MapGroupItem[];
-  @Prop({ default: () => [] })
+  @Prop({ type: Array as () => number[] })
+  readonly center!: [number, number];
+  @Prop({ type: Array as () => string[], default: () => [] })
   readonly dems!: string[];
+  @Prop({ type: Array as () => MapGroupItem[], default: () => [] })
+  readonly items!: MapGroupItem[];
+  @Prop({ type: Number, default: 0 })
+  readonly minZoom!: number;
+  @Prop({ type: Number, default: 19 })
+  readonly maxZoom!: number;
   @PropSync("zoom", { type: Number, default: 11 })
   syncedZoom!: number;
 
@@ -140,6 +140,14 @@ export default class WebMap extends Vue {
 
   get map(): Map {
     return this.lMap.mapObject;
+  }
+
+  get mapOptions(): MapOptions {
+    return {
+      zoomControl: false,
+      minZoom: this.minZoom,
+      maxZoom: this.maxZoom,
+    };
   }
 
   created(): void {

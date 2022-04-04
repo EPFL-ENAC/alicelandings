@@ -12,7 +12,7 @@
       us the chance to create alternative spatial representations to know this
       lived dimension. By having maps able to address affective engagements,
       social imaginaries, and collective memories, we can make our communities
-      matter more in the conversations about our cities’ future.
+      matter more in the conversations about our cities' future.
     </p>
   </v-container>
 </template>
