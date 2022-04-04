@@ -60,13 +60,6 @@
                 return-object
                 selectable
               >
-                <template v-slot:append="{ item, leaf, selected }">
-                  <template v-if="!item.disabled && leaf && selected">
-                    <v-btn icon @click="moveItemToFront(item)">
-                      <v-icon>mdi-flip-to-front</v-icon>
-                    </v-btn>
-                  </template>
-                </template>
               </v-treeview>
             </v-list-group>
           </v-list>
@@ -282,10 +275,12 @@ export default class Plhebicite extends Vue {
                 {
                   name: "In",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_IN.geojson",
+                  popupKey: "Text Conte",
                 },
                 {
                   name: "Out",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_OUT.geojson",
+                  popupKey: "Text Content",
                 },
               ],
             },
@@ -450,6 +445,7 @@ export default class Plhebicite extends Vue {
 
   @Watch("selectedTreeviewItems")
   onSelectedTreeviewItemsChanged(): void {
+    let zIndex = 0;
     const promises: Promise<MapGroupItem>[] = this.selectedTreeviewItems
       .flat()
       .map((item) => item.value)
@@ -465,6 +461,7 @@ export default class Plhebicite extends Vue {
             const prefix = absoluteUrl.replace("metadata.json", "");
             return {
               id: absoluteUrl,
+              zIndex: zIndex--,
               children: metadata.layers.map(
                 (layer) =>
                   new UrlMapItem(prefix + layer.geojson, {
@@ -478,6 +475,7 @@ export default class Plhebicite extends Vue {
               : undefined;
             return {
               id: absoluteUrl,
+              zIndex: zIndex--,
               children: [
                 new UrlMapItem(absoluteUrl, {
                   styleUrl: style,
@@ -490,6 +488,7 @@ export default class Plhebicite extends Vue {
         if (layer.tile) {
           return {
             id: layer.tile.urlTemplate,
+            zIndex: zIndex--,
             children: [new TileMapItem(layer.tile)],
           } as MapGroupItem;
         }
@@ -523,11 +522,6 @@ export default class Plhebicite extends Vue {
           (children?.every((child) => child.disabled) ?? true),
       };
     });
-  }
-
-  moveItemToFront(item: TreeviewItem<Layer>): void {
-    const id = this.getAbsoluteUrl(item.value.url);
-    this.webMap.moveLayerToFront(id);
   }
 }
 

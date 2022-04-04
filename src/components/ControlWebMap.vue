@@ -83,8 +83,10 @@ export default class ControlWebMap extends Vue {
   webMap: WebMap | null = null;
 
   get mapItems(): MapGroupItem[] {
+    let zIndex = 0;
     return this.layerFiles.map((file) => ({
       id: file.name,
+      zIndex: zIndex--,
       children: [new FileMapItem(file, { color: randomColor() })],
     }));
   }

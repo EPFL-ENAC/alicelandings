@@ -226,15 +226,24 @@ export default class WebMap extends Vue {
         this.deleteLayer(layer.id);
       }
     });
+    this.items
+      .filter((item) => oldIds.has(item.id))
+      .forEach((item) => {
+        this.getLayer(item.id)[0].layerGroup.setZIndex(item.zIndex);
+      });
     const newItems: MapGroupItem[] = this.items.filter(
-      (layer) => !oldIds.has(layer.id)
+      (item) => !oldIds.has(item.id)
     );
     if (newItems.length > 0) {
       this.loading = true;
       const promises: Promise<void>[] = newItems.map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
+        layerGroup.setZIndex(item.zIndex);
         item.children.forEach((itemLayer) =>
-          itemLayer.getLayer().then((layer) => layerGroup.addLayer(layer))
+          itemLayer.getLayer().then((layer) => {
+            layer.setZIndex(item.zIndex);
+            layerGroup.addLayer(layer);
+          })
         );
         this.map.addLayer(layerGroup);
         const mapLayer = new MapLayer(item.id, item.id, layerGroup);
@@ -246,6 +255,9 @@ export default class WebMap extends Vue {
     }
   }
 
+  /**
+   * @deprecated use zIndex
+   */
   public moveLayerToFront(id: string): void {
     const [layer, index] = this.getLayer(id);
     layer.layers.forEach((layer) => layer.bringToFront());
@@ -270,6 +282,7 @@ export default class WebMap extends Vue {
 
 export interface MapGroupItem {
   id: string;
+  zIndex: number;
   children: MapItem[];
 }
 
@@ -368,7 +381,6 @@ abstract class MapItem {
                 }
               : undefined,
             resolution: 128,
-            resampleMethod: "nearest",
           });
         });
       case "application/x-zip-compressed":
