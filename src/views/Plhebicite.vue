@@ -39,9 +39,10 @@
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
+              v-model="item.active"
               color
               no-action
-              :value="index === 0"
+              @click="clickCategory(item)"
             >
               <template v-slot:activator>
                 <v-list-item-content>
@@ -149,23 +150,97 @@
         ></web-map>
         <v-divider></v-divider>
         <div class="d-flex flex-row">
-          <div class="flex-even ma-2">
-            <h4>Left Legend</h4>
-            <p>
-              On the left legend we have information about the active layers on
-              the left column plus the color and symbol legend of what we are
-              seeing. There are two legends, one for AffMaps, another for Atlas.
-            </p>
+          <div class="flex-even legend">
+            <div class="ma-2">
+              <template v-if="selectedCategoryId === 'mapping'">
+                <h4>Description</h4>
+                <p>
+                  La compréhension et la spatialité de la commune évoluent selon
+                  qui l’habite et comment. Ces cartes tentent de dessiner les
+                  engagements affectifs des citoyens avec leur environnement
+                  quotidien, en mettant en évidence leurs perceptions, leurs
+                  paysages et leurs expériences.
+                </p>
+              </template>
+              <template v-if="selectedCategoryId === 'atlas'">
+                <h4>Description de la thématique</h4>
+                <p>
+                  Les pratiques de mobilité peuvent être soit encouragées, soit
+                  bloquées par l'environnement matériel et physiologique dans
+                  lequel nous vivons. Expérience de mobilité se compose de
+                  quatre codes qui étudient les manières et raisons de se
+                  déplacer, les paramètres influençant la qualité et fréquence
+                  des déplacements ainsi que les itinéraires choisis ou évités
+                  dans la mobilité douce.
+                </p>
+              </template>
+              <template v-if="selectedCategoryId === 'environment'">
+                <h4>Description</h4>
+                <p>
+                  La carte d'accessibilité est une mesure environnementale sur
+                  une grille de 100x100m d’après un index de 17 paramètres
+                  facilitant ou obstruant la mobilité piétonne. Elle a été
+                  effectuée par le laboratoire LASIG.
+                </p>
+              </template>
+            </div>
           </div>
           <v-divider vertical></v-divider>
-          <div class="flex-even ma-2">
-            <h4>Right Legend</h4>
-            <p>
-              On the Right Legend we have the information about the elements the
-              user clicks on the map. Consider in the building of the table to
-              create a column of attributes for all elements (for instance for
-              the constellation elements, an explanation)
-            </p>
+          <div class="flex-even legend">
+            <div class="ma-2">
+              <template v-if="selectedCategoryId === 'mapping'">
+                <h4>Légende</h4>
+                <p>
+                  <span class="font-weight-bold">Voix. </span>Recueille des
+                  fragments de récits tout au long du parcours effectué, parlant
+                  de lieux directement visibles, proches ou lointains qui
+                  apparaissent dans la discussion.
+                </p>
+                <p>
+                  <span class="font-weight-bold">Parcours. </span>L’itinéraire
+                  de l’entretien effectué. La largeur fluctue selon la vitesse
+                  de marche, la couleur selon la pente du parcours.
+                </p>
+                <p>
+                  <span class="font-weight-bold">Constellation. </span
+                  >Rassemblent une série de lieux significatifs pour chaque
+                  récit, montrant l'étendue et la nature discontinue de notre
+                  expérience vécue et les différents territoires que cela
+                  dessine.
+                </p>
+                <p>
+                  <span class="font-weight-bold">Horizons. </span>Succession de
+                  points de vue visibles depuis l’itinéraire. Révèle la
+                  profondeur de l’espace affecté par notre mobilité et l’étendue
+                  variable du regard selon les lieux.
+                </p>
+              </template>
+              <template v-if="selectedCategoryId === 'atlas'">
+                <h4>Description du cadre</h4>
+                <p>
+                  Réseau piéton de la commune de Vernier et dessin de la
+                  signalétique au sol (bus, piéton, vélo, TIM) révélant les
+                  relations et conflits entre les différents moyens de transport
+                  ainsi que leurs chorégraphies communes.
+                </p>
+                <p>Sources : Openstreemap / SITG</p>
+              </template>
+              <template v-if="selectedCategoryId === 'environment'">
+                <h4>Légende</h4>
+                <p>Gradient de couleurs.</p>
+                <p>
+                  Un carré vert montre que la zone favorise le déplacement à
+                  pied. A l’inverse un carré rouge montre qu’il est difficile de
+                  circuler à pied.
+                </p>
+                <p>
+                  Quelques paramètres de l’index : largeur des trottoirs,
+                  continuité des trottoirs, bruit routier, degré de connectivité
+                  au réseau, densité de chemins parcourables à pied, distance à
+                  un espace vert...
+                </p>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -200,9 +275,11 @@ export default class Plhebicite extends Vue {
   ].map((filename) => this.getAbsoluteUrl(filename));
   readonly categories: Category[] = [
     {
+      id: "mapping",
       name: "Cartographies affectives de Vernier",
       description:
         "Ces cartographies affectives représentent l'espace urbain vécu dans Vernier à travers quinze entretiens réalisés avec des habitant.e.s de la commune. La compréhension et la spatialité de la commune évolue selon qui l'habite. Une image collective partagée émerge à l'intersection des expériences individuelles.",
+      active: true,
       layers: [
         {
           name: "01 La forêt tropicale",
@@ -337,9 +414,11 @@ export default class Plhebicite extends Vue {
       ],
     },
     {
+      id: "atlas",
       name: "Atlas de mobilité",
       description:
         "La collection de cet Atlas est organisée selon 10 grands thèmes et 49 sous-thèmes. L'utilisateur peut naviguer librement sur la carte pour comprendre la relation entre les caractéristiques environnementales et les perceptions collectives.",
+      active: false,
       layers: [
         {
           name: "Place attachment & spatial reach",
@@ -401,9 +480,11 @@ export default class Plhebicite extends Vue {
       ],
     },
     {
+      id: "environment",
       name: "Environmental Features",
       description:
         "Les supports de carte facilitent la lecture du territoire. Cependant ils tendent à figer ce même territoire en des images conventionnelles et bien souvent routières. C’est pourquoi chaque chapitre propose différentes couches de cartes à tester par vous-même. Vous trouverez dans cette section des cartes plus générales pour vous situer facilement.",
+      active: false,
       layers: [
         {
           name: "Fond de carte ALICE ",
@@ -436,6 +517,7 @@ export default class Plhebicite extends Vue {
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
   about = false;
+  selectedCategoryId: CategoryId = "mapping";
 
   created(): void {
     this.selectedTreeviewItems = this.categories.map((category) =>
@@ -523,11 +605,21 @@ export default class Plhebicite extends Vue {
       };
     });
   }
+
+  clickCategory(category: Category): void {
+    if (!category.active) {
+      this.selectedCategoryId = category.id;
+    }
+  }
 }
 
+type CategoryId = "mapping" | "atlas" | "environment";
+
 interface Category {
+  id: CategoryId;
   name: string;
   description: string;
+  active: boolean;
   layers: Layer[];
 }
 
@@ -555,5 +647,10 @@ interface Layer {
 .v-list {
   padding: 0;
   overflow-y: auto;
+}
+
+.legend {
+  height: 150px;
+  overflow: auto;
 }
 </style>

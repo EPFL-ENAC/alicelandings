@@ -9,7 +9,8 @@
       :zoom.sync="syncedZoom"
     >
       <l-control-layers
-        position="topright"
+        v-if="baseTileLayers.length > 0"
+        position="topleft"
         :autoZIndex="false"
       ></l-control-layers>
       <l-tile-layer
@@ -27,7 +28,7 @@
         position="bottomright"
         :imperial="false"
       ></l-control-scale>
-      <l-control-zoom position="bottomright"></l-control-zoom>
+      <l-control-zoom position="topright"></l-control-zoom>
     </l-map>
   </div>
 </template>
