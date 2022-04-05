@@ -34,7 +34,17 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056, EPSG_21781, TileLayerProp } from "@/utils/leaflet";
+import {
+  DebugLayer,
+  EPSG_2056,
+  EPSG_21781,
+  sitgCrs,
+  swisstopoAttribution,
+  swisstopoCrs,
+  swisstopoSubdomains,
+  TileLayerProp,
+  WorldFileTileLayer,
+} from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -42,8 +52,10 @@ import { identify } from "geoblaze";
 import { Feature } from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
-import L, {
+import {
+  Bounds,
   Control,
+  control,
   CRS,
   DomUtil,
   GeoJSON,
@@ -57,6 +69,7 @@ import L, {
   Map,
   MapOptions,
   marker,
+  Marker,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -98,12 +111,43 @@ import colors, { Color } from "vuetify/lib/util/colors";
 export default class WebMap extends Vue {
   readonly baseTileLayers: TileLayerProps[] = [
     {
-      name: "None",
+      name: "None EPSG3857",
       url: "",
-      visible: true,
+      visible: false,
       options: {
         crs: CRS.EPSG3857,
         maxZoom: 19,
+      },
+    },
+    {
+      name: "None swisstopoCrs",
+      url: "",
+      visible: true,
+      options: {
+        crs: swisstopoCrs,
+        maxZoom: 27,
+      },
+    },
+    {
+      name: "SITG",
+      visible: false,
+      attribution:
+        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
+      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
+      options: {
+        crs: sitgCrs,
+        maxZoom: 11,
+      },
+    },
+    {
+      name: "swisstopo",
+      visible: false,
+      attribution: swisstopoAttribution,
+      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
+      subdomains: swisstopoSubdomains,
+      options: {
+        crs: swisstopoCrs,
+        maxZoom: 27,
       },
     },
   ];
@@ -187,9 +231,9 @@ export default class WebMap extends Vue {
         this.defaultCrs;
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (L.control as any).browserPrint().addTo(this.map);
+    (control as any).browserPrint().addTo(this.map);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (L.Control as any).BrowserPrint.Utils.registerLayer(
+    (Control as any).BrowserPrint.Utils.registerLayer(
       GeoRasterLayer,
       "GeoRasterLayer",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -197,6 +241,31 @@ export default class WebMap extends Vue {
         return new GeoRasterLayer(layer.options);
       }
     );
+
+    new DebugLayer().addTo(this.map).bringToFront();
+    new WorldFileTileLayer(
+      "./data/INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
+      new Proj.CRS("EPSG:2056", EPSG_2056, {
+        origin: [2494661.821213541552, 1120309.45617263671],
+        resolutions: [
+          18.0445546007679987, 9.02227730038399933, 4.51113865019199967,
+          2.25556932509599983, 1.12778466254799992, 0.563892331273999958,
+          0.281946165636999979,
+        ],
+        bounds: new Bounds(
+          [2494661.68024045881, 1120309.5971436426],
+          [2498621.050244499, 1117509.02588037029]
+        ),
+      }),
+      {
+        minZoom: 0,
+        maxZoom: 6,
+      }
+    )
+      .addTo(this.map)
+      .bringToFront();
+    new Marker([46.2107, 6.0946]).addTo(this.map);
+    new Marker([46.22596347326438, 6.073280019597476]).addTo(this.map);
 
     this.onDemsChanged();
   }

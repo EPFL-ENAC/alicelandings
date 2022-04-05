@@ -317,8 +317,8 @@ import { mapMutations } from "vuex";
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
-  readonly minZoom = 12;
-  readonly maxZoom = 18;
+  readonly minZoom = 0; // 12;
+  readonly maxZoom = 27; // 18;
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
@@ -331,6 +331,12 @@ export default class Plhebicite extends Vue {
         "Ces cartographies affectives représentent l'espace urbain vécu dans Vernier à travers quinze entretiens réalisés avec des habitant.e.s de la commune. La compréhension et la spatialité de la commune évolue selon qui l'habite. Une image collective partagée émerge à l'intersection des expériences individuelles.",
       active: true,
       layers: [
+        {
+          name: "test",
+          tile: {
+            urlTemplate: "INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
+          },
+        },
         {
           name: "01 La forêt tropicale",
           children: [
@@ -759,7 +765,7 @@ export default class Plhebicite extends Vue {
   @Ref()
   readonly webMap!: WebMap;
 
-  zoom = 15;
+  zoom = 21;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
   selectedCategoryId: CategoryId = "mapping";

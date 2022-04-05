@@ -1,4 +1,17 @@
-import { Bounds, CRS, Proj, TileLayerOptions } from "leaflet";
+import {
+  Bounds,
+  Browser,
+  Coords,
+  CRS,
+  DomUtil,
+  GridLayer,
+  LatLng,
+  Point,
+  Proj,
+  TileLayer,
+  TileLayerOptions,
+} from "leaflet";
+import { range } from "lodash";
 import "proj4leaflet";
 
 // https://epsg.io/2056
@@ -106,4 +119,259 @@ export const tileLayerProps: Record<
 export interface TileLayerProp {
   urlTemplate: string;
   options?: TileLayerOptions;
+}
+
+declare module "leaflet" {
+  interface Map {
+    _getNewPixelOrigin(center: LatLng, zoom: number): Point;
+    _getMapPanePos(): Point;
+  }
+
+  interface GridLayer {
+    _level: Level;
+    _levels: Record<number, Level>;
+
+    _getTiledPixelBounds(center: LatLng): Bounds;
+    _getTilePos(coords: Coords): Point;
+    _updateLevels(): Level | undefined;
+    _tileCoordsToNwSe(coords: Coords): [LatLng, LatLng];
+    _setView(
+      center: LatLng,
+      zoom: number,
+      noPrune: boolean,
+      noUpdate: boolean
+    ): void;
+    _clampZoom(zoom: number): number;
+    _setZoomTransform(level: Level, center: LatLng, zoom: number): void;
+    _isValidTile(coords: Coords): boolean;
+    _pxBoundsToTileRange(bounds: Bounds): Bounds;
+    _noTilesToLoad(): boolean;
+    _pruneTiles(): void;
+    _removeAllTiles(): void;
+    _retainParent(x: number, y: number, z: number, minZoom: number): boolean;
+    _retainChildren(x: number, y: number, z: number, minZoom: number): void;
+    _removeTile(key: string): void;
+    _resetView(): void;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Proj {
+    interface CRS {
+      options: Proj.ProjCRSOptions;
+    }
+  }
+}
+
+interface Level {
+  el: HTMLElement;
+  origin: Point;
+  zoom: number;
+}
+
+/**
+ * https://en.wikipedia.org/wiki/World_file
+ */
+export class WorldFileTileLayer extends TileLayer {
+  private tileSizeScale = 1;
+
+  constructor(
+    urlTemplate: string,
+    public crs: Proj.CRS,
+    options?: TileLayerOptions
+  ) {
+    super(urlTemplate, options);
+  }
+
+  get tileZoom(): number {
+    return this._tileZoom ?? this._map.getZoom();
+  }
+
+  get minZoom(): number {
+    if (this.options.minZoom === undefined) {
+      throw new Error("minZoom should be defined");
+    }
+    return this.options.minZoom;
+  }
+
+  get maxZoom(): number {
+    if (this.options.maxZoom === undefined) {
+      throw new Error("maxZoom should be defined");
+    }
+    return this.options.maxZoom;
+  }
+
+  get mapCrs(): CRS {
+    if (this._map.options.crs === undefined) {
+      throw new Error("map should have crs");
+    }
+    return this._map.options.crs;
+  }
+
+  _getTiledPixelBounds(center: LatLng): Bounds {
+    const pixelCenter: Point = this._map
+      .latLngToLayerPoint(center)
+      .subtract([256, 128]) // FIXME
+      .floor();
+    const halfSize = this._map.getSize().divideBy(2);
+    const bounds = new Bounds(
+      pixelCenter.subtract(halfSize),
+      pixelCenter.add(halfSize)
+    );
+    return bounds;
+  }
+
+  _getTilePos(coords: Coords): Point {
+    const latLng = this.crs.unproject(
+      this.crs.transformation.untransform(
+        coords.scaleBy(super.getTileSize()),
+        this.crs.scale(this.tileZoom)
+      )
+    );
+    const pos = this._map.latLngToLayerPoint(latLng);
+    return pos;
+  }
+
+  getTileSize(): Point {
+    const size = super.getTileSize().multiplyBy(this.tileSizeScale).round();
+    return size;
+  }
+
+  createTile(coords: Coords): HTMLElement {
+    const tile = document.createElement("div");
+    const pos = this._getTilePos(coords);
+    const latLng = this._map.layerPointToLatLng(pos);
+    tile.innerHTML =
+      [coords.x, coords.y, coords.z].join(", ") +
+      "<br>" +
+      [pos.x, pos.y, this._tileZoom].join(", ") +
+      "<br>" +
+      [latLng.lat, latLng.lng].join(", ");
+    tile.style.outline = "1px solid blue";
+    return tile;
+  }
+
+  _updateLevels(): Level | undefined {
+    // this._levels = {}; // FIXME
+    return super._updateLevels();
+  }
+
+  private get getTileZoom(): number {
+    const mapScale: number = this.mapCrs.scale(this._map.getZoom());
+    let minIndex = this.minZoom;
+    let minValue = Math.abs(mapScale - this.crs.scale(minIndex));
+    range(this.minZoom + 1, this.maxZoom + 1).forEach((zoom, index) => {
+      const scale = Math.abs(mapScale - this.crs.scale(zoom));
+      if (scale < minValue) {
+        minIndex = index;
+        minValue = scale;
+      }
+    });
+    const zoom = minIndex;
+    this.tileSizeScale = mapScale / this.crs.scale(zoom);
+    return zoom;
+  }
+
+  _clampZoom(): number {
+    const newZoom = super._clampZoom(this.getTileZoom);
+    return newZoom;
+  }
+
+  _setView(
+    center: LatLng,
+    _: number,
+    noPrune: boolean,
+    noUpdate: boolean
+  ): void {
+    super._setView(center, this.getTileZoom, noPrune, noUpdate);
+  }
+
+  _setZoomTransform(level: Level, center: LatLng): void {
+    const translate = this._map
+      .latLngToLayerPoint(center)
+      .subtract(this._map.getSize().divideBy(2))
+      .add(this._map._getMapPanePos())
+      .round();
+    if (Browser.any3d) {
+      DomUtil.setTransform(level.el, translate, 1);
+    } else {
+      DomUtil.setPosition(level.el, translate);
+    }
+  }
+
+  _isValidTile(coords: Coords): boolean {
+    if (!this.crs.infinite) {
+      const projectedBounds = this.crs.getProjectedBounds(this.tileZoom);
+      const _globalTileRange = this._pxBoundsToTileRange(
+        new Bounds(
+          projectedBounds.getTopLeft().round(),
+          projectedBounds.getBottomRight().round()
+        )
+      );
+      return _globalTileRange.contains(coords);
+    }
+    throw new Error("crs should be finite (has bounds)");
+  }
+
+  _tileCoordsToNwSe(coords: Coords): [LatLng, LatLng] {
+    const [nw, se] = super._tileCoordsToNwSe(coords);
+    console.debug(nw, se);
+    return [nw, se];
+  }
+
+  /**
+   * https://github.com/Leaflet/Leaflet/blob/v1.7.1/src/layer/tile/GridLayer.js#L411
+   */
+  _pruneTiles(): void {
+    if (!this._map) {
+      return;
+    }
+
+    let key, tile;
+
+    const zoom = this.tileZoom;
+    if (
+      (this.options.maxZoom !== undefined && zoom > this.options.maxZoom) ||
+      (this.options.minZoom !== undefined && zoom < this.options.minZoom)
+    ) {
+      this._removeAllTiles();
+      return;
+    }
+
+    for (key in this._tiles) {
+      tile = this._tiles[key];
+      tile.retain = tile.current;
+    }
+
+    for (key in this._tiles) {
+      tile = this._tiles[key];
+      if (tile.current && !tile.active) {
+        const coords = tile.coords;
+        if (!this._retainParent(coords.x, coords.y, coords.z, coords.z - 5)) {
+          this._retainChildren(coords.x, coords.y, coords.z, coords.z + 2);
+        }
+      }
+    }
+
+    for (key in this._tiles) {
+      if (!this._tiles[key].retain) {
+        this._removeTile(key);
+      }
+    }
+  }
+}
+
+export class DebugLayer extends GridLayer {
+  createTile(coords: Coords): HTMLElement {
+    const tile = document.createElement("div");
+    const pos = this._getTilePos(coords);
+    const latLng = this._map.layerPointToLatLng(pos);
+    tile.innerHTML =
+      [coords.x, coords.y, coords.z].join(", ") +
+      "<br>" +
+      [pos.x, pos.y, this._tileZoom].join(", ") +
+      "<br>" +
+      [latLng.lat, latLng.lng].join(", ");
+    tile.style.outline = "1px solid red";
+    return tile;
+  }
 }
