@@ -9,7 +9,7 @@
       :zoom.sync="syncedZoom"
     >
       <l-control-layers
-        v-if="baseTileLayers.length > 0"
+        v-if="baseTileLayers.length > 1"
         position="topleft"
         :autoZIndex="false"
       ></l-control-layers>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { EPSG_2056, EPSG_21781, sitgCrs, TileLayerProp } from "@/utils/leaflet";
+import { EPSG_2056, EPSG_21781, TileLayerProp } from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -100,17 +100,6 @@ export default class WebMap extends Vue {
       options: {
         crs: CRS.EPSG3857,
         maxZoom: 19,
-      },
-    },
-    {
-      name: "SITG",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
-      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
-      options: {
-        crs: sitgCrs,
-        maxZoom: 11,
       },
     },
   ];
