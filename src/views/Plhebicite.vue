@@ -35,7 +35,7 @@
           class="flex-even"
           :style="{ 'max-height': about ? '0px' : undefined }"
         >
-          <v-list dense width="350" max-height="100%">
+          <v-list dense width="350" height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -69,72 +69,82 @@
         <v-btn v-if="!about" class="flex-grow-0" text @click="about = true">
           About
         </v-btn>
-        <div v-if="about" class="ma-4">
-          <v-btn class="float-right" icon color="black" @click="about = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <h2>About</h2>
-          <p>
-            To address the challenges posed by climate change to our cities, it
-            is essential to acknowledge the role the environment plays in our
-            everyday lives. However our maps tend to silence our lived
-            experience and how it both shapes and is shaped by the places we
-            move through. Consequently, planning and design processes have often
-            disregarded this and lost great opportunities to collectively shape
-            friendlier and human-oriented cities. An analysis of active mobility
-            practices in the commune of Vernier offers us the chance to create
-            alternative spatial representations to know this lived dimension. By
-            having maps able to address affective engagements, social
-            imaginaries, and collective memories, we can make our communities
-            matter more in the conversations about our cities' future.
-          </p>
-          <p>
-            The <span class="font-weight-bold">Affective Mappings</span> series
-            offers an alternative way of representing urban lived space in the
-            commune of Vernier. Based on fifteen walk-along interviews done with
-            neighbours of Vernier, these maps attempt to draw these citizens'
-            affective engagements with their everyday environments highlighting
-            perceptions, landscapes and experience instead of abstract
-            administrative lines or symbols. By acknowledging the lived space of
-            a city in maps that can be collectively shared, discussed and
-            transformed, we can expand our urban imaginaries and improve how we
-            plan and design our cities.
-          </p>
-          <p>
-            The
-            <span class="font-weight-bold">Atlas of Mobility Landscapes</span>
-            is a collection of citizen testimonies, documents and images
-            gathered around the experience of walking and cycling in Vernier.
-            Mobility is much more than connecting point A to point B, it is
-            mostly defined by the experience of the journey. Because of that,
-            mobility is an extraordinary point of entrance into the relations
-            between everyday practices and our surrounding environment. The
-            collection is organized according to X large themes and X sub-themes
-            describing the lived experience of the commune of Vernier. The user
-            can navigate the map freely to understand the relationship between
-            different environmental features of the commune and collective
-            imaginaries and perceptions.
-          </p>
-          <p>
-            We believe that making available all these documents in an online
-            and open visualization tool will help acknowledge the importance of
-            these often hidden qualities of space, and how they can encourage
-            more inclusive discussions about the city and its potential futures.
-          </p>
-          <p>
-            Cet outil de visualisation a été créé en collaboration avec l'équipe
-            IT4R de l'EPFL dans le cadre du projet de recherche
-            <span class="font-weight-bold">PLHEBICITE</span>
-            (Planifier des villes plus saines et plus riches en biodiversité:
-            relier les quartiers grâce à une mobilité active et des
-            infrastructures paysagères). Ce projet est une collaboration entre
-            les laboratoires ALICE (Atelier de la Conception de l'Espace) et
-            LASIG (Laboratoire des Systèmes d'Information Géographique) de
-            l'EPFL, afin d'étudier de quelle manière l'espace urbain influence
-            et potentialise les pratiques de mobilité active ainsi que le bien
-            être et la santé physique et psychologique des habitants de la
-            commune de Vernier à Genève.
-          </p>
+        <div v-if="about" class="flex-even about">
+          <div class="ma-4">
+            <v-btn
+              class="float-right"
+              icon
+              color="black"
+              @click="about = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <h2>About</h2>
+            <p>
+              To address the challenges posed by climate change to our cities,
+              it is essential to acknowledge the role the environment plays in
+              our everyday lives. However our maps tend to silence our lived
+              experience and how it both shapes and is shaped by the places we
+              move through. Consequently, planning and design processes have
+              often disregarded this and lost great opportunities to
+              collectively shape friendlier and human-oriented cities. An
+              analysis of active mobility practices in the commune of Vernier
+              offers us the chance to create alternative spatial representations
+              to know this lived dimension. By having maps able to address
+              affective engagements, social imaginaries, and collective
+              memories, we can make our communities matter more in the
+              conversations about our cities' future.
+            </p>
+            <p>
+              The
+              <span class="font-weight-bold">Affective Mappings</span> series
+              offers an alternative way of representing urban lived space in the
+              commune of Vernier. Based on fifteen walk-along interviews done
+              with neighbours of Vernier, these maps attempt to draw these
+              citizens' affective engagements with their everyday environments
+              highlighting perceptions, landscapes and experience instead of
+              abstract administrative lines or symbols. By acknowledging the
+              lived space of a city in maps that can be collectively shared,
+              discussed and transformed, we can expand our urban imaginaries and
+              improve how we plan and design our cities.
+            </p>
+            <p>
+              The
+              <span class="font-weight-bold">Atlas of Mobility Landscapes</span>
+              is a collection of citizen testimonies, documents and images
+              gathered around the experience of walking and cycling in Vernier.
+              Mobility is much more than connecting point A to point B, it is
+              mostly defined by the experience of the journey. Because of that,
+              mobility is an extraordinary point of entrance into the relations
+              between everyday practices and our surrounding environment. The
+              collection is organized according to X large themes and X
+              sub-themes describing the lived experience of the commune of
+              Vernier. The user can navigate the map freely to understand the
+              relationship between different environmental features of the
+              commune and collective imaginaries and perceptions.
+            </p>
+            <p>
+              We believe that making available all these documents in an online
+              and open visualization tool will help acknowledge the importance
+              of these often hidden qualities of space, and how they can
+              encourage more inclusive discussions about the city and its
+              potential futures.
+            </p>
+            <p>
+              Cet outil de visualisation a été créé en collaboration avec
+              l'équipe IT4R de l'EPFL dans le cadre du projet de recherche
+              <span class="font-weight-bold">PLHEBICITE</span>
+              (Planifier des villes plus saines et plus riches en biodiversité:
+              relier les quartiers grâce à une mobilité active et des
+              infrastructures paysagères). Ce projet est une collaboration entre
+              les laboratoires ALICE (Atelier de la Conception de l'Espace) et
+              LASIG (Laboratoire des Systèmes d'Information Géographique) de
+              l'EPFL, afin d'étudier de quelle manière l'espace urbain influence
+              et potentialise les pratiques de mobilité active ainsi que le bien
+              être et la santé physique et psychologique des habitants de la
+              commune de Vernier à Genève.
+            </p>
+          </div>
         </div>
       </div>
       <v-divider vertical></v-divider>
@@ -149,7 +159,7 @@
           :zoom.sync="zoom"
         ></web-map>
         <v-divider></v-divider>
-        <div class="d-flex flex-row">
+        <div v-if="!about" class="d-flex flex-row">
           <div class="flex-even legend">
             <div class="ma-2">
               <template v-if="selectedCategoryId === 'mapping'">
@@ -651,6 +661,10 @@ interface Layer {
 
 .legend {
   height: 150px;
+  overflow: auto;
+}
+
+.about {
   overflow: auto;
 }
 </style>
