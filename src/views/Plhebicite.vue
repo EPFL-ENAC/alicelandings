@@ -7,22 +7,21 @@
           An affordance-based and affective reading of the Commune of Vernier,
           Geneva
         </p>
-        <span>Zoom level: {{ zoom }}</span>
       </div>
-      <div class="flex-grow-0">
+      <div class="d-flex flex-grow-0">
         <a href="https://alice.epfl.ch" target="_blank">
           <v-img
-            aspect-ratio="2"
             contain
             src="/logo/alice_logo2-01.png"
+            height="100%"
             width="100px"
           ></v-img>
         </a>
         <a href="https://epfl.ch" target="_blank">
           <v-img
-            aspect-ratio="2"
             contain
             src="/logo/EPFL_Logo_184X53.svg"
+            height="100%"
             width="100px"
           ></v-img>
         </a>
@@ -35,7 +34,7 @@
           class="flex-even"
           :style="{ 'max-height': about ? '0px' : undefined }"
         >
-          <v-list dense width="350" height="100%">
+          <v-list dense width="300" height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -656,7 +655,7 @@ interface Layer {
 
 .v-list {
   padding: 0;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .legend {
