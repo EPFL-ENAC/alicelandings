@@ -281,7 +281,7 @@ export default class Plhebicite extends Vue {
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
-  ].map((filename) => this.getAbsoluteUrl(filename));
+  ].map((filename) => this.getDataUrl(filename));
   readonly categories: Category[] = [
     {
       id: "mapping",
@@ -326,7 +326,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Parcours",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/05_DELTA/220324_test_05_trajectories/{z}/{x}/{y}.png"
                 ),
               },
@@ -334,7 +334,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Constellation",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png"
                 ),
               },
@@ -342,7 +342,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Horizons",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/05_DELTA/220324_test_05_horizons/{z}/{x}/{y}.png"
                 ),
               },
@@ -373,7 +373,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Parcours",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/07_CROISIERE/220324_test_07_trajectories/{z}/{x}/{y}.png"
                 ),
               },
@@ -381,7 +381,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Constellation",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/07_CROISIERE/220322_test_07_constellation/{z}/{x}/{y}.png"
                 ),
               },
@@ -389,7 +389,7 @@ export default class Plhebicite extends Vue {
             {
               name: "Horizons",
               tile: {
-                urlTemplate: this.getAbsoluteUrl(
+                urlTemplate: this.getDataUrl(
                   "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png"
                 ),
               },
@@ -544,7 +544,7 @@ export default class Plhebicite extends Vue {
       .filter((layer) => layer.url || layer.tile)
       .map(async (layer) => {
         if (layer.url) {
-          const absoluteUrl = this.getAbsoluteUrl(layer.url);
+          const absoluteUrl = this.getDataUrl(layer.url);
           if (absoluteUrl.endsWith("metadata.json")) {
             const metadata = await axios
               .get<Metadata>(absoluteUrl)
@@ -588,8 +588,8 @@ export default class Plhebicite extends Vue {
     Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
   }
 
-  private getAbsoluteUrl(dataUrl?: string): string {
-    return `${location.origin}${process.env.BASE_URL}data/${dataUrl}`;
+  private getDataUrl(path: string): string {
+    return `${process.env.VUE_APP_DATA_URL}/${path}`;
   }
 
   getTreeviewItems(
