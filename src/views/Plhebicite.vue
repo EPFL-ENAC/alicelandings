@@ -199,29 +199,57 @@
             <div class="ma-2">
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Légende</h4>
-                <p>
-                  <span class="font-weight-bold">Voix. </span>Recueille des
-                  fragments de récits tout au long du parcours effectué, parlant
-                  de lieux directement visibles, proches ou lointains qui
-                  apparaissent dans la discussion.
+                <p class="d-flex">
+                  <v-img
+                    src="img/legends/voices.png"
+                    contain
+                    width="32"
+                  ></v-img>
+                  <span>
+                    <span class="font-weight-bold">Voix. </span>Recueille des
+                    fragments de récits tout au long du parcours effectué,
+                    parlant de lieux directement visibles, proches ou lointains
+                    qui apparaissent dans la discussion.
+                  </span>
                 </p>
-                <p>
-                  <span class="font-weight-bold">Parcours. </span>L’itinéraire
-                  de l’entretien effectué. La largeur fluctue selon la vitesse
-                  de marche, la couleur selon la pente du parcours.
+                <p class="d-flex">
+                  <v-img
+                    src="img/legends/parcours.png"
+                    contain
+                    width="32"
+                  ></v-img>
+                  <span>
+                    <span class="font-weight-bold">Parcours. </span>L’itinéraire
+                    de l’entretien effectué. La largeur fluctue selon la vitesse
+                    de marche, la couleur selon la pente du parcours.
+                  </span>
                 </p>
-                <p>
-                  <span class="font-weight-bold">Constellation. </span
-                  >Rassemblent une série de lieux significatifs pour chaque
-                  récit, montrant l'étendue et la nature discontinue de notre
-                  expérience vécue et les différents territoires que cela
-                  dessine.
+                <p class="d-flex">
+                  <v-img
+                    src="img/legends/constellation.png"
+                    contain
+                    width="32"
+                  ></v-img>
+                  <span>
+                    <span class="font-weight-bold">Constellation. </span
+                    >Rassemblent une série de lieux significatifs pour chaque
+                    récit, montrant l'étendue et la nature discontinue de notre
+                    expérience vécue et les différents territoires que cela
+                    dessine.
+                  </span>
                 </p>
-                <p>
-                  <span class="font-weight-bold">Horizons. </span>Succession de
-                  points de vue visibles depuis l’itinéraire. Révèle la
-                  profondeur de l’espace affecté par notre mobilité et l’étendue
-                  variable du regard selon les lieux.
+                <p class="d-flex">
+                  <v-img
+                    src="img/legends/horizons.png"
+                    contain
+                    width="32"
+                  ></v-img>
+                  <span>
+                    <span class="font-weight-bold">Horizons. </span>Succession
+                    de points de vue visibles depuis l’itinéraire. Révèle la
+                    profondeur de l’espace affecté par notre mobilité et
+                    l’étendue variable du regard selon les lieux.
+                  </span>
                 </p>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
@@ -661,6 +689,10 @@ interface Layer {
 .legend {
   height: 150px;
   overflow: auto;
+
+  .v-image {
+    margin-right: 8px;
+  }
 }
 
 .about {
