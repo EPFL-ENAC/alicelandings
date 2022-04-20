@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column full-height">
+  <div class="d-flex flex-column full-height text-justify">
     <div class="d-flex flex-row justify-space-between mx-4">
       <div class="flex-grow-1">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
@@ -34,7 +34,7 @@
           class="flex-even"
           :style="{ 'max-height': about ? '0px' : undefined }"
         >
-          <v-list dense width="300" height="100%">
+          <v-list dense width="320" height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -50,22 +50,30 @@
                   </v-list-item-title>
                 </v-list-item-content>
               </template>
-              <p class="mx-4 text-caption text-justify">
+              <p class="mx-4">
                 {{ item.description }}
               </p>
               <v-treeview
                 v-model="selectedTreeviewItems[index]"
                 dense
                 :items="getTreeviewItems(item.layers)"
+                off-icon="mdi-checkbox-blank-outline"
+                on-icon="mdi-checkbox-blank"
                 return-object
                 selectable
+                selected-color="secondary"
               >
               </v-treeview>
             </v-list-group>
           </v-list>
         </div>
         <v-divider v-if="!about"></v-divider>
-        <v-btn v-if="!about" class="flex-grow-0" text @click="about = true">
+        <v-btn
+          v-if="!about"
+          class="flex-grow-0 about-btn btn-right"
+          text
+          @click="about = true"
+        >
           About
         </v-btn>
         <div v-if="about" class="flex-even about">

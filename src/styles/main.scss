@@ -12,6 +12,12 @@ html {
   padding-left: 0px;
 }
 
+.btn-right {
+  > .v-btn__content {
+    justify-content: end;
+  }
+}
+
 $alice-font-family: "Akzidenz-Grotesk Pro";
 @font-face {
   font-family: $alice-font-family;
