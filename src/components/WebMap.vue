@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { EPSG_2056, EPSG_21781, TileLayerProp } from "@/utils/leaflet";
-import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
+import { getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
@@ -47,12 +47,14 @@ import L, {
   DomUtil,
   GeoJSON,
   GridLayer,
+  icon,
   Layer,
   LayerEvent,
   LayerGroup,
   LeafletMouseEvent,
   Map,
   MapOptions,
+  marker,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -327,7 +329,14 @@ abstract class MapItem {
           }
         : undefined,
       style: style,
-      pointToLayer: getPointToLayer(styleText),
+      // pointToLayer: getPointToLayer(styleText),
+      pointToLayer: (_, latlng) =>
+        marker(latlng, {
+          icon: icon({
+            iconUrl: "img/legends/voices.png",
+            iconSize: [32, 32],
+          }),
+        }),
     });
     if (onAdd) {
       return geoJson.on("add", onAdd);
