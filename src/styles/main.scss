@@ -18,6 +18,10 @@ html {
   }
 }
 
+.text-justify {
+  hyphens: auto;
+}
+
 $alice-font-family: "Akzidenz-Grotesk Pro";
 @font-face {
   font-family: $alice-font-family;

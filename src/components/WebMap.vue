@@ -524,3 +524,13 @@ interface ExtendedGeoRaster extends GeoRaster {
   cursor: crosshair;
 }
 </style>
+
+<style lang="scss">
+.leaflet-bar {
+  border-radius: 0;
+}
+
+.leaflet-touch .leaflet-bar a:first-child {
+  border-radius: 0;
+}
+</style>

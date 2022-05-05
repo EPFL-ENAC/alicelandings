@@ -683,7 +683,7 @@ interface Layer {
 
 <style lang="scss" scoped>
 .v-divider {
-  border-color: black !important;
+  border-color: var(--v-primary-base) !important;
   z-index: 1;
 }
 
