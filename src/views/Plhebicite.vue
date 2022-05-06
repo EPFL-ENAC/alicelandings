@@ -1,22 +1,14 @@
 <template>
   <div class="d-flex flex-column full-height text-justify">
-    <div class="d-flex flex-row justify-space-between mx-4">
+    <div class="d-flex flex-row justify-space-between ma-3">
       <div class="flex-grow-1">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
-        <p class="text-subtitle-1">
+        <span class="text-subtitle-1">
           An affordance-based and affective reading of the Commune of Vernier,
           Geneva
-        </p>
+        </span>
       </div>
       <div class="d-flex flex-grow-0">
-        <a href="https://alice.epfl.ch" target="_blank">
-          <v-img
-            contain
-            src="/logo/alice_logo2-01.png"
-            height="100%"
-            width="100px"
-          ></v-img>
-        </a>
         <a href="https://epfl.ch" target="_blank">
           <v-img
             contain
@@ -26,12 +18,17 @@
           ></v-img>
         </a>
       </div>
+      <div class="d-flex align-center">
+        <v-btn icon color="primary" class="ml-3" @click="toggleAppBar">
+          <v-icon x-large>mdi-menu</v-icon>
+        </v-btn>
+      </div>
     </div>
     <v-divider></v-divider>
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
         <div class="flex-even">
-          <v-list dense width="320" height="100%">
+          <v-list dense width="300" height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -43,19 +40,20 @@
               <template v-slot:activator>
                 <v-list-item-content>
                   <v-list-item-title class="font-weight-black">
-                    {{ item.name }}
+                    <h3>{{ item.name }}</h3>
                   </v-list-item-title>
                 </v-list-item-content>
               </template>
-              <p class="mx-4">
+              <p class="mx-3">
                 {{ item.description }}
               </p>
               <v-treeview
                 v-model="selectedTreeviewItems[index]"
                 dense
                 :items="getTreeviewItems(item.layers)"
-                off-icon="mdi-checkbox-blank-outline"
-                on-icon="mdi-checkbox-blank"
+                off-icon="mdi-square-outline"
+                on-icon="mdi-square"
+                indeterminate-icon="mdi-square"
                 return-object
                 selectable
                 selected-color="secondary"
@@ -171,7 +169,7 @@
         <v-divider></v-divider>
         <div class="d-flex flex-row">
           <div class="flex-even legend">
-            <div class="ma-2">
+            <div class="ma-3">
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Description</h4>
                 <p>
@@ -207,7 +205,7 @@
           </div>
           <v-divider vertical></v-divider>
           <div class="flex-even legend">
-            <div class="ma-2">
+            <div class="ma-3">
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Légende</h4>
                 <p class="d-flex">
@@ -307,13 +305,18 @@ import { TileLayerProp, tileLayerProps } from "@/utils/leaflet";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
+import { mapMutations } from "vuex";
 
 @Component({
   components: {
     WebMap,
   },
+  methods: {
+    ...mapMutations(["toggleAppBar"]),
+  },
 })
 export default class Plhebicite extends Vue {
+  toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
   readonly minZoom = 14;
   readonly maxZoom = 18;
@@ -324,7 +327,7 @@ export default class Plhebicite extends Vue {
   readonly categories: Category[] = [
     {
       id: "mapping",
-      name: "Cartographies affectives de Vernier",
+      name: "Cartographies affectives",
       description:
         "Ces cartographies affectives représentent l'espace urbain vécu dans Vernier à travers quinze entretiens réalisés avec des habitant.e.s de la commune. La compréhension et la spatialité de la commune évolue selon qui l'habite. Une image collective partagée émerge à l'intersection des expériences individuelles.",
       active: true,
@@ -698,7 +701,7 @@ interface Layer {
 }
 
 .legend {
-  height: 150px;
+  height: 140px;
   overflow: auto;
 
   .v-image {

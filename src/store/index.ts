@@ -4,8 +4,14 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    appBar: false,
+  },
+  mutations: {
+    toggleAppBar(state) {
+      state.appBar = !state.appBar;
+    },
+  },
   actions: {},
   modules: {},
 });

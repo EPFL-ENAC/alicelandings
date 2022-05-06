@@ -1,14 +1,12 @@
 <template>
   <v-app>
-    <v-app-bar v-if="appBar" app dense @mouseleave="appBar = false">
+    <v-app-bar v-if="appBar" app dense>
       <v-app-bar-title>Alice Landings</v-app-bar-title>
       <v-tabs>
-        <v-tab to="/">Home</v-tab>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
+        <v-tab to="/playground">Playground</v-tab>
         <v-tab to="/about">About</v-tab>
       </v-tabs>
-    </v-app-bar>
-    <v-app-bar v-if="!appBar" app height="8px" @mouseover="appBar = true">
     </v-app-bar>
     <v-main>
       <router-view></router-view>
@@ -18,10 +16,15 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { mapState } from "vuex";
 
-@Component
+@Component({
+  computed: {
+    ...mapState(["appBar"]),
+  },
+})
 export default class App extends Vue {
-  appBar = false;
+  readonly appBar!: boolean;
 }
 </script>
 

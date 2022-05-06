@@ -55,6 +55,7 @@ import L, {
   Map,
   MapOptions,
   marker,
+  point,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -335,6 +336,7 @@ abstract class MapItem {
           icon: icon({
             iconUrl: "img/legends/voices.png",
             iconSize: [32, 32],
+            popupAnchor: point(186, 0),
           }),
         }),
     });
@@ -527,10 +529,11 @@ interface ExtendedGeoRaster extends GeoRaster {
 
 <style lang="scss">
 .leaflet-bar {
-  border-radius: 0;
+  border-radius: 0 !important;
+  border: none !important;
 }
 
-.leaflet-touch .leaflet-bar a:first-child {
-  border-radius: 0;
+.leaflet-touch .leaflet-bar a {
+  border-radius: 0 !important;
 }
 </style>

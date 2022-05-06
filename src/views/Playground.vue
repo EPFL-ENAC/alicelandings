@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Home</h1>
+    <h1>Playground</h1>
     <control-web-map></control-web-map>
   </v-container>
 </template>
@@ -14,5 +14,5 @@ import { Component, Vue } from "vue-property-decorator";
     ControlWebMap,
   },
 })
-export default class Home extends Vue {}
+export default class Playground extends Vue {}
 </script>

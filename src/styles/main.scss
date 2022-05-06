@@ -22,32 +22,54 @@ html {
   hyphens: auto;
 }
 
-$alice-font-family: "Akzidenz-Grotesk Pro";
-@font-face {
-  font-family: $alice-font-family;
-  src: url("/fonts/Akzidenz-Grotesk-Pro/AkzidenzGroteskPro-Regular.otf")
-    format("opentype");
-  font-weight: normal;
-  font-style: normal;
+.v-ripple__container {
+  display: none !important;
 }
-@font-face {
-  font-family: $alice-font-family;
-  src: url("/fonts/Akzidenz-Grotesk-Pro/AkzidenzGroteskPro-It.otf")
-    format("opentype");
-  font-weight: normal;
-  font-style: italic;
+
+.v-btn::before {
+  background-color: transparent;
 }
-@font-face {
-  font-family: $alice-font-family;
-  src: url("/fonts/Akzidenz-Grotesk-Pro/AkzidenzGroteskPro-Bold.otf")
-    format("opentype");
-  font-weight: bold;
-  font-style: normal;
+
+.v-list-item {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
 }
-@font-face {
-  font-family: $alice-font-family;
-  src: url("/fonts/Akzidenz-Grotesk-Pro/AkzidenzGroteskPro-BoldIt.otf")
-    format("opentype");
-  font-weight: bold;
-  font-style: italic;
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0;
+  border: 2px solid var(--v-primary-base);
+}
+
+.leaflet-popup-tip-container {
+  display: none;
+}
+
+.leaflet-popup-close-button {
+  display: none;
+}
+
+/* https://www.digitalocean.com/community/tutorials/css-scrollbars */
+
+$scrollbar-color: var(--v-secondary-base);
+$scrollbar-background-color: white;
+
+/* Works on Firefox */
+* {
+  // scrollbar-width: thin;
+  scrollbar-color: $scrollbar-color $scrollbar-background-color;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: $scrollbar-background-color;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $scrollbar-color;
+  border-radius: 20px;
+  border: 3px solid $scrollbar-background-color;
 }

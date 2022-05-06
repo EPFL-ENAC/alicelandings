@@ -6,14 +6,19 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "Home",
-    component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
+    redirect: "/plhebicite",
   },
   {
     path: "/plhebicite",
     name: "Plhebicite",
     component: () =>
       import(/* webpackChunkName: "plhebicite" */ "../views/Plhebicite.vue"),
+  },
+  {
+    path: "/playground",
+    name: "Playground",
+    component: () =>
+      import(/* webpackChunkName: "playground" */ "../views/Playground.vue"),
   },
   {
     path: "/about",
