@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column full-height text-justify">
-    <div class="d-flex flex-row justify-space-between ma-3">
+    <div class="d-flex flex-row align-center ma-3">
       <div class="flex-grow-1">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
         <span class="text-subtitle-1">
@@ -8,21 +8,17 @@
           Geneva
         </span>
       </div>
-      <div class="d-flex flex-grow-0">
-        <a href="https://epfl.ch" target="_blank">
-          <v-img
-            contain
-            src="/logo/EPFL_Logo_184X53.svg"
-            height="100%"
-            width="100px"
-          ></v-img>
-        </a>
-      </div>
-      <div class="d-flex align-center">
-        <v-btn icon color="primary" class="ml-3" @click="toggleAppBar">
-          <v-icon x-large>mdi-menu</v-icon>
-        </v-btn>
-      </div>
+      <a href="https://epfl.ch" target="_blank">
+        <v-img
+          contain
+          src="/logo/EPFL_Logo_184X53.svg"
+          height="50px"
+          width="100px"
+        ></v-img>
+      </a>
+      <v-btn icon color="primary" class="ml-3" @click="toggleAppBar">
+        <v-icon x-large>mdi-menu</v-icon>
+      </v-btn>
     </div>
     <v-divider></v-divider>
     <div class="flex-grow-1 d-flex flex-row">
