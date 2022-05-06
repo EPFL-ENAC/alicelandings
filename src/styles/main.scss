@@ -35,19 +35,6 @@ html {
   padding-right: 12px !important;
 }
 
-.leaflet-popup-content-wrapper {
-  border-radius: 0;
-  border: 2px solid var(--v-primary-base);
-}
-
-.leaflet-popup-tip-container {
-  display: none;
-}
-
-.leaflet-popup-close-button {
-  display: none;
-}
-
 /* https://www.digitalocean.com/community/tutorials/css-scrollbars */
 
 $scrollbar-color: var(--v-secondary-base);

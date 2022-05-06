@@ -530,10 +530,31 @@ interface ExtendedGeoRaster extends GeoRaster {
 <style lang="scss">
 .leaflet-bar {
   border-radius: 0 !important;
-  border: none !important;
+  border-color: var(--v-primary-base) !important;
+
+  a {
+    border-color: var(--v-primary-base);
+
+    &:hover {
+      border-color: var(--v-primary-base);
+    }
+  }
 }
 
 .leaflet-touch .leaflet-bar a {
   border-radius: 0 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0;
+  border: 1px solid var(--v-primary-base);
+}
+
+.leaflet-popup-tip-container {
+  display: none;
+}
+
+.leaflet-popup-close-button {
+  display: none;
 }
 </style>
