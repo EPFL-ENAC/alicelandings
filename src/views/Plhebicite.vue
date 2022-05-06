@@ -67,9 +67,9 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               v-bind="attrs"
-              v-on="on"
               class="flex-grow-0 about-btn btn-right"
               text
+              v-on="on"
             >
               About
             </v-btn>

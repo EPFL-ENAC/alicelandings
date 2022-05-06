@@ -11,7 +11,7 @@
       <l-control-layers
         v-if="baseTileLayers.length > 1"
         position="topleft"
-        :autoZIndex="false"
+        :auto-z-index="false"
       ></l-control-layers>
       <l-tile-layer
         v-for="item in baseTileLayers"
