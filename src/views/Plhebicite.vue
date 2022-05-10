@@ -330,18 +330,51 @@ export default class Plhebicite extends Vue {
       layers: [
         {
           name: "01 La forêt tropicale",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "02 Ville-dortoir",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "03 Une barrière bleue",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "04 Passages secrets",
-        },
-        {
-          name: "05 Archipels et deltas",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "05 Delta & Archipels",
@@ -350,45 +383,72 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               children: [
                 {
-                  name: "In",
-                  url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_IN.geojson",
+                  name: "in",
+                  url: "INTERVIEW/05_DELTA/voices/voices_in/plh_interview_05_voices_in.geojson",
                   popupKey: "Text Conte",
                 },
                 {
-                  name: "Out",
-                  url: "INTERVIEW/05_DELTA/voices/05_DELTA_VOICES_OUT.geojson",
-                  popupKey: "Text Content",
+                  name: "in general",
+                  url: "INTERVIEW/05_DELTA/voices/voices_in_general/plh_interview_05_voices_in_general.geojson",
+                  popupKey: "Text Conte",
+                },
+                {
+                  name: "out",
+                  url: "INTERVIEW/05_DELTA/voices/voices_out/plh_interview_05_voices_out.geojson",
+                  popupKey: "Text Conte",
+                },
+                {
+                  name: "out general",
+                  url: "INTERVIEW/05_DELTA/voices/voices_out_callout/plh_interview_05_voices_out_callout.geojson",
                 },
               ],
             },
             {
               name: "Parcours",
               tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/05_DELTA/220324_test_05_trajectories/{z}/{x}/{y}.png"
-                ),
+                urlTemplate:
+                  "INTERVIEW/05_DELTA/trajectoire/plh_interview_05_trajectoire/{z}/{x}/{y}.png",
               },
             },
             {
               name: "Constellation",
               tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/05_DELTA/220322_test_05_constellation/{z}/{x}/{y}.png"
-                ),
+                urlTemplate:
+                  "INTERVIEW/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
               },
             },
             {
               name: "Horizons",
-              tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/05_DELTA/220324_test_05_horizons/{z}/{x}/{y}.png"
-                ),
-              },
+              children: [
+                {
+                  name: "black",
+                  tile: {
+                    urlTemplate:
+                      "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_black/{z}/{x}/{y}.png",
+                  },
+                },
+                {
+                  name: "white",
+                  tile: {
+                    urlTemplate:
+                      "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_white/{z}/{x}/{y}.png",
+                  },
+                },
+              ],
             },
           ],
         },
         {
           name: "06 Territoires DOM-TOM",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "07 Jeux de pistes",
@@ -397,66 +457,135 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               children: [
                 {
-                  name: "In",
+                  name: "in",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_IN.geojson",
+                  style: true,
                   popupKey: "Text Conte",
                 },
                 {
-                  name: "Out",
+                  name: "out",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_OUT.geojson",
+                  style: true,
                   popupKey: "Text Content",
                 },
               ],
             },
             {
               name: "Parcours",
-              tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/07_CROISIERE/220324_test_07_trajectories/{z}/{x}/{y}.png"
-                ),
-              },
+              url: "INTERVIEW/07_CROISIERE/trajectories/07_CROISIERE_TRAJECTORIES.geojson",
+              style: true,
             },
             {
               name: "Constellation",
               tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/07_CROISIERE/220322_test_07_constellation/{z}/{x}/{y}.png"
-                ),
+                urlTemplate:
+                  "INTERVIEW/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
               },
             },
             {
               name: "Horizons",
               tile: {
-                urlTemplate: this.getDataUrl(
-                  "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png"
-                ),
+                urlTemplate:
+                  "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png",
               },
             },
           ],
         },
         {
           name: "08 Au plateau des pins",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "09 Sous les pavés, la Cité",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "10 Le nom des rues",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "11 Une histoire de cailloux",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "12 L'invention d'une ritournelle",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "13 La campagne Naville",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "14 Le coin de terre",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
         {
           name: "15 Là où l'on revient",
+          children: [
+            {
+              name: "Constellation",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+          ],
         },
       ],
     },
@@ -481,7 +610,8 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Voix",
-              url: "ATLAS/MOBILITY_EXPERIENCES/voices/05_07_MOBILITY_EXPERIENCES_VOICES.geojson",
+              url: "ATLAS/mobility/voices/plh_atlas_mobility_voices.geojson",
+              style: true,
               popupKey: "Text Conte",
             },
             {
@@ -539,11 +669,18 @@ export default class Plhebicite extends Vue {
         {
           name: "Carte d’accessibilité LASIG",
           url: "grid_tot_vn_21781_v17_shp_df_weighted_20210917_MANUAL_INDEX_V3.geojson",
+          style: true,
+        },
+        {
+          name: "grid",
+          tile: {
+            urlTemplate:
+              "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
+          },
         },
         {
           name: "Swisstopo",
           tile: tileLayerProps.swisstopo_pixelkarte_farbe,
-          selected: true,
         },
         {
           name: "Image satellite",
@@ -552,6 +689,15 @@ export default class Plhebicite extends Vue {
         {
           name: "OpenStreetMap",
           tile: tileLayerProps.openStreetMap,
+        },
+        {
+          name: "repère",
+          tile: {
+            urlTemplate:
+              "general/background_repere/background_repere/{z}/{x}/{y}.png",
+          },
+          selected: true,
+          disabled: true,
         },
       ],
     },
@@ -599,7 +745,7 @@ export default class Plhebicite extends Vue {
               ),
             };
           } else {
-            const style = absoluteUrl?.endsWith(".geojson")
+            const style = layer.style
               ? absoluteUrl.replace(/\.[^/.]+$/, ".sld")
               : undefined;
             return {
@@ -615,6 +761,9 @@ export default class Plhebicite extends Vue {
           }
         }
         if (layer.tile) {
+          if (!layer.tile.urlTemplate.startsWith("https://")) {
+            layer.tile.urlTemplate = this.getDataUrl(layer.tile.urlTemplate);
+          }
           return {
             id: layer.tile.urlTemplate,
             zIndex: zIndex--,
@@ -646,9 +795,10 @@ export default class Plhebicite extends Vue {
         value: layer,
         children: children,
         disabled:
-          !layer.url &&
-          !layer.tile &&
-          (children?.every((child) => child.disabled) ?? true),
+          layer.disabled ||
+          (!layer.url &&
+            !layer.tile &&
+            (children?.every((child) => child.disabled) ?? true)),
       };
     });
   }
@@ -676,6 +826,8 @@ interface Layer {
   popupKey?: string;
   tile?: TileLayerProp;
   selected?: boolean;
+  style?: boolean;
+  disabled?: boolean;
   children?: Layer[];
 }
 </script>

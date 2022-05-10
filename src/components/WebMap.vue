@@ -297,11 +297,16 @@ abstract class MapItem {
   }
 
   async style(): Promise<string | undefined> {
-    return this.option?.styleUrl
-      ? await (
+    if (this.option?.styleUrl) {
+      try {
+        return await (
           await axios.get(this.option?.styleUrl, { responseType: "text" })
-        ).data
-      : undefined;
+        ).data;
+      } catch (e) {
+        console.debug(e);
+      }
+    }
+    return undefined;
   }
 
   abstract get mimeType(): string;
