@@ -314,7 +314,7 @@ import { mapMutations } from "vuex";
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
-  readonly minZoom = 14;
+  readonly minZoom = 12;
   readonly maxZoom = 18;
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
@@ -336,6 +336,27 @@ export default class Plhebicite extends Vue {
               tile: {
                 urlTemplate:
                   "INTERVIEW/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              },
+            },
+            {
+              name: "Constellation 1000 150dpi",
+              tile: {
+                urlTemplate:
+                  "int_constellation_test_resolution/int_01_test_resolution_1000_150dpi/{z}/{x}/{y}.png",
+              },
+            },
+            {
+              name: "Constellation 2000 150dpi",
+              tile: {
+                urlTemplate:
+                  "int_constellation_test_resolution/int_01_test_resolution_2000_150dpi/{z}/{x}/{y}.png",
+              },
+            },
+            {
+              name: "Constellation 3330 150dpi",
+              tile: {
+                urlTemplate:
+                  "int_constellation_test_resolution/int_01_test_resolution_3330_150dpi/{z}/{x}/{y}.png",
               },
             },
           ],
@@ -400,6 +421,27 @@ export default class Plhebicite extends Vue {
                 {
                   name: "out general",
                   url: "INTERVIEW/05_DELTA/voices/voices_out_callout/plh_interview_05_voices_out_callout.geojson",
+                },
+              ],
+            },
+            {
+              name: "Voix test",
+              children: [
+                {
+                  name: "callout",
+                  tile: {
+                    urlTemplate:
+                      "int_voix_test_symboles/int_05_voices_callout/{z}/{x}/{y}.png",
+                  },
+                },
+                {
+                  name: "callout geojson",
+                  url: "int_voix_test_symboles/int_05_voices_callout.geojson",
+                },
+                {
+                  name: "int_05_voices",
+                  url: "int_voix_test_symboles/int_05_voices.geojson",
+                  popupKey: "Text Conte",
                 },
               ],
             },
@@ -616,6 +658,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Cadre",
+              tile: {
+                urlTemplate:
+                  "ATLAS/mobility/cadre/plh_atlas_mobility_cadre/{z}/{x}/{y}.png",
+              },
             },
             {
               name: "Codes",
@@ -623,16 +669,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Overlay",
-              children: [
-                {
-                  name: "Network",
-                  url: "ATLAS/MOBILITY_EXPERIENCES/overlay/1_network/MOBILITY_EXPERIENCES_OVERLAY_1.geojson",
-                },
-                {
-                  name: "Signs",
-                  url: "ATLAS/MOBILITY_EXPERIENCES/overlay/2_signs/MOBILITY_EXPERIENCES_OVERLAY_2.geojson",
-                },
-              ],
+              tile: {
+                urlTemplate:
+                  "ATLAS/mobility/overlay/plh_atlas_mobility_overlay/{z}/{x}/{y}.png",
+              },
             },
           ],
         },
@@ -697,7 +737,12 @@ export default class Plhebicite extends Vue {
               "general/background_repere/background_repere/{z}/{x}/{y}.png",
           },
           selected: true,
-          disabled: true,
+        },
+        {
+          name: "repère geojson",
+          url: "general/repere/GEOJSON/background_repere.geojson",
+          style: true,
+          selected: true,
         },
       ],
     },
