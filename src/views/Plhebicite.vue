@@ -298,8 +298,11 @@ import WebMap, {
 } from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
 import { TileLayerProp, tileLayerProps } from "@/utils/leaflet";
+import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
+import { Feature } from "geojson";
+import { IconOptions, point } from "leaflet";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -442,6 +445,23 @@ export default class Plhebicite extends Vue {
                   name: "int_05_voices",
                   url: "int_voix_test_symboles/int_05_voices.geojson",
                   popupKey: "Text Conte",
+                  getIconOptions: function (feature: Feature): IconOptions {
+                    const properties = feature.properties as Record<
+                      string,
+                      string
+                    >;
+                    let size = 64;
+                    if (getBooleanFromString(properties["_LOC_Far a"])) {
+                      size = 32;
+                    } else if (getBooleanFromString(properties["_LOC_Gener"])) {
+                      size = 16;
+                    }
+                    return {
+                      iconUrl: "img/legends/voices.png",
+                      iconSize: [size, size],
+                      popupAnchor: point(186, 0),
+                    };
+                  },
                 },
               ],
             },
@@ -800,6 +820,7 @@ export default class Plhebicite extends Vue {
                 new UrlMapItem(absoluteUrl, {
                   styleUrl: style,
                   popupKey: layer.popupKey,
+                  getIconOptions: layer.getIconOptions,
                 }),
               ],
             };
@@ -873,6 +894,7 @@ interface Layer {
   selected?: boolean;
   style?: boolean;
   disabled?: boolean;
+  getIconOptions?: (feature: Feature) => IconOptions;
   children?: Layer[];
 }
 </script>

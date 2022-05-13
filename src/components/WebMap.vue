@@ -35,10 +35,11 @@
 
 <script lang="ts">
 import { EPSG_2056, EPSG_21781, TileLayerProp } from "@/utils/leaflet";
-import { getStyle } from "@/utils/leaflet-sld";
+import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
+import { Feature } from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import L, {
@@ -48,6 +49,7 @@ import L, {
   GeoJSON,
   GridLayer,
   icon,
+  IconOptions,
   Layer,
   LayerEvent,
   LayerGroup,
@@ -55,7 +57,6 @@ import L, {
   Map,
   MapOptions,
   marker,
-  point,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -283,6 +284,7 @@ interface MapItemOption {
   color?: Color;
   popupKey?: string;
   styleUrl?: string;
+  getIconOptions?: (feature: Feature) => IconOptions;
 }
 
 abstract class MapItem {
@@ -294,6 +296,10 @@ abstract class MapItem {
 
   get popupKey(): string | undefined {
     return this.option?.popupKey;
+  }
+
+  get getIconOptions(): ((feature: Feature) => IconOptions) | undefined {
+    return this.option?.getIconOptions;
   }
 
   async style(): Promise<string | undefined> {
@@ -321,6 +327,7 @@ abstract class MapItem {
     const popupKey = this.popupKey;
     const styleText: string | undefined = await this.style();
     const { style, onAdd, onRemove } = getStyle(styleText);
+    const getIconOptions = this.getIconOptions;
     const geoJson = Proj.geoJson(json, {
       onEachFeature: popupKey
         ? (feature, l) => {
@@ -335,15 +342,12 @@ abstract class MapItem {
           }
         : undefined,
       style: style,
-      // pointToLayer: getPointToLayer(styleText),
-      pointToLayer: (_, latlng) =>
-        marker(latlng, {
-          icon: icon({
-            iconUrl: "img/legends/voices.png",
-            iconSize: [32, 32],
-            popupAnchor: point(186, 0),
-          }),
-        }),
+      pointToLayer: getIconOptions
+        ? (feature: Feature, latlng) =>
+            marker(latlng, {
+              icon: icon(getIconOptions(feature)),
+            })
+        : getPointToLayer(styleText),
     });
     if (onAdd) {
       return geoJson.on("add", onAdd);
