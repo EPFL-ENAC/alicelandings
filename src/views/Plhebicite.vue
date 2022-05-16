@@ -362,6 +362,20 @@ export default class Plhebicite extends Vue {
                   "int_constellation_test_resolution/int_01_test_resolution_3330_150dpi/{z}/{x}/{y}.png",
               },
             },
+            {
+              name: "Constellation 3330 200dpi",
+              tile: {
+                urlTemplate:
+                  "int_constellation_test_resolution/int_01_test_resolution_3330_200dpi/int_01_test_resolution_3330_200dpi/{z}/{x}/{y}.png",
+              },
+            },
+            {
+              name: "Constellation 3330 300dpi",
+              tile: {
+                urlTemplate:
+                  "int_constellation_test_resolution/int_01_test_resolution_3330_300dpi/int_01_test_resolution_3330_300dpi/{z}/{x}/{y}.png",
+              },
+            },
           ],
         },
         {
