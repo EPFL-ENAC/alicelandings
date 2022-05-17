@@ -739,6 +739,12 @@ export default class Plhebicite extends Vue {
       layers: [
         {
           name: "Fond de carte ALICE ",
+          tile: {
+            urlTemplate: "general/basemap/{z}/{x}/{y}.png",
+            options: {
+              tms: true,
+            },
+          },
         },
         {
           name: "Carte d’accessibilité LASIG",
