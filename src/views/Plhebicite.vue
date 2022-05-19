@@ -421,39 +421,11 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               children: [
                 {
-                  name: "in",
-                  url: "INTERVIEW/05_DELTA/voices/voices_in/plh_interview_05_voices_in.geojson",
-                  popupKey: "Text Conte",
-                },
-                {
-                  name: "in general",
-                  url: "INTERVIEW/05_DELTA/voices/voices_in_general/plh_interview_05_voices_in_general.geojson",
-                  popupKey: "Text Conte",
-                },
-                {
-                  name: "out",
-                  url: "INTERVIEW/05_DELTA/voices/voices_out/plh_interview_05_voices_out.geojson",
-                  popupKey: "Text Conte",
-                },
-                {
-                  name: "out general",
-                  url: "INTERVIEW/05_DELTA/voices/voices_out_callout/plh_interview_05_voices_out_callout.geojson",
-                },
-              ],
-            },
-            {
-              name: "Voix test",
-              children: [
-                {
                   name: "callout",
                   tile: {
                     urlTemplate:
                       "int_voix_test_symboles/int_05_voices_callout/{z}/{x}/{y}.png",
                   },
-                },
-                {
-                  name: "callout geojson",
-                  url: "int_voix_test_symboles/int_05_voices_callout.geojson",
                 },
                 {
                   name: "int_05_voices",
@@ -492,25 +464,6 @@ export default class Plhebicite extends Vue {
                 urlTemplate:
                   "INTERVIEW/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
               },
-            },
-            {
-              name: "Horizons",
-              children: [
-                {
-                  name: "black",
-                  tile: {
-                    urlTemplate:
-                      "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_black/{z}/{x}/{y}.png",
-                  },
-                },
-                {
-                  name: "white",
-                  tile: {
-                    urlTemplate:
-                      "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_white/{z}/{x}/{y}.png",
-                  },
-                },
-              ],
             },
           ],
         },
@@ -663,6 +616,25 @@ export default class Plhebicite extends Vue {
             },
           ],
         },
+        {
+          name: "Horizons",
+          children: [
+            {
+              name: "black",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_black/{z}/{x}/{y}.png",
+              },
+            },
+            {
+              name: "white",
+              tile: {
+                urlTemplate:
+                  "INTERVIEW/05_DELTA/horizons/plh_interview_05_horizons_white/{z}/{x}/{y}.png",
+              },
+            },
+          ],
+        },
       ],
     },
     {
@@ -696,10 +668,6 @@ export default class Plhebicite extends Vue {
                 urlTemplate:
                   "ATLAS/mobility/cadre/plh_atlas_mobility_cadre/{z}/{x}/{y}.png",
               },
-            },
-            {
-              name: "Codes",
-              url: "ATLAS/MOBILITY_EXPERIENCES/codes/05_07_MOBILITY_EXPERIENCES_CODES.geojson",
             },
             {
               name: "Overlay",
