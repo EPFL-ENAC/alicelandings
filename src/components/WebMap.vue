@@ -550,8 +550,16 @@ interface ExtendedGeoRaster extends GeoRaster {
   }
 }
 
-.leaflet-touch .leaflet-bar a {
-  border-radius: 0 !important;
+.leaflet-touch .leaflet-bar {
+  border-width: 1px;
+
+  a {
+    border-radius: 0 !important;
+  }
+
+  a.leaflet-browser-print {
+    border: none;
+  }
 }
 
 .leaflet-popup-content-wrapper {
