@@ -565,6 +565,14 @@ interface ExtendedGeoRaster extends GeoRaster {
 .leaflet-popup-content-wrapper {
   border-radius: 0;
   border: 1px solid var(--v-primary-base);
+  box-shadow: none;
+  padding: 0px;
+
+  .leaflet-popup-content {
+    margin: 12px;
+    text-align: justify;
+    hyphens: auto;
+  }
 }
 
 .leaflet-popup-tip-container {
