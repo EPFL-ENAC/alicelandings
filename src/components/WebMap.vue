@@ -266,6 +266,8 @@ export default class WebMap extends Vue {
       .bringToFront();
     new Marker([46.2107, 6.0946]).addTo(this.map);
     new Marker([46.22596347326438, 6.073280019597476]).addTo(this.map);
+    new Marker([46.1843, 6.0743]).addTo(this.map);
+    new Marker([46.2051, 6.0738]).addTo(this.map);
 
     this.onDemsChanged();
   }

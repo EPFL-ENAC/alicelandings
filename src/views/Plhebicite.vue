@@ -765,7 +765,7 @@ export default class Plhebicite extends Vue {
   @Ref()
   readonly webMap!: WebMap;
 
-  zoom = 21;
+  zoom = 22;
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
   selectedCategoryId: CategoryId = "mapping";

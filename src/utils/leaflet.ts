@@ -127,6 +127,9 @@ declare module "leaflet" {
     _getMapPanePos(): Point;
   }
 
+  /**
+   * https://github.com/Leaflet/Leaflet/blob/v1.7.1/src/layer/tile/GridLayer.js
+   */
   interface GridLayer {
     _level: Level;
     _levels: Record<number, Level>;
@@ -148,6 +151,7 @@ declare module "leaflet" {
     _noTilesToLoad(): boolean;
     _pruneTiles(): void;
     _removeAllTiles(): void;
+    _invalidateAll(): void;
     _retainParent(x: number, y: number, z: number, minZoom: number): boolean;
     _retainChildren(x: number, y: number, z: number, minZoom: number): void;
     _removeTile(key: string): void;
@@ -251,11 +255,11 @@ export class WorldFileTileLayer extends TileLayer {
   }
 
   _updateLevels(): Level | undefined {
-    // this._levels = {}; // FIXME
+    this._removeAllTiles();
     return super._updateLevels();
   }
 
-  private get getTileZoom(): number {
+  private getTileZoom(): number {
     const mapScale: number = this.mapCrs.scale(this._map.getZoom());
     let minIndex = this.minZoom;
     let minValue = Math.abs(mapScale - this.crs.scale(minIndex));
@@ -272,7 +276,7 @@ export class WorldFileTileLayer extends TileLayer {
   }
 
   _clampZoom(): number {
-    const newZoom = super._clampZoom(this.getTileZoom);
+    const newZoom = super._clampZoom(this.getTileZoom());
     return newZoom;
   }
 
@@ -282,11 +286,14 @@ export class WorldFileTileLayer extends TileLayer {
     noPrune: boolean,
     noUpdate: boolean
   ): void {
-    super._setView(center, this.getTileZoom, noPrune, noUpdate);
+    super._setView(center, this.getTileZoom(), noPrune, noUpdate);
   }
 
+  /**
+   * https://github.com/Leaflet/Leaflet/blob/v1.7.1/src/layer/tile/GridLayer.js#L591
+   */
   _setZoomTransform(level: Level, center: LatLng): void {
-    const translate = this._map
+    const translate: Point = this._map
       .latLngToLayerPoint(center)
       .subtract(this._map.getSize().divideBy(2))
       .add(this._map._getMapPanePos())
