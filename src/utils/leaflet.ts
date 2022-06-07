@@ -122,6 +122,9 @@ export interface TileLayerProp {
 }
 
 declare module "leaflet" {
+  /**
+   * https://github.com/Leaflet/Leaflet/blob/v1.7.1/src/map/Map.js
+   */
   interface Map {
     _getNewPixelOrigin(center: LatLng, zoom: number): Point;
     _getMapPanePos(): Point;
@@ -175,7 +178,7 @@ interface Level {
 /**
  * https://en.wikipedia.org/wiki/World_file
  */
-export class WorldFileTileLayer extends TileLayer {
+export class RasterTileLayer extends TileLayer {
   private tileSizeScale = 1;
 
   constructor(
@@ -187,7 +190,7 @@ export class WorldFileTileLayer extends TileLayer {
   }
 
   get tileZoom(): number {
-    return this._tileZoom ?? this._map.getZoom();
+    return this.getTileZoom() ?? this._map.getZoom();
   }
 
   get minZoom(): number {
@@ -211,15 +214,15 @@ export class WorldFileTileLayer extends TileLayer {
     return this._map.options.crs;
   }
 
-  _getTiledPixelBounds(center: LatLng): Bounds {
-    const pixelCenter: Point = this._map
-      .latLngToLayerPoint(center)
-      .subtract([256, 128]) // FIXME
-      .floor();
-    const halfSize = this._map.getSize().divideBy(2);
+  _getTiledPixelBounds(): Bounds {
+    const tileSize = this.getTileSize();
     const bounds = new Bounds(
-      pixelCenter.subtract(halfSize),
-      pixelCenter.add(halfSize)
+      this.crs
+        .latLngToPoint(this._map.getBounds().getNorthWest(), this.tileZoom)
+        .subtract(tileSize),
+      this.crs
+        .latLngToPoint(this._map.getBounds().getSouthEast(), this.tileZoom)
+        .add(tileSize)
     );
     return bounds;
   }
@@ -240,19 +243,19 @@ export class WorldFileTileLayer extends TileLayer {
     return size;
   }
 
-  createTile(coords: Coords): HTMLElement {
-    const tile = document.createElement("div");
-    const pos = this._getTilePos(coords);
-    const latLng = this._map.layerPointToLatLng(pos);
-    tile.innerHTML =
-      [coords.x, coords.y, coords.z].join(", ") +
-      "<br>" +
-      [pos.x, pos.y, this._tileZoom].join(", ") +
-      "<br>" +
-      [latLng.lat, latLng.lng].join(", ");
-    tile.style.outline = "1px solid blue";
-    return tile;
-  }
+  // createTile(coords: Coords): HTMLElement {
+  //   const tile = document.createElement("div");
+  //   const pos = this._getTilePos(coords);
+  //   const latLng = this._map.layerPointToLatLng(pos);
+  //   tile.innerHTML =
+  //     [coords.x, coords.y, coords.z].join(", ") +
+  //     "<br>" +
+  //     [pos.x, pos.y, this._tileZoom].join(", ") +
+  //     "<br>" +
+  //     [latLng.lat, latLng.lng].join(", ");
+  //   tile.style.outline = "1px solid blue";
+  //   return tile;
+  // }
 
   _updateLevels(): Level | undefined {
     this._removeAllTiles();
@@ -276,7 +279,7 @@ export class WorldFileTileLayer extends TileLayer {
   }
 
   _clampZoom(): number {
-    const newZoom = super._clampZoom(this.getTileZoom());
+    const newZoom = super._clampZoom(this.tileZoom);
     return newZoom;
   }
 
@@ -286,7 +289,7 @@ export class WorldFileTileLayer extends TileLayer {
     noPrune: boolean,
     noUpdate: boolean
   ): void {
-    super._setView(center, this.getTileZoom(), noPrune, noUpdate);
+    super._setView(center, this.tileZoom, noPrune, noUpdate);
   }
 
   /**
@@ -303,6 +306,16 @@ export class WorldFileTileLayer extends TileLayer {
     } else {
       DomUtil.setPosition(level.el, translate);
     }
+  }
+
+  _pxBoundsToTileRange(bounds: Bounds): Bounds {
+    const tileSize = super.getTileSize();
+    return new Bounds(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      bounds.min!.unscaleBy(tileSize).floor(),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      bounds.max!.unscaleBy(tileSize).ceil().subtract([1, 1])
+    );
   }
 
   _isValidTile(coords: Coords): boolean {

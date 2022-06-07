@@ -35,15 +35,14 @@
 
 <script lang="ts">
 import {
-  DebugLayer,
   EPSG_2056,
   EPSG_21781,
+  RasterTileLayer,
   sitgCrs,
   swisstopoAttribution,
   swisstopoCrs,
   swisstopoSubdomains,
   TileLayerProp,
-  WorldFileTileLayer,
 } from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
@@ -69,7 +68,6 @@ import {
   Map,
   MapOptions,
   marker,
-  Marker,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -242,9 +240,9 @@ export default class WebMap extends Vue {
       }
     );
 
-    new DebugLayer().addTo(this.map).bringToFront();
-    new WorldFileTileLayer(
-      "./data/INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
+    // new DebugLayer().addTo(this.map).bringToFront();
+    new RasterTileLayer(
+      "https://enacit4r-cdn.epfl.ch/alicelandings/2022-05-05/INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
       new Proj.CRS("EPSG:2056", EPSG_2056, {
         origin: [2494661.821213541552, 1120309.45617263671],
         resolutions: [
@@ -264,10 +262,6 @@ export default class WebMap extends Vue {
     )
       .addTo(this.map)
       .bringToFront();
-    new Marker([46.2107, 6.0946]).addTo(this.map);
-    new Marker([46.22596347326438, 6.073280019597476]).addTo(this.map);
-    new Marker([46.1843, 6.0743]).addTo(this.map);
-    new Marker([46.2051, 6.0738]).addTo(this.map);
 
     this.onDemsChanged();
   }
