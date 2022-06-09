@@ -1,0 +1,6 @@
+services:
+  processor:
+    build: ./
+    volumes:
+      - ../../alicelandings-data/raw:/opt/raw:ro
+      - ../../alicelandings-data/out:/opt/out:rw

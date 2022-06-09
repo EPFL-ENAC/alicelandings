@@ -23,3 +23,6 @@ deploy-prod:
 
 upload-data:
 	rsync -av --delete ./public/data/ root@enacvm0080.xaas.epfl.ch:/opt/plhebicite-webmap/public/data/
+
+process-data:
+	cd data; docker-compose up --build
