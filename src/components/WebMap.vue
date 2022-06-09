@@ -38,10 +38,8 @@ import {
   EPSG_2056,
   EPSG_21781,
   RasterTileLayer,
-  sitgCrs,
-  swisstopoAttribution,
+  RasterTileLayerProp,
   swisstopoCrs,
-  swisstopoSubdomains,
   TileLayerProp,
 } from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
@@ -52,7 +50,6 @@ import { Feature } from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
 import {
-  Bounds,
   Control,
   control,
   CRS,
@@ -109,40 +106,9 @@ import colors, { Color } from "vuetify/lib/util/colors";
 export default class WebMap extends Vue {
   readonly baseTileLayers: TileLayerProps[] = [
     {
-      name: "None EPSG3857",
-      url: "",
-      visible: false,
-      options: {
-        crs: CRS.EPSG3857,
-        maxZoom: 19,
-      },
-    },
-    {
       name: "None swisstopoCrs",
       url: "",
       visible: true,
-      options: {
-        crs: swisstopoCrs,
-        maxZoom: 27,
-      },
-    },
-    {
-      name: "SITG",
-      visible: false,
-      attribution:
-        '&copy; <a target="_blank" href="https://ge.ch/sitg/">SITG</a>',
-      url: "https://ge.ch/sitgags2/rest/services/RASTER/PLAN_SITG/MapServer/WMTS/tile/1.0.0/RASTER_PLAN_SITG/default/default028mm/{z}/{y}/{x}.png",
-      options: {
-        crs: sitgCrs,
-        maxZoom: 11,
-      },
-    },
-    {
-      name: "swisstopo",
-      visible: false,
-      attribution: swisstopoAttribution,
-      url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
-      subdomains: swisstopoSubdomains,
       options: {
         crs: swisstopoCrs,
         maxZoom: 27,
@@ -241,27 +207,6 @@ export default class WebMap extends Vue {
     );
 
     // new DebugLayer().addTo(this.map).bringToFront();
-    new RasterTileLayer(
-      "https://enacit4r-cdn.epfl.ch/alicelandings/2022-05-05/INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
-      new Proj.CRS("EPSG:2056", EPSG_2056, {
-        origin: [2494661.821213541552, 1120309.45617263671],
-        resolutions: [
-          18.0445546007679987, 9.02227730038399933, 4.51113865019199967,
-          2.25556932509599983, 1.12778466254799992, 0.563892331273999958,
-          0.281946165636999979,
-        ],
-        bounds: new Bounds(
-          [2494661.68024045881, 1120309.5971436426],
-          [2498621.050244499, 1117509.02588037029]
-        ),
-      }),
-      {
-        minZoom: 0,
-        maxZoom: 6,
-      }
-    )
-      .addTo(this.map)
-      .bringToFront();
 
     this.onDemsChanged();
   }
@@ -545,6 +490,20 @@ export class TileMapItem extends UrlMapItem {
 
   async getLayer(): Promise<LeafletLayer> {
     return new TileLayer(this.prop.urlTemplate, this.prop.options);
+  }
+}
+
+export class RasterTileMapItem extends UrlMapItem {
+  constructor(public prop: RasterTileLayerProp) {
+    super(prop.urlTemplate);
+  }
+
+  async getLayer(): Promise<LeafletLayer> {
+    return new RasterTileLayer(
+      this.prop.urlTemplate,
+      this.prop.crs,
+      this.prop.options
+    );
   }
 }
 

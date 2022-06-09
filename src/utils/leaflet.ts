@@ -58,7 +58,9 @@ export const tileLayerProps: Record<
   | "swisstopo_pixelkarte_grau"
   | "swisstopo_landeskarte_farbe"
   | "swisstopo_landeskarte_grau"
-  | "swisstopo_photo",
+  | "swisstopo_photo"
+  | "swisstopo_pixelkarte_farbe_2056"
+  | "swisstopo_photo_2056",
   TileLayerProp
 > = {
   openStreetMap: {
@@ -111,6 +113,24 @@ export const tileLayerProps: Record<
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19, // 20
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_pixelkarte_farbe_2056: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 27,
+      subdomains: swisstopoSubdomains,
+    },
+  },
+  swisstopo_photo_2056: {
+    urlTemplate:
+      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
+    options: {
+      attribution: swisstopoAttribution,
+      maxZoom: 27,
       subdomains: swisstopoSubdomains,
     },
   },
@@ -173,6 +193,12 @@ interface Level {
   el: HTMLElement;
   origin: Point;
   zoom: number;
+}
+
+export interface RasterTileLayerProp {
+  urlTemplate: string;
+  crs: Proj.CRS;
+  options?: TileLayerOptions;
 }
 
 /**

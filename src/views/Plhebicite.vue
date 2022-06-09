@@ -293,16 +293,22 @@
 <script lang="ts">
 import WebMap, {
   MapGroupItem,
+  RasterTileMapItem,
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
-import { TileLayerProp, tileLayerProps } from "@/utils/leaflet";
+import {
+  EPSG_2056,
+  RasterTileLayerProp,
+  TileLayerProp,
+  tileLayerProps,
+} from "@/utils/leaflet";
 import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Feature } from "geojson";
-import { IconOptions, point } from "leaflet";
+import { Bounds, IconOptions, point, Proj } from "leaflet";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -317,8 +323,8 @@ import { mapMutations } from "vuex";
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
-  readonly minZoom = 0; // 12;
-  readonly maxZoom = 27; // 18;
+  readonly minZoom = 21;
+  readonly maxZoom = 27;
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
@@ -332,9 +338,21 @@ export default class Plhebicite extends Vue {
       active: true,
       layers: [
         {
-          name: "test",
-          tile: {
+          name: "raster tile",
+          rasterTile: {
             urlTemplate: "INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
+            crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+              origin: [2494661.821213541552, 1120309.45617263671],
+              resolutions: [
+                18.0445546007679987, 9.02227730038399933, 4.51113865019199967,
+                2.25556932509599983, 1.12778466254799992, 0.563892331273999958,
+                0.281946165636999979,
+              ],
+              bounds: new Bounds(
+                [2494661.68024045881, 1120309.5971436426],
+                [2498621.050244499, 1117509.02588037029]
+              ),
+            }),
           },
         },
         {
@@ -734,15 +752,11 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "Swisstopo",
-          tile: tileLayerProps.swisstopo_pixelkarte_farbe,
+          tile: tileLayerProps.swisstopo_pixelkarte_farbe_2056,
         },
         {
           name: "Image satellite",
-          tile: tileLayerProps.swisstopo_photo,
-        },
-        {
-          name: "OpenStreetMap",
-          tile: tileLayerProps.openStreetMap,
+          tile: tileLayerProps.swisstopo_photo_2056,
         },
         {
           name: "repère",
@@ -784,7 +798,6 @@ export default class Plhebicite extends Vue {
       .flat()
       .map((item) => item.value)
       .flatMap((layer) => layer.children ?? [layer])
-      .filter((layer) => layer.url || layer.tile)
       .map(async (layer) => {
         if (layer.url) {
           const absoluteUrl = this.getDataUrl(layer.url);
@@ -830,7 +843,19 @@ export default class Plhebicite extends Vue {
             children: [new TileMapItem(layer.tile)],
           } as MapGroupItem;
         }
-        throw new Error("Expected url or tile");
+        if (layer.rasterTile) {
+          if (!layer.rasterTile.urlTemplate.startsWith("https://")) {
+            layer.rasterTile.urlTemplate = this.getDataUrl(
+              layer.rasterTile.urlTemplate
+            );
+          }
+          return {
+            id: layer.rasterTile.urlTemplate,
+            zIndex: zIndex--,
+            children: [new RasterTileMapItem(layer.rasterTile)],
+          } as MapGroupItem;
+        }
+        throw new Error("Expected url or tile or rasterTile");
       });
     Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
   }
@@ -858,6 +883,7 @@ export default class Plhebicite extends Vue {
           layer.disabled ||
           (!layer.url &&
             !layer.tile &&
+            !layer.rasterTile &&
             (children?.every((child) => child.disabled) ?? true)),
       };
     });
@@ -885,6 +911,7 @@ interface Layer {
   url?: string;
   popupKey?: string;
   tile?: TileLayerProp;
+  rasterTile?: RasterTileLayerProp;
   selected?: boolean;
   style?: boolean;
   disabled?: boolean;
