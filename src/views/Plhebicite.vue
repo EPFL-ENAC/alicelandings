@@ -412,9 +412,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -430,9 +431,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -467,9 +469,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -485,9 +488,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -519,9 +523,10 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
             {
@@ -538,9 +543,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -550,9 +556,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -562,9 +569,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -574,9 +582,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -586,9 +595,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -598,9 +608,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -610,9 +621,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -622,9 +634,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
