@@ -341,6 +341,20 @@ export default class Plhebicite extends Vue {
       [2505232.01689624181, 1111606.66907431604]
     ),
   });
+  readonly getIconOptions = function (feature: Feature): IconOptions {
+    const properties = feature.properties as Record<string, string>;
+    let size = 64;
+    if (getBooleanFromString(properties["_LOC_Far a"])) {
+      size = 32;
+    } else if (getBooleanFromString(properties["_LOC_Gener"])) {
+      size = 16;
+    }
+    return {
+      iconUrl: "img/legends/voices.png",
+      iconSize: [size, size],
+      popupAnchor: point(186, 0),
+    };
+  };
   readonly categories: Category[] = [
     {
       id: "mapping",
@@ -352,6 +366,12 @@ export default class Plhebicite extends Vue {
         {
           name: "01 La forêt tropicale",
           children: [
+            {
+              name: "Voix",
+              url: "interview/voix/int_01_BAIE_VOICES.geojson",
+              popupKey: "Text Conte",
+              getIconOptions: this.getIconOptions,
+            },
             {
               name: "Constellation",
               rasterTile: {
@@ -366,6 +386,12 @@ export default class Plhebicite extends Vue {
           name: "02 Ville-dortoir",
           children: [
             {
+              name: "Voix",
+              url: "interview/voix/int_02_PIPELINE_VOICES.geojson",
+              popupKey: "Text Conte",
+              getIconOptions: this.getIconOptions,
+            },
+            {
               name: "Constellation",
               rasterTile: {
                 urlTemplate:
@@ -379,6 +405,12 @@ export default class Plhebicite extends Vue {
           name: "03 Une barrière bleue",
           children: [
             {
+              name: "Voix",
+              url: "interview/voix/int_03_BARRIERE_VOICES.geojson",
+              popupKey: "Text Conte",
+              getIconOptions: this.getIconOptions,
+            },
+            {
               name: "Constellation",
               tile: {
                 urlTemplate:
@@ -390,6 +422,12 @@ export default class Plhebicite extends Vue {
         {
           name: "04 Passages secrets",
           children: [
+            {
+              name: "Voix",
+              url: "interview/voix/int_04_SECRETS_VOICES.geojson",
+              popupKey: "Text Conte",
+              getIconOptions: this.getIconOptions,
+            },
             {
               name: "Constellation",
               tile: {
@@ -416,23 +454,7 @@ export default class Plhebicite extends Vue {
                   name: "int_05_voices",
                   url: "int_voix_test_symboles/int_05_voices.geojson",
                   popupKey: "Text Conte",
-                  getIconOptions: function (feature: Feature): IconOptions {
-                    const properties = feature.properties as Record<
-                      string,
-                      string
-                    >;
-                    let size = 64;
-                    if (getBooleanFromString(properties["_LOC_Far a"])) {
-                      size = 32;
-                    } else if (getBooleanFromString(properties["_LOC_Gener"])) {
-                      size = 16;
-                    }
-                    return {
-                      iconUrl: "img/legends/voices.png",
-                      iconSize: [size, size],
-                      popupAnchor: point(186, 0),
-                    };
-                  },
+                  getIconOptions: this.getIconOptions,
                 },
               ],
             },
@@ -455,6 +477,12 @@ export default class Plhebicite extends Vue {
         {
           name: "06 Territoires DOM-TOM",
           children: [
+            {
+              name: "Voix",
+              url: "interview/voix/int_06_DOMTOM_VOICES.geojson",
+              popupKey: "Text Conte",
+              getIconOptions: this.getIconOptions,
+            },
             {
               name: "Constellation",
               tile: {

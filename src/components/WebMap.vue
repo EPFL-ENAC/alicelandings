@@ -344,7 +344,7 @@ abstract class MapItem {
             if (feature.properties) {
               const property = feature.properties[popupKey];
               if (property) {
-                l.bindPopup(property);
+                l.bindPopup(property.replace("\n", "<br>"));
                 l.on("mouseover", () => l.openPopup());
                 l.on("mouseout", () => l.closePopup());
               }
