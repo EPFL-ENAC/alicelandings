@@ -329,6 +329,18 @@ export default class Plhebicite extends Vue {
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
   ].map((filename) => this.getDataUrl(filename));
+  readonly defaultCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {
+    origin: [2488232.00057888823, 1124606.73130729701],
+    resolutions: [
+      108.266889997823995, 54.1334449989119975, 27.0667224994559987,
+      13.5333612497279994, 6.76668062486399968, 3.38334031243199984,
+      1.69167015621599992,
+    ],
+    bounds: new Bounds(
+      [2488232.00057888823, 1124606.73130729701],
+      [2505232.01689624181, 1111606.66907431604]
+    ),
+  });
   readonly categories: Category[] = [
     {
       id: "mapping",
@@ -338,66 +350,14 @@ export default class Plhebicite extends Vue {
       active: true,
       layers: [
         {
-          name: "raster tile",
-          rasterTile: {
-            urlTemplate: "INTERVIEW/05_DELTA/raster/{z}/{x}/{y}.png",
-            crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-              origin: [2494661.821213541552, 1120309.45617263671],
-              resolutions: [
-                18.0445546007679987, 9.02227730038399933, 4.51113865019199967,
-                2.25556932509599983, 1.12778466254799992, 0.563892331273999958,
-                0.281946165636999979,
-              ],
-              bounds: new Bounds(
-                [2494661.68024045881, 1120309.5971436426],
-                [2498621.050244499, 1117509.02588037029]
-              ),
-            }),
-          },
-        },
-        {
           name: "01 La forêt tropicale",
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-              },
-            },
-            {
-              name: "Constellation 1000 150dpi",
-              tile: {
-                urlTemplate:
-                  "int_constellation_test_resolution/int_01_test_resolution_1000_150dpi/{z}/{x}/{y}.png",
-              },
-            },
-            {
-              name: "Constellation 2000 150dpi",
-              tile: {
-                urlTemplate:
-                  "int_constellation_test_resolution/int_01_test_resolution_2000_150dpi/{z}/{x}/{y}.png",
-              },
-            },
-            {
-              name: "Constellation 3330 150dpi",
-              tile: {
-                urlTemplate:
-                  "int_constellation_test_resolution/int_01_test_resolution_3330_150dpi/{z}/{x}/{y}.png",
-              },
-            },
-            {
-              name: "Constellation 3330 200dpi",
-              tile: {
-                urlTemplate:
-                  "int_constellation_test_resolution/int_01_test_resolution_3330_200dpi/int_01_test_resolution_3330_200dpi/{z}/{x}/{y}.png",
-              },
-            },
-            {
-              name: "Constellation 3330 300dpi",
-              tile: {
-                urlTemplate:
-                  "int_constellation_test_resolution/int_01_test_resolution_3330_300dpi/int_01_test_resolution_3330_300dpi/{z}/{x}/{y}.png",
+                  "interview/constellation/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],
@@ -407,9 +367,10 @@ export default class Plhebicite extends Vue {
           children: [
             {
               name: "Constellation",
-              tile: {
+              rasterTile: {
                 urlTemplate:
-                  "INTERVIEW/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  "interview/constellation/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                crs: this.defaultCrs,
               },
             },
           ],

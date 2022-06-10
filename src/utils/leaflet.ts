@@ -290,16 +290,16 @@ export class RasterTileLayer extends TileLayer {
 
   private getTileZoom(): number {
     const mapScale: number = this.mapCrs.scale(this._map.getZoom());
-    let minIndex = this.minZoom;
-    let minValue = Math.abs(mapScale - this.crs.scale(minIndex));
-    range(this.minZoom + 1, this.maxZoom + 1).forEach((zoom, index) => {
-      const scale = Math.abs(mapScale - this.crs.scale(zoom));
-      if (scale < minValue) {
-        minIndex = index;
-        minValue = scale;
+    let bestZoom = this.minZoom;
+    let bestDiff = Math.abs(mapScale - this.crs.scale(bestZoom));
+    range(this.minZoom + 1, this.maxZoom + 1).forEach((zoom) => {
+      const diff = Math.abs(mapScale - this.crs.scale(zoom));
+      if (diff < bestDiff) {
+        bestZoom = zoom;
+        bestDiff = diff;
       }
     });
-    const zoom = minIndex;
+    const zoom = bestZoom;
     this.tileSizeScale = mapScale / this.crs.scale(zoom);
     return zoom;
   }
