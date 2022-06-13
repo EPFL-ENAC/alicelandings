@@ -5,16 +5,11 @@ OUT_ROOT="/opt/out"
 PROCESSES=8
 ZOOMS="0-6" # saving processing time for test
 
-for file in $(find $RAW_ROOT -name "*.geojson"); do
+for file in $(find $RAW_ROOT -name "*.geojson" -o -name "*.sld"); do
     outputFile=$OUT_ROOT${file#"$RAW_ROOT"}
     echo "processing $file -> $outputFile"
     mkdir -p "$(dirname "$outputFile")"
     cp "$file" "$outputFile"
-    sldFile=${file%.geojson}.sld
-    echo $sldFile
-    if [ -e $sldFile ]; then
-        cp $sldFile ${outputFile%.geojson}.sld
-    fi
 done
 
 for file in $(find $RAW_ROOT -name "*.tif"); do

@@ -297,7 +297,7 @@ interface MapItemOption {
   getIconOptions?: (feature: Feature) => IconOptions;
 }
 
-abstract class MapItem {
+export abstract class MapItem {
   constructor(protected option?: MapItemOption) {}
 
   get color(): Color | undefined {
