@@ -269,7 +269,16 @@
               </template>
               <template v-if="selectedCategoryId === 'environment'">
                 <h4>Légende</h4>
-                <p>Gradient de couleurs.</p>
+                <p>
+                  <span
+                    v-for="item in lasiglegendItems"
+                    :key="item.color"
+                    style="display: block"
+                  >
+                    <color-box :color="item.color"></color-box>
+                    {{ item.text }}
+                  </span>
+                </p>
                 <p>
                   Un carré vert montre que la zone favorise le déplacement à
                   pied. A l’inverse un carré rouge montre qu’il est difficile de
@@ -291,6 +300,7 @@
 </template>
 
 <script lang="ts">
+import ColorBox from "@/components/ColorBox.vue";
 import WebMap, {
   MapGroupItem,
   MapItem,
@@ -313,6 +323,7 @@ import { mapMutations } from "vuex";
 
 @Component({
   components: {
+    ColorBox,
     WebMap,
   },
   methods: {
@@ -1067,6 +1078,28 @@ export default class Plhebicite extends Vue {
           selected: true,
         },
       ],
+    },
+  ];
+  readonly lasiglegendItems: { color: string; text: string }[] = [
+    {
+      color: "#1a9641",
+      text: "0.00000 - 0.07692",
+    },
+    {
+      color: "#a6d96a",
+      text: "0.07692 - 0.22260",
+    },
+    {
+      color: "#ffffc0",
+      text: "0.22260 - 0.37318",
+    },
+    {
+      color: "#fdae61",
+      text: "0.37318 - 0.59601",
+    },
+    {
+      color: "#d7191c",
+      text: "0.59601 - 1.00000",
     },
   ];
 
