@@ -469,7 +469,18 @@ export default class Plhebicite extends Vue {
               rasterTile: {
                 urlTemplate:
                   "int_01_TEST/test-B_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
+                crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                  origin: [2492448.39314908441, 1121288.76195859746],
+                  resolutions: [
+                    53.9708821009920001, 26.9854410504960001, 13.492720525248,
+                    6.74636026262400001, 3.37318013131200001, 1.686590065656,
+                    0.843295032828000002,
+                  ],
+                  bounds: new Bounds(
+                    [2492448.39314908441, 1121288.76195859746],
+                    [2500922.87575773103, 1114808.25045507238]
+                  ),
+                }),
               },
             },
           ],
@@ -995,8 +1006,22 @@ export default class Plhebicite extends Vue {
           name: "Carte d’accessibilité LASIG",
           items: [
             {
-              url: "grid_tot_vn_21781_v17_shp_df_weighted_20210917_MANUAL_INDEX_V3.geojson",
-              style: true,
+              rasterTile: {
+                urlTemplate:
+                  "20220610_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL_IMAGE/{z}/{x}/{y}.png",
+                crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                  origin: [2493905.19190381095, 1120306.0438000001],
+                  resolutions: [
+                    22.6755088089738841, 11.3377544044869421,
+                    5.66887720224347103, 2.83443860112173551,
+                    1.41721930056086776,
+                  ],
+                  bounds: new Bounds(
+                    [2493905.19190381095, 1120306.0438000001],
+                    [2498875.37999087805, 1116791.33993460913]
+                  ),
+                }),
+              },
             },
           ],
         },
