@@ -21,6 +21,7 @@
     "georaster-layer-for-leaflet": "^3.5.0",
     "leaflet": "^1.7.1",
     "leaflet.browser.print": "^1.0.6",
+    "leaflet.heat": "^0.2.0",
     "leaflet.pattern": "github:A1rPun/Leaflet.pattern",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.34",

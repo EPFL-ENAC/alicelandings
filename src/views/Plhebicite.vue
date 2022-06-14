@@ -302,6 +302,7 @@
 <script lang="ts">
 import ColorBox from "@/components/ColorBox.vue";
 import WebMap, {
+  HeatmapMapItem,
   MapGroupItem,
   MapItem,
   RasterTileMapItem,
@@ -1022,6 +1023,18 @@ export default class Plhebicite extends Vue {
       active: false,
       layers: [
         {
+          name: "heatmap",
+          items: [
+            {
+              heatmap: {
+                url: "geojson_obstacles_20220518_tot_sel.geojson",
+                latitude: "latitude",
+                longitude: "longitude",
+              },
+            },
+          ],
+        },
+        {
           name: "Fond de carte ALICE ",
           items: [
             {
@@ -1190,6 +1203,18 @@ export default class Plhebicite extends Vue {
       }
       return [new RasterTileMapItem(layerItem.rasterTile)];
     }
+    if (layerItem.heatmap) {
+      if (!layerItem.heatmap.url.startsWith("https://")) {
+        layerItem.heatmap.url = this.getDataUrl(layerItem.heatmap.url);
+      }
+      return [
+        new HeatmapMapItem(
+          layerItem.heatmap.url,
+          layerItem.heatmap.latitude,
+          layerItem.heatmap.longitude
+        ),
+      ];
+    }
     throw new Error("Expected url or tile or rasterTile");
   }
 
@@ -1253,6 +1278,11 @@ interface LayerItem {
   rasterTile?: RasterTileLayerProp;
   style?: boolean;
   styleUrl?: string;
+  heatmap?: {
+    url: string;
+    latitude?: string;
+    longitude?: string;
+  };
   getIconOptions?: (feature: Feature) => IconOptions;
 }
 </script>

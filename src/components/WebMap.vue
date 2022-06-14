@@ -46,10 +46,10 @@ import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
 import { identify } from "geoblaze";
-import { Feature } from "geojson";
+import { Feature, FeatureCollection } from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
-import {
+import L, {
   Control,
   control,
   CRS,
@@ -58,6 +58,7 @@ import {
   GridLayer,
   icon,
   IconOptions,
+  latLng,
   Layer,
   LayerEvent,
   LayerGroup,
@@ -70,6 +71,7 @@ import {
   TileLayerOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
+import "leaflet.heat";
 import { clone } from "lodash";
 import { lookup } from "mime-types";
 import proj4 from "proj4";
@@ -245,7 +247,9 @@ export default class WebMap extends Vue {
         layerGroup.setZIndex(item.zIndex);
         item.children.forEach((itemLayer) =>
           itemLayer.getLayer().then((layer) => {
-            layer.setZIndex(item.zIndex);
+            if (layer.setZIndex) {
+              layer.setZIndex(item.zIndex);
+            }
             layerGroup.addLayer(layer);
           })
         );
@@ -329,7 +333,7 @@ export abstract class MapItem {
   abstract get filename(): string;
   abstract arrayBuffer(): Promise<ArrayBuffer>;
   abstract geoRaster(): Promise<ExtendedGeoRaster>;
-  abstract json(): Promise<Proj4GeoJSONFeature>;
+  abstract json<T>(): Promise<T>;
 
   private async getGeoJsonLayer(
     json: Proj4GeoJSONFeature
@@ -414,7 +418,9 @@ export abstract class MapItem {
     switch (extension) {
       case "geojson":
       case "json":
-        return this.json().then((json) => this.getGeoJsonLayer(json));
+        return this.json<Proj4GeoJSONFeature>().then((json) =>
+          this.getGeoJsonLayer(json)
+        );
     }
     return Promise.reject(
       `unsupported type ${this.mimeType} for file ${this.filename}`
@@ -444,7 +450,7 @@ export class FileMapItem extends MapItem {
     return parseGeoRaster(arrayBuffer);
   }
 
-  async json(): Promise<Proj4GeoJSONFeature> {
+  async json<T>(): Promise<T> {
     const text = await this.file.text();
     return JSON.parse(text);
   }
@@ -475,7 +481,7 @@ export class UrlMapItem extends MapItem {
     return parseGeoRaster(this.url);
   }
 
-  async json(): Promise<Proj4GeoJSONFeature> {
+  async json<T>(): Promise<T> {
     const response = await axios.get(this.url, {
       responseType: "json",
     });
@@ -504,6 +510,32 @@ export class RasterTileMapItem extends UrlMapItem {
       this.prop.crs,
       this.prop.options
     );
+  }
+}
+
+export class HeatmapMapItem extends UrlMapItem {
+  constructor(
+    geojsonUrl: string,
+    public latitude = "lat",
+    public longitude = "lng"
+  ) {
+    super(geojsonUrl);
+  }
+
+  async getLayer(): Promise<LeafletLayer> {
+    const json = await this.json<FeatureCollection>();
+    const points = json.features
+      .map((feature) =>
+        feature.properties
+          ? latLng(
+              feature.properties[this.latitude],
+              feature.properties[this.longitude]
+            )
+          : undefined
+      )
+      .filter((point) => point !== undefined);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (L as any).heatLayer(points);
   }
 }
 
