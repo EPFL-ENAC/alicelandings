@@ -342,9 +342,9 @@ export abstract class MapItem {
       onEachFeature: popupKey
         ? (feature, l) => {
             if (feature.properties) {
-              const property = feature.properties[popupKey];
+              const property: string | undefined = feature.properties[popupKey];
               if (property) {
-                l.bindPopup(property.replace("\n", "<br>"));
+                l.bindPopup(property.replaceAll("\n", "<br>"));
                 l.on("mouseover", () => l.openPopup());
                 l.on("mouseout", () => l.closePopup());
               }
