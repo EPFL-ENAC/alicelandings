@@ -56,7 +56,6 @@ import L, {
   GridLayer,
   icon,
   IconOptions,
-  latLng,
   Layer,
   LayerEvent,
   LayerGroup,
@@ -525,13 +524,15 @@ export class HeatmapMapItem extends UrlMapItem {
     const points = json.features
       .map((feature) =>
         feature.properties
-          ? latLng(
+          ? [
               feature.properties[this.latitude],
-              feature.properties[this.longitude]
-            )
+              feature.properties[this.longitude],
+              5,
+            ]
           : undefined
       )
       .filter((point) => point !== undefined);
+    // https://github.com/Leaflet/Leaflet.heat
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (L as any).heatLayer(points);
   }
