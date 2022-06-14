@@ -513,6 +513,27 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
+          name: "Constellation vector",
+          items: [
+            {
+              url: "int_01_TEST/01_vector_export/int_01_foret.geojson",
+              style: true,
+            },
+            {
+              url: "int_01_TEST/01_vector_export/int_01_lines.geojson",
+              style: true,
+            },
+            {
+              url: "int_01_TEST/01_vector_export/int_01_parcours.geojson",
+              style: true,
+            },
+            {
+              url: "int_01_TEST/01_vector_export/int_01_reperes.geojson",
+              style: true,
+            },
+          ],
+        },
+        {
           name: "01 La forêt tropicale",
           children: [
             {
@@ -943,9 +964,9 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
-                  url: "ATLAS/mobility/voices/plh_atlas_mobility_voices.geojson",
+                  url: "atlas/voix/atlas_voices_mobility_experiences.geojson",
                   style: true,
-                  popupKey: "Text Conte",
+                  popupKey: "Text Content",
                 },
               ],
             },

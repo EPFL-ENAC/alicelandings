@@ -34,14 +34,15 @@ const attributeNameMapping = new Map<string, keyof PathOptions>([
 ]);
 const operatorMapping = new Map<string, Operator>([
   ["PropertyIsEqualTo", (p, l) => p === l],
-  ["PropertyIsGreaterThan", (p, l) => p > l],
-  ["PropertyIsGreaterThanOrEqualTo", (p, l) => p >= l],
-  ["PropertyIsLessThan", (p, l) => p < l],
-  ["PropertyIsLessThanOrEqualTo", (p, l) => p <= l],
+  ["PropertyIsGreaterThan", (p, l) => p > (l as number)],
+  ["PropertyIsGreaterThanOrEqualTo", (p, l) => p >= (l as number)],
+  ["PropertyIsLessThan", (p, l) => p < (l as number)],
+  ["PropertyIsLessThanOrEqualTo", (p, l) => p <= (l as number)],
   ["PropertyIsNotEqualTo", (p, l) => p !== l],
+  ["PropertyIsNull", (p) => p == undefined],
 ]);
 
-type Operator = (p: number, l: number) => boolean;
+type Operator = (p: number, l: number | string | undefined) => boolean;
 
 interface Rule {
   condition?: {
@@ -53,7 +54,7 @@ interface Rule {
 
 interface Filter {
   property: string;
-  literal: number;
+  literal: number | string | undefined;
   operator: Operator;
 }
 
@@ -88,12 +89,9 @@ export function getStyle(style?: string): {
           select(operatorExpression, filterNode) as Element[]
         ).map((node) => {
           const property = getText("./ogc:PropertyName", node);
-          const literal = getNumber("./ogc:Literal", node);
+          const literal = getNumberOrText("./ogc:Literal", node);
           if (!property) {
             throw "Expected ogc:PropertyName";
-          }
-          if (literal === undefined) {
-            throw "Expected ogc:Literal";
           }
           const operator = operatorMapping.get(node.localName);
           if (!operator) {
@@ -181,6 +179,14 @@ function getNumber(expression: string, node: Node): number | undefined {
   return text === undefined ? undefined : Number(text);
 }
 
+function getNumberOrText(
+  expression: string,
+  node: Node
+): number | string | undefined {
+  const text = getText(expression, node);
+  return text === undefined ? undefined : Number(text) ?? text;
+}
+
 function getPathOptions(ruleNode: Node): {
   pathOptions: PathOptions;
   pattern?: Pattern;
@@ -206,21 +212,18 @@ function getPathOptions(ruleNode: Node): {
     switch (wellKnownName) {
       case "circle": {
         const size = getNumber("./se:Size", graphicNode);
+        const color = getText(
+          "./se:Mark/se:Fill/se:SvgParameter[@name='fill']",
+          graphicNode
+        );
         const shape = new PatternCircle({
           radius: size,
-          color: getText(
-            "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke']",
-            graphicNode
-          ),
-          fillColor: getText(
-            "./se:Mark/se:Fill/se:SvgParameter[@name='fill']",
-            graphicNode
-          ),
+          color: color,
+          fillColor: color,
         });
-        const dimension = ratio(size, 3);
         const pattern = new Pattern({
-          width: dimension,
-          height: dimension,
+          width: size,
+          height: size,
         });
         pattern.addShape(shape);
         return {
@@ -289,7 +292,7 @@ function castValue(key: keyof PathOptions, value?: string): unknown {
     case "dashArray":
       return value.split(" ").map((item) => Number(item));
     case "weight":
-      return Number(value);
+      return Number(value) / 2.5;
     default:
       return value;
   }
