@@ -38,9 +38,7 @@ import {
   EPSG_2056,
   EPSG_21781,
   RasterTileLayer,
-  RasterTileLayerProp,
   swisstopoCrs,
-  TileLayerProp,
 } from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
@@ -490,26 +488,26 @@ export class UrlMapItem extends MapItem {
 }
 
 export class TileMapItem extends UrlMapItem {
-  constructor(public prop: TileLayerProp) {
-    super(prop.urlTemplate);
+  constructor(url: string, private options?: TileLayerOptions) {
+    super(url);
   }
 
   async getLayer(): Promise<LeafletLayer> {
-    return new TileLayer(this.prop.urlTemplate, this.prop.options);
+    return new TileLayer(this.url, this.options);
   }
 }
 
 export class RasterTileMapItem extends UrlMapItem {
-  constructor(public prop: RasterTileLayerProp) {
-    super(prop.urlTemplate);
+  constructor(
+    url: string,
+    private crs: Proj.CRS,
+    private options?: TileLayerOptions
+  ) {
+    super(url);
   }
 
   async getLayer(): Promise<LeafletLayer> {
-    return new RasterTileLayer(
-      this.prop.urlTemplate,
-      this.prop.crs,
-      this.prop.options
-    );
+    return new RasterTileLayer(this.url, this.crs, this.options);
   }
 }
 

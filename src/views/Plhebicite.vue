@@ -309,16 +309,11 @@ import WebMap, {
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
-import {
-  EPSG_2056,
-  RasterTileLayerProp,
-  TileLayerProp,
-  tileLayerProps,
-} from "@/utils/leaflet";
+import { EPSG_2056, tileLayerProps } from "@/utils/leaflet";
 import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
 import { Feature } from "geojson";
-import { Bounds, IconOptions, point, Proj } from "leaflet";
+import { Bounds, IconOptions, point, Proj, TileLayerOptions } from "leaflet";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -400,10 +395,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation bilinear",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/bilinear/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/bilinear/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -411,10 +405,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation cubic",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/cubic/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/cubic/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -422,10 +415,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation cubicspline",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/cubicspline/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/cubicspline/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -433,10 +425,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation lanczos",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/lanczos/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/lanczos/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -444,10 +435,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation med",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/med/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/med/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -455,10 +445,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation mode",
           items: [
             {
-              rasterTile: {
-                urlTemplate: "test/constellation/mode/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "test/constellation/mode/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -466,11 +455,9 @@ export default class Plhebicite extends Vue {
           name: "Constellation test A",
           items: [
             {
-              rasterTile: {
-                urlTemplate:
-                  "int_01_TEST/test-A_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "int_01_TEST/test-A_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
           ],
         },
@@ -478,22 +465,20 @@ export default class Plhebicite extends Vue {
           name: "Constellation test B",
           items: [
             {
-              rasterTile: {
-                urlTemplate:
-                  "int_01_TEST/test-B_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                  origin: [2492448.39314908441, 1121288.76195859746],
-                  resolutions: [
-                    53.9708821009920001, 26.9854410504960001, 13.492720525248,
-                    6.74636026262400001, 3.37318013131200001, 1.686590065656,
-                    0.843295032828000002,
-                  ],
-                  bounds: new Bounds(
-                    [2492448.39314908441, 1121288.76195859746],
-                    [2500922.87575773103, 1114808.25045507238]
-                  ),
-                }),
-              },
+              type: "tile",
+              url: "int_01_TEST/test-B_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                origin: [2492448.39314908441, 1121288.76195859746],
+                resolutions: [
+                  53.9708821009920001, 26.9854410504960001, 13.492720525248,
+                  6.74636026262400001, 3.37318013131200001, 1.686590065656,
+                  0.843295032828000002,
+                ],
+                bounds: new Bounds(
+                  [2492448.39314908441, 1121288.76195859746],
+                  [2500922.87575773103, 1114808.25045507238]
+                ),
+              }),
             },
           ],
         },
@@ -501,13 +486,12 @@ export default class Plhebicite extends Vue {
           name: "Constellation test C",
           items: [
             {
-              rasterTile: {
-                urlTemplate:
-                  "int_01_TEST/test-C_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                crs: this.defaultCrs,
-              },
+              type: "tile",
+              url: "int_01_TEST/test-C_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+              crs: this.defaultCrs,
             },
             {
+              type: "url",
               url: "int_01_TEST/test-C_int_01_BAIE_CONSTELLATIONS.geojson",
               style: true,
             },
@@ -517,18 +501,22 @@ export default class Plhebicite extends Vue {
           name: "Constellation vector",
           items: [
             {
+              type: "url",
               url: "int_01_TEST/01_vector_export/int_01_foret.geojson",
               style: true,
             },
             {
+              type: "url",
               url: "int_01_TEST/01_vector_export/int_01_lines.geojson",
               style: true,
             },
             {
+              type: "url",
               url: "int_01_TEST/01_vector_export/int_01_parcours.geojson",
               style: true,
             },
             {
+              type: "url",
               url: "int_01_TEST/01_vector_export/int_01_reperes.geojson",
               style: true,
             },
@@ -541,11 +529,13 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "interview/voix/int_01_constellation_callout.geojson",
-                  styleUrl:
+                  style:
                     "interview/voix/symbol/symbol_constellation_voices_callout.sld",
                 },
                 {
+                  type: "url",
                   url: "interview/voix/int_01_constellation_voices.geojson",
                   popupKey: "Text Conte",
                   getIconOptions: this.getIconOptions,
@@ -556,11 +546,9 @@ export default class Plhebicite extends Vue {
               name: "Parcours",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/parcours/int_01_parcours/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/parcours/int_01_parcours/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -568,11 +556,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -580,11 +566,9 @@ export default class Plhebicite extends Vue {
               name: "Horizons",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/horizons/int_01_horizons/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/horizons/int_01_horizons/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -597,6 +581,7 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "interview/voix/int_02_PIPELINE_VOICES.geojson",
                   popupKey: "Text Conte",
                   getIconOptions: this.getIconOptions,
@@ -607,11 +592,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -624,6 +607,7 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "interview/voix/int_03_BARRIERE_VOICES.geojson",
                   popupKey: "Text Conte",
                   getIconOptions: this.getIconOptions,
@@ -634,11 +618,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -651,6 +633,7 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "interview/voix/int_04_SECRETS_VOICES.geojson",
                   popupKey: "Text Conte",
                   getIconOptions: this.getIconOptions,
@@ -661,11 +644,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -681,10 +662,8 @@ export default class Plhebicite extends Vue {
                   name: "callout",
                   items: [
                     {
-                      tile: {
-                        urlTemplate:
-                          "int_voix_test_symboles/int_05_voices_callout/{z}/{x}/{y}.png",
-                      },
+                      type: "tile",
+                      url: "int_voix_test_symboles/int_05_voices_callout/{z}/{x}/{y}.png",
                     },
                   ],
                 },
@@ -692,6 +671,7 @@ export default class Plhebicite extends Vue {
                   name: "int_05_voices",
                   items: [
                     {
+                      type: "url",
                       url: "int_voix_test_symboles/int_05_voices.geojson",
                       popupKey: "Text Conte",
                       getIconOptions: this.getIconOptions,
@@ -704,10 +684,8 @@ export default class Plhebicite extends Vue {
               name: "Parcours",
               items: [
                 {
-                  tile: {
-                    urlTemplate:
-                      "INTERVIEW/05_DELTA/trajectoire/plh_interview_05_trajectoire/{z}/{x}/{y}.png",
-                  },
+                  type: "tile",
+                  url: "INTERVIEW/05_DELTA/trajectoire/plh_interview_05_trajectoire/{z}/{x}/{y}.png",
                 },
               ],
             },
@@ -715,11 +693,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -732,6 +708,7 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "interview/voix/int_06_DOMTOM_VOICES.geojson",
                   popupKey: "Text Conte",
                   getIconOptions: this.getIconOptions,
@@ -742,11 +719,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -759,11 +734,13 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_IN.geojson",
                   style: true,
                   popupKey: "Text Conte",
                 },
                 {
+                  type: "url",
                   url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_OUT.geojson",
                   style: true,
                   popupKey: "Text Content",
@@ -774,6 +751,7 @@ export default class Plhebicite extends Vue {
               name: "Parcours",
               items: [
                 {
+                  type: "url",
                   url: "INTERVIEW/07_CROISIERE/trajectories/07_CROISIERE_TRAJECTORIES.geojson",
                   style: true,
                 },
@@ -783,11 +761,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -795,10 +771,8 @@ export default class Plhebicite extends Vue {
               name: "Horizons",
               items: [
                 {
-                  tile: {
-                    urlTemplate:
-                      "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png",
-                  },
+                  type: "tile",
+                  url: "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png",
                 },
               ],
             },
@@ -811,11 +785,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -828,11 +800,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -845,11 +815,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -862,11 +830,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -879,11 +845,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -896,11 +860,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -913,11 +875,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -930,11 +890,9 @@ export default class Plhebicite extends Vue {
               name: "Constellation",
               items: [
                 {
-                  rasterTile: {
-                    urlTemplate:
-                      "interview/constellation/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
-                    crs: this.defaultCrs,
-                  },
+                  type: "tile",
+                  url: "interview/constellation/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
+                  crs: this.defaultCrs,
                 },
               ],
             },
@@ -965,6 +923,7 @@ export default class Plhebicite extends Vue {
               name: "Voix",
               items: [
                 {
+                  type: "url",
                   url: "atlas/voix/atlas_voices_mobility_experiences.geojson",
                   style: true,
                   popupKey: "Text Content",
@@ -975,10 +934,8 @@ export default class Plhebicite extends Vue {
               name: "Cadre",
               items: [
                 {
-                  tile: {
-                    urlTemplate:
-                      "ATLAS/mobility/cadre/plh_atlas_mobility_cadre/{z}/{x}/{y}.png",
-                  },
+                  type: "tile",
+                  url: "ATLAS/mobility/cadre/plh_atlas_mobility_cadre/{z}/{x}/{y}.png",
                 },
               ],
             },
@@ -986,10 +943,8 @@ export default class Plhebicite extends Vue {
               name: "Overlay",
               items: [
                 {
-                  tile: {
-                    urlTemplate:
-                      "ATLAS/mobility/overlay/plh_atlas_mobility_overlay/{z}/{x}/{y}.png",
-                  },
+                  type: "tile",
+                  url: "ATLAS/mobility/overlay/plh_atlas_mobility_overlay/{z}/{x}/{y}.png",
                 },
               ],
             },
@@ -1026,11 +981,10 @@ export default class Plhebicite extends Vue {
           name: "heatmap",
           items: [
             {
-              heatmap: {
-                url: "geojson_obstacles_20220518_tot_sel.geojson",
-                latitude: "latitude",
-                longitude: "longitude",
-              },
+              type: "heatmap",
+              url: "geojson_obstacles_20220518_tot_sel.geojson",
+              latitude: "latitude",
+              longitude: "longitude",
             },
           ],
         },
@@ -1038,11 +992,10 @@ export default class Plhebicite extends Vue {
           name: "Fond de carte ALICE ",
           items: [
             {
-              tile: {
-                urlTemplate: "general/basemap/{z}/{x}/{y}.png",
-                options: {
-                  tms: true,
-                },
+              type: "tile",
+              url: "general/basemap/{z}/{x}/{y}.png",
+              options: {
+                tms: true,
               },
             },
           ],
@@ -1051,22 +1004,19 @@ export default class Plhebicite extends Vue {
           name: "Carte d’accessibilité LASIG",
           items: [
             {
-              rasterTile: {
-                urlTemplate:
-                  "20220610_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL_IMAGE/{z}/{x}/{y}.png",
-                crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                  origin: [2493905.19190381095, 1120306.0438000001],
-                  resolutions: [
-                    22.6755088089738841, 11.3377544044869421,
-                    5.66887720224347103, 2.83443860112173551,
-                    1.41721930056086776,
-                  ],
-                  bounds: new Bounds(
-                    [2493905.19190381095, 1120306.0438000001],
-                    [2498875.37999087805, 1116791.33993460913]
-                  ),
-                }),
-              },
+              type: "tile",
+              url: "20220610_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL_IMAGE/{z}/{x}/{y}.png",
+              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                origin: [2493905.19190381095, 1120306.0438000001],
+                resolutions: [
+                  22.6755088089738841, 11.3377544044869421, 5.66887720224347103,
+                  2.83443860112173551, 1.41721930056086776,
+                ],
+                bounds: new Bounds(
+                  [2493905.19190381095, 1120306.0438000001],
+                  [2498875.37999087805, 1116791.33993460913]
+                ),
+              }),
             },
           ],
         },
@@ -1074,29 +1024,30 @@ export default class Plhebicite extends Vue {
           name: "grid",
           items: [
             {
-              tile: {
-                urlTemplate:
-                  "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
-              },
+              type: "tile",
+              url: "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
             },
           ],
         },
         {
           name: "Swisstopo",
-          items: [{ tile: tileLayerProps.swisstopo_pixelkarte_farbe_2056 }],
+          items: [
+            {
+              type: "tile",
+              ...tileLayerProps.swisstopo_pixelkarte_farbe_2056,
+            },
+          ],
         },
         {
           name: "Image satellite",
-          items: [{ tile: tileLayerProps.swisstopo_photo_2056 }],
+          items: [{ type: "tile", ...tileLayerProps.swisstopo_photo_2056 }],
         },
         {
           name: "repère",
           items: [
             {
-              tile: {
-                urlTemplate:
-                  "general/background_repere/background_repere/{z}/{x}/{y}.png",
-              },
+              type: "tile",
+              url: "general/background_repere/background_repere/{z}/{x}/{y}.png",
             },
           ],
           selected: true,
@@ -1105,6 +1056,7 @@ export default class Plhebicite extends Vue {
           name: "repère geojson",
           items: [
             {
+              type: "url",
               url: "general/repere/GEOJSON/background_repere.geojson",
               style: true,
             },
@@ -1172,50 +1124,48 @@ export default class Plhebicite extends Vue {
   }
 
   private getMapItem(layerItem: LayerItem): MapItem[] {
-    if (layerItem.url) {
-      const absoluteUrl = this.getDataUrl(layerItem.url);
-      const styleUrl = layerItem.styleUrl
-        ? this.getDataUrl(layerItem.styleUrl)
-        : layerItem.style
-        ? absoluteUrl.replace(/\.[^/.]+$/, ".sld")
-        : undefined;
-      return [
-        new UrlMapItem(absoluteUrl, {
-          styleUrl: styleUrl,
-          popupKey: layerItem.popupKey,
-          getIconOptions: layerItem.getIconOptions,
-        }),
-      ];
+    if (!layerItem.url.startsWith("https://")) {
+      layerItem.url = this.getDataUrl(layerItem.url);
     }
-    if (layerItem.tile) {
-      if (!layerItem.tile.urlTemplate.startsWith("https://")) {
-        layerItem.tile.urlTemplate = this.getDataUrl(
-          layerItem.tile.urlTemplate
-        );
+    switch (layerItem.type) {
+      case "url": {
+        const styleUrl = layerItem.style
+          ? typeof layerItem.style === "string"
+            ? this.getDataUrl(layerItem.style)
+            : layerItem.url.replace(/\.[^/.]+$/, ".sld")
+          : undefined;
+        return [
+          new UrlMapItem(layerItem.url, {
+            styleUrl: styleUrl,
+            popupKey: layerItem.popupKey,
+            getIconOptions: layerItem.getIconOptions,
+          }),
+        ];
       }
-      return [new TileMapItem(layerItem.tile)];
-    }
-    if (layerItem.rasterTile) {
-      if (!layerItem.rasterTile.urlTemplate.startsWith("https://")) {
-        layerItem.rasterTile.urlTemplate = this.getDataUrl(
-          layerItem.rasterTile.urlTemplate
-        );
+      case "tile": {
+        if (layerItem.crs) {
+          return [
+            new RasterTileMapItem(
+              layerItem.url,
+              layerItem.crs,
+              layerItem.options
+            ),
+          ];
+        } else {
+          return [new TileMapItem(layerItem.url, layerItem.options)];
+        }
       }
-      return [new RasterTileMapItem(layerItem.rasterTile)];
+      case "heatmap":
+        return [
+          new HeatmapMapItem(
+            layerItem.url,
+            layerItem.latitude,
+            layerItem.longitude
+          ),
+        ];
+      default:
+        throw new Error("Expected type");
     }
-    if (layerItem.heatmap) {
-      if (!layerItem.heatmap.url.startsWith("https://")) {
-        layerItem.heatmap.url = this.getDataUrl(layerItem.heatmap.url);
-      }
-      return [
-        new HeatmapMapItem(
-          layerItem.heatmap.url,
-          layerItem.heatmap.latitude,
-          layerItem.heatmap.longitude
-        ),
-      ];
-    }
-    throw new Error("Expected url or tile or rasterTile");
   }
 
   private getDataUrl(path: string): string {
@@ -1271,19 +1221,26 @@ interface Layer {
   children?: Layer[];
 }
 
-interface LayerItem {
-  url?: string;
+type LayerItem = UrlLayerItem | TileLayerItem | HeatmapLayerItem;
+
+interface UrlLayerItem {
+  type: "url";
+  url: string;
   popupKey?: string;
-  tile?: TileLayerProp;
-  rasterTile?: RasterTileLayerProp;
-  style?: boolean;
-  styleUrl?: string;
-  heatmap?: {
-    url: string;
-    latitude?: string;
-    longitude?: string;
-  };
+  style?: boolean | string;
   getIconOptions?: (feature: Feature) => IconOptions;
+}
+interface TileLayerItem {
+  type: "tile";
+  url: string;
+  options?: TileLayerOptions;
+  crs?: Proj.CRS;
+}
+interface HeatmapLayerItem {
+  type: "heatmap";
+  url: string;
+  latitude?: string;
+  longitude?: string;
 }
 </script>
 

@@ -64,7 +64,7 @@ export const tileLayerProps: Record<
   TileLayerProp
 > = {
   openStreetMap: {
-    urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     options: {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -72,8 +72,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_pixelkarte_farbe: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19,
@@ -81,8 +80,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_pixelkarte_grau: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/3857/{z}/{x}/{y}.jpeg",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-grau/default/current/3857/{z}/{x}/{y}.jpeg",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19,
@@ -90,8 +88,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_landeskarte_farbe: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/3857/{z}/{x}/{y}.png",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-farbe-10/default/current/3857/{z}/{x}/{y}.png",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19,
@@ -99,8 +96,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_landeskarte_grau: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/3857/{z}/{x}/{y}.png",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.landeskarte-grau-10/default/current/3857/{z}/{x}/{y}.png",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19,
@@ -108,8 +104,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_photo: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/3857/{z}/{x}/{y}.jpeg",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/3857/{z}/{x}/{y}.jpeg",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 19, // 20
@@ -117,8 +112,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_pixelkarte_farbe_2056: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 27,
@@ -126,8 +120,7 @@ export const tileLayerProps: Record<
     },
   },
   swisstopo_photo_2056: {
-    urlTemplate:
-      "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
+    url: "https://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/2056/{z}/{x}/{y}.jpeg",
     options: {
       attribution: swisstopoAttribution,
       maxZoom: 27,
@@ -137,7 +130,7 @@ export const tileLayerProps: Record<
 };
 
 export interface TileLayerProp {
-  urlTemplate: string;
+  url: string;
   options?: TileLayerOptions;
 }
 
@@ -193,12 +186,6 @@ interface Level {
   el: HTMLElement;
   origin: Point;
   zoom: number;
-}
-
-export interface RasterTileLayerProp {
-  urlTemplate: string;
-  crs: Proj.CRS;
-  options?: TileLayerOptions;
 }
 
 /**
