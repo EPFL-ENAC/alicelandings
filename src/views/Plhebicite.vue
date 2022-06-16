@@ -309,9 +309,11 @@ import WebMap, {
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
+import { Metadata } from "@/models/qgis";
 import { EPSG_2056, tileLayerProps } from "@/utils/leaflet";
 import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
+import axios from "axios";
 import { Feature } from "geojson";
 import { Bounds, IconOptions, point, Proj, TileLayerOptions } from "leaflet";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
@@ -1111,9 +1113,11 @@ export default class Plhebicite extends Vue {
       .flat()
       .flatMap((item) => item.children ?? [item])
       .map(async (item) => {
-        const mapItems = (item.value.items ?? []).flatMap((layerItem) =>
-          this.getMapItem(layerItem)
-        );
+        const mapItems = await Promise.all(
+          (item.value.items ?? []).map((layerItem) =>
+            this.getMapItem(layerItem)
+          )
+        ).then((items) => items.flat());
         return {
           id: item.id,
           zIndex: zIndex--,
@@ -1123,24 +1127,37 @@ export default class Plhebicite extends Vue {
     Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
   }
 
-  private getMapItem(layerItem: LayerItem): MapItem[] {
+  private async getMapItem(layerItem: LayerItem): Promise<MapItem[]> {
     if (!layerItem.url.startsWith("https://")) {
       layerItem.url = this.getDataUrl(layerItem.url);
     }
     switch (layerItem.type) {
       case "url": {
-        const styleUrl = layerItem.style
-          ? typeof layerItem.style === "string"
-            ? this.getDataUrl(layerItem.style)
-            : layerItem.url.replace(/\.[^/.]+$/, ".sld")
-          : undefined;
-        return [
-          new UrlMapItem(layerItem.url, {
-            styleUrl: styleUrl,
-            popupKey: layerItem.popupKey,
-            getIconOptions: layerItem.getIconOptions,
-          }),
-        ];
+        if (layerItem.url.endsWith("metadata.json")) {
+          const metadata = await axios
+            .get<Metadata>(layerItem.url)
+            .then((response) => response.data);
+          const prefix = layerItem.url.replace("metadata.json", "");
+          return metadata.layers.map(
+            (layer) =>
+              new UrlMapItem(prefix + layer.geojson, {
+                styleUrl: prefix + layer.sld,
+              })
+          );
+        } else {
+          const styleUrl = layerItem.style
+            ? typeof layerItem.style === "string"
+              ? this.getDataUrl(layerItem.style)
+              : layerItem.url.replace(/\.[^/.]+$/, ".sld")
+            : undefined;
+          return [
+            new UrlMapItem(layerItem.url, {
+              styleUrl: styleUrl,
+              popupKey: layerItem.popupKey,
+              getIconOptions: layerItem.getIconOptions,
+            }),
+          ];
+        }
       }
       case "tile": {
         if (layerItem.crs) {
