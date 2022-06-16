@@ -4,8 +4,8 @@
       <div class="flex-grow-1">
         <h1>An Atlas of Vernier Mobility Landscapes</h1>
         <span class="text-subtitle-1">
-          An affordance-based and affective reading of the Commune of Vernier,
-          Geneva
+          Un atlas des paysages de mobilité à vernier. Vers une lecture
+          affective de l’espace de la Commune de Vernier, Genève
         </span>
       </div>
       <a href="https://epfl.ch" target="_blank">
@@ -24,7 +24,7 @@
     <div class="flex-grow-1 d-flex flex-row">
       <div class="d-flex flex-column">
         <div class="flex-even">
-          <v-list dense width="300" height="100%">
+          <v-list dense width="330" height="100%">
             <v-list-group
               v-for="(item, index) in categories"
               :key="index"
@@ -40,9 +40,8 @@
                   </v-list-item-title>
                 </v-list-item-content>
               </template>
-              <p class="mx-3">
-                {{ item.description }}
-              </p>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <p class="mx-3" v-html="item.description"></p>
               <v-treeview
                 v-model="selectedTreeviewItems[index]"
                 dense
@@ -67,80 +66,98 @@
               text
               v-on="on"
             >
-              About
+              <h4>A Propos</h4>
             </v-btn>
           </template>
           <v-card class="text-justify">
-            <v-card-title>About</v-card-title>
+            <v-card-title>A Propos</v-card-title>
             <v-card-text>
+              <h4>Le projet</h4>
               <p>
-                To address the challenges posed by climate change to our cities,
-                it is essential to acknowledge the role the environment plays in
-                our everyday lives. However our maps tend to silence our lived
-                experience and how it both shapes and is shaped by the places we
-                move through. Consequently, planning and design processes have
-                often disregarded this and lost great opportunities to
-                collectively shape friendlier and human-oriented cities. An
-                analysis of active mobility practices in the commune of Vernier
-                offers us the chance to create alternative spatial
-                representations to know this lived dimension. By having maps
-                able to address affective engagements, social imaginaries, and
-                collective memories, we can make our communities matter more in
-                the conversations about our cities' future.
+                Pour relever les défis posés par le changement climatique dans
+                nos villes, il est essentiel de reconnaître le rôle que joue
+                l'environnement dans notre vie quotidienne. Cependant, nos
+                cartes ont tendance à passer sous silence notre expérience vécue
+                et la manière dont elle façonne et est façonnée par les lieux
+                que nous traversons. Par conséquent, les processus de
+                planification et de conception n'en ont souvent pas tenu compte
+                et ont perdu de grandes opportunités de façonner collectivement
+                des villes plus conviviales et plus humaines. Une analyse des
+                pratiques de mobilité active dans la commune de Vernier nous
+                offre la possibilité de créer des images spatiales alternatives
+                pour connaître cette dimension vécue. En disposant de cartes
+                capables d'aborder les engagements affectifs, les imaginaires
+                sociaux et les mémoires collectives, nous pouvons donner plus
+                d'importance à nos communautés dans les conversations sur
+                l'avenir de nos villes.
+              </p>
+              <h4>Cartographies affectives</h4>
+              <p>
+                La série des cartographies affectives propose une manière
+                alternative à la représentation de l'espace urbain de la commune
+                de Vernier à travers quinze entretiens menés à pied avec des
+                habitant.e.s de Vernier. Ces cartes tentent de dessiner les
+                engagements affectifs des citoyen.ne.s avec leurs environnements
+                quotidiens en mettant en évidence les perceptions, les paysages
+                vécus et l'expérience plutôt que des lignes administratives ou
+                des symboles abstraits. Une image collective émerge à
+                l'intersection des expériences individuelles. Les paysages
+                habités se superposent et proposent une nouvelle figure de la
+                commune aux limites diffuses et aux réalités complexes. En
+                reconnaissant l'espace vécu d'une ville dans des cartes qui
+                peuvent être collectivement partagées, discutées et
+                transformées, nous pouvons élargir nos imaginaires urbains et
+                améliorer la façon dont nous planifions et concevons nos villes.
+              </p>
+              <h4>Atlas des paysages de la mobilité</h4>
+              <p>
+                L'Atlas des paysages de mobilité est une série de témoignages de
+                citoyen.ne.s et de données d'information géographique rassemblés
+                autour de l'expérience de la marche et du vélo à Vernier. La
+                mobilité est bien plus que le fait de relier un point A à un
+                point B, elle est surtout définie par l'expérience du parcours.
+                De ce fait, la mobilité est un point d'entrée extraordinaire
+                pour comprendre les liens entre les pratiques quotidiennes et
+                l'environnement qui nous entoure. La série est organisée selon
+                10 grands thèmes et 49 sous-thématiques décrivant des
+                expériences faites en se déplaçant dans la commune de Vernier.
+                L'utilisateur peut naviguer librement sur la carte pour
+                comprendre les relations entre les caractéristiques
+                environnementales de divers lieux de la commune et les
+                imaginaires et perceptions collectives qui les animent.
               </p>
               <p>
-                The
-                <span class="font-weight-bold">Affective Mappings</span> series
-                offers an alternative way of representing urban lived space in
-                the commune of Vernier. Based on fifteen walk-along interviews
-                done with neighbours of Vernier, these maps attempt to draw
-                these citizens' affective engagements with their everyday
-                environments highlighting perceptions, landscapes and experience
-                instead of abstract administrative lines or symbols. By
-                acknowledging the lived space of a city in maps that can be
-                collectively shared, discussed and transformed, we can expand
-                our urban imaginaries and improve how we plan and design our
-                cities.
+                L’Atlas inclut également quelques premières analyses du
+                questionnaire participatif (MAPTIONNAIRE) venant de clore et
+                réalisé sur la commune de Vernier entre février et juin 2022.
+                Une analyse plus approfondie du questionnaire sera réalisée par
+                la suite.
               </p>
               <p>
-                The
-                <span class="font-weight-bold"
-                  >Atlas of Mobility Landscapes</span
-                >
-                is a collection of citizen testimonies, documents and images
-                gathered around the experience of walking and cycling in
-                Vernier. Mobility is much more than connecting point A to point
-                B, it is mostly defined by the experience of the journey.
-                Because of that, mobility is an extraordinary point of entrance
-                into the relations between everyday practices and our
-                surrounding environment. The collection is organized according
-                to X large themes and X sub-themes describing the lived
-                experience of the commune of Vernier. The user can navigate the
-                map freely to understand the relationship between different
-                environmental features of the commune and collective imaginaries
-                and perceptions.
+                Cet outil de visualisation a été créé grâce à la participation
+                de l'équipe IT4R (ENAC-IT 4 RESEARCH) de l'EPFL dans le cadre du
+                projet de recherche
+                <span class="font-weight-bold">PLHEBICITE</span> (Planifier des
+                villes plus saines et plus riches en biodiversité: relier les
+                quartiers grâce à une mobilité active et des infrastructures
+                paysagères). Ce projet est une collaboration entre les
+                laboratoires ALICE (Atelier de la Conception de l’Espace) et
+                LASIG (Laboratoire des Systèmes d'Information Géographique) de
+                l'EPFL, afin d'étudier de quelle manière l'espace urbain
+                influence et potentialise les pratiques de mobilité active ainsi
+                que le bien-être et la santé physique et psychologique des
+                habitant.e.s de la commune de Vernier dans le canton de Genève.
               </p>
+              <h4>Remerciements</h4>
               <p>
-                We believe that making available all these documents in an
-                online and open visualization tool will help acknowledge the
-                importance of these often hidden qualities of space, and how
-                they can encourage more inclusive discussions about the city and
-                its potential futures.
-              </p>
-              <p>
-                Cet outil de visualisation a été créé en collaboration avec
-                l'équipe IT4R de l'EPFL dans le cadre du projet de recherche
-                <span class="font-weight-bold">PLHEBICITE</span>
-                (Planifier des villes plus saines et plus riches en
-                biodiversité: relier les quartiers grâce à une mobilité active
-                et des infrastructures paysagères). Ce projet est une
-                collaboration entre les laboratoires ALICE (Atelier de la
-                Conception de l'Espace) et LASIG (Laboratoire des Systèmes
-                d'Information Géographique) de l'EPFL, afin d'étudier de quelle
-                manière l'espace urbain influence et potentialise les pratiques
-                de mobilité active ainsi que le bien être et la santé physique
-                et psychologique des habitants de la commune de Vernier à
-                Genève.
+                Nous remercions les nombreuses personnes qui nous ont aidé dans
+                la recherche et qui ont participé au projet. En particuliers les
+                habitant.e.s nous ayant guidé à travers la commune durant les
+                entretiens en marchant. Nous remercions également le service de
+                la cohésion sociale, les contrats de quartiers, les personnes
+                rencontrées dans des associations ou dans les différents
+                quartiers, le service de la culture et communication, le service
+                de l’aménagement.
               </p>
             </v-card-text>
             <v-card-actions class="justify-end">
@@ -169,11 +186,15 @@
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Description</h4>
                 <p>
-                  La compréhension et la spatialité de la commune évoluent selon
-                  qui l’habite et comment. Ces cartes tentent de dessiner les
-                  engagements affectifs des citoyens avec leur environnement
-                  quotidien, en mettant en évidence leurs perceptions, leurs
-                  paysages et leurs expériences.
+                  Ces cartes tentent de dessiner les engagements affectifs des
+                  citoyens avec leur environnement quotidien, en mettant en
+                  évidence leurs perceptions, leurs paysages et leurs
+                  expériences. La compréhension et la spatialité de la commune
+                  évolue selon qui l’habite. Une image collective et partagée
+                  émerge à l'intersection des expériences individuelles. Les
+                  paysages habités se superposent et proposent une nouvelle
+                  figure de la commune aux limites diffuses et aux réalités
+                  complexes.
                 </p>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
@@ -226,7 +247,8 @@
                   <span>
                     <span class="font-weight-bold">Parcours. </span>L’itinéraire
                     de l’entretien effectué. La largeur fluctue selon la vitesse
-                    de marche, la couleur selon la pente du parcours.
+                    de marche, la couleur selon la pente du parcours. Les
+                    entretiens durent entre 50 minutes et 3 heures.
                   </span>
                 </p>
                 <p class="d-flex">
@@ -436,9 +458,9 @@ export default class Plhebicite extends Vue {
   readonly categories: Category[] = [
     {
       id: "mapping",
-      name: "Cartographies affectives",
+      name: "Cartographie affective de Vernier",
       description:
-        "Ces cartographies affectives représentent l'espace urbain vécu dans Vernier à travers quinze entretiens réalisés avec des habitant.e.s de la commune. La compréhension et la spatialité de la commune évolue selon qui l'habite. Une image collective partagée émerge à l'intersection des expériences individuelles.",
+        "Ces cartographies affectives représentent l'espace urbain vécu dans Vernier à travers quinze entretiens réalisés avec des habitant.e.s nous guidant à travers la commune.",
       active: true,
       layers: [
         {
@@ -458,7 +480,7 @@ export default class Plhebicite extends Vue {
           children: this.getInterviewChildren("04"),
         },
         {
-          name: "05 Delta & Archipels",
+          name: "05 Archipels et deltas",
           children: this.getInterviewChildren("05"),
         },
         {
@@ -505,23 +527,95 @@ export default class Plhebicite extends Vue {
     },
     {
       id: "atlas",
-      name: "Atlas de mobilité",
+      name: "Atlas des paysages de mobilité",
       description:
-        "La collection de cet Atlas est organisée selon 10 grands thèmes et 49 sous-thèmes. L'utilisateur peut naviguer librement sur la carte pour comprendre la relation entre les caractéristiques environnementales et les perceptions collectives.",
+        "Cet Atlas, organisé selon dix grands thèmes et presque cinquante sous-thèmes, recueille une série de voix (citations) sur la relation entre mobilité et environnement. Ces cartes sont constituées autant de témoignages de citoyen.ne.s, que de sources historiques et d’analyses géographiques. ",
       active: false,
       layers: [
         {
-          name: "Place attachment & spatial reach",
+          name: "Attachement au lieu et étendue spatiale",
+          children: [
+            {
+              name: "Attachement",
+            },
+            {
+              name: "Lieux familiers (et affectionnés)",
+            },
+            {
+              name: "Spatialités étendues",
+            },
+            {
+              name: "Toponymes",
+            },
+            {
+              name: "Voisinage",
+            },
+          ],
         },
         {
-          name: "Identity of the commune",
+          name: "Identité de la commune",
         },
         {
-          name: "Imaginaries & Oral knowledges",
+          name: "Imaginaires et savoirs oraux",
         },
         {
           name: "Expériences de mobilité",
           children: [
+            {
+              name: "Accessibilité",
+              items: [
+                {
+                  type: "tile",
+                  url: "general/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
+                  crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                    origin: [2493617.3434664933, 1120234.04876646609],
+                    resolutions: [
+                      24.8222344368640009, 12.4111172184320004,
+                      6.20555860921600022, 3.10277930460800011,
+                      1.55138965230400006,
+                    ],
+                    bounds: new Bounds(
+                      [2493617.3434664933, 1120234.04876646609],
+                      [2499058.06697712326, 1116386.60242875223]
+                    ),
+                  }),
+                },
+              ],
+            },
+            {
+              name: "Facilitateurs",
+              items: [
+                {
+                  type: "heatmap",
+                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                  latitude: "latitude",
+                  longitude: "longitude",
+                },
+              ],
+            },
+            {
+              name: "Obstacles",
+              items: [
+                {
+                  type: "heatmap",
+                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                  latitude: "latitude",
+                  longitude: "longitude",
+                },
+              ],
+            },
+            {
+              name: "Rythmes et occurrences",
+            },
+            {
+              name: "Routes et chemins",
+            },
+            {
+              name: "(Des)orientations",
+            },
+            {
+              name: "Lieux impopulaires",
+            },
             {
               name: "Voix",
               items: [
@@ -554,81 +648,34 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
-          name: "Non Visual Dimensions",
+          name: "Sensibilité(s), au-delà du visuel",
         },
         {
-          name: "Memory & Plural Temporalities",
+          name: "Mémoire et temporalités plurielles",
         },
         {
-          name: "Well-Being & Risk Perception",
+          name: "Bien-être et perception des risques",
         },
         {
-          name: "Situated Practices",
+          name: "Pratiques situées",
         },
         {
-          name: "Territoriality",
+          name: "Territorialité",
         },
         {
-          name: "Political Ecologies",
-        },
-        {
-          name: "Obstacles et Facilitateurs",
-          children: [
-            {
-              name: "Obstacles",
-              items: [
-                {
-                  type: "heatmap",
-                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
-                  latitude: "latitude",
-                  longitude: "longitude",
-                },
-              ],
-            },
-            {
-              name: "Facilitateurs",
-              items: [
-                {
-                  type: "heatmap",
-                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
-                  latitude: "latitude",
-                  longitude: "longitude",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: "Carte d’accessibilité LASIG",
-          items: [
-            {
-              type: "tile",
-              url: "general/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
-              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                origin: [2493617.3434664933, 1120234.04876646609],
-                resolutions: [
-                  24.8222344368640009, 12.4111172184320004, 6.20555860921600022,
-                  3.10277930460800011, 1.55138965230400006,
-                ],
-                bounds: new Bounds(
-                  [2493617.3434664933, 1120234.04876646609],
-                  [2499058.06697712326, 1116386.60242875223]
-                ),
-              }),
-            },
-          ],
+          name: "Écologies politiques",
         },
       ],
     },
     {
       id: "environment",
-      name: "Environmental Features",
+      name: "Contextes et fonds de carte",
       description:
-        "Les supports de carte facilitent la lecture du territoire. Cependant ils tendent à figer ce même territoire en des images conventionnelles et bien souvent routières. C’est pourquoi chaque chapitre propose différentes couches de cartes à tester par vous-même. Vous trouverez dans cette section des cartes plus générales pour vous situer facilement.",
+        "Les supports de carte facilitent la lecture du territoire. Cependant ils tendent à figer ce même territoire en des images conventionnelles et bien souvent administratives ou routières. C’est pourquoi chaque chapitre propose différentes couches de cartes à tester par vous-même. <br>Vous trouverez dans cette section des cartes plus générales pour vous situer facilement.",
       active: false,
       layers: [
         {
-          name: "Fond de carte ALICE ",
+          name: "Fond de carte ALICE",
           items: [
             {
               type: "tile",
@@ -636,15 +683,6 @@ export default class Plhebicite extends Vue {
               options: {
                 tms: true,
               },
-            },
-          ],
-        },
-        {
-          name: "grid",
-          items: [
-            {
-              type: "tile",
-              url: "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
             },
           ],
         },
@@ -662,17 +700,16 @@ export default class Plhebicite extends Vue {
           items: [{ type: "tile", ...tileLayerProps.swisstopo_photo_2056 }],
         },
         {
-          name: "repère",
+          name: "Grille kilométrique",
           items: [
             {
               type: "tile",
-              url: "general/background_repere/background_repere/{z}/{x}/{y}.png",
+              url: "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
             },
           ],
-          selected: false,
         },
         {
-          name: "repère geojson",
+          name: "Repère (TODO)",
           items: [
             {
               type: "url",

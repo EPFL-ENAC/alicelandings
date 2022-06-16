@@ -5,7 +5,7 @@
       <v-tabs>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
         <v-tab to="/playground">Playground</v-tab>
-        <v-tab to="/about">About</v-tab>
+        <v-tab to="/about">Infos</v-tab>
       </v-tabs>
     </v-app-bar>
     <v-main>

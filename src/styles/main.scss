@@ -35,6 +35,10 @@ html {
   padding-right: 12px !important;
 }
 
+.theme--light.v-btn {
+  color: var(--v-primary-base);
+}
+
 /* https://www.digitalocean.com/community/tutorials/css-scrollbars */
 
 $scrollbar-color: var(--v-secondary-base);

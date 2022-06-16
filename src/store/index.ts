@@ -11,6 +11,9 @@ export default new Vuex.Store({
     toggleAppBar(state) {
       state.appBar = !state.appBar;
     },
+    openAppBar(state) {
+      state.appBar = true;
+    },
   },
   actions: {},
   modules: {},
