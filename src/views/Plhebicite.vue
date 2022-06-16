@@ -337,54 +337,102 @@ export default class Plhebicite extends Vue {
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
   ].map((filename) => this.getDataUrl(filename));
-  readonly defaultCrs = new Proj.CRS("EPSG:2056", EPSG_2056, {
-    origin: [2488232.00057888823, 1124606.73130729701],
-    resolutions: [
-      108.266889997823995, 54.1334449989119975, 27.0667224994559987,
-      13.5333612497279994, 6.76668062486399968, 3.38334031243199984,
-      1.69167015621599992,
-    ],
-    bounds: new Bounds(
-      [2488232.00057888823, 1124606.73130729701],
-      [2505232.01689624181, 1111606.66907431604]
-    ),
-  });
-  readonly getIconOptions = function (feature: Feature): IconOptions {
-    const properties = feature.properties as Record<string, string>;
-    const farAway = properties["far_away"];
-    const popupAnchor = point(186, 0);
-    switch (farAway) {
-      case "false":
-        return {
-          iconUrl: "img/legends/voices.png",
-          iconSize: [64, 64],
-          popupAnchor: popupAnchor,
-        };
-      case "in":
-        return {
-          iconUrl: "img/legends/voices-in.svg",
-          iconSize: [16, 16],
-          popupAnchor: popupAnchor,
-        };
-      case "out":
-        return {
-          iconUrl: "img/legends/voices.png",
-          iconSize: [32, 32],
-          popupAnchor: popupAnchor,
-        };
-    }
-    let size = 64;
-    if (getBooleanFromString(properties["_LOC_Far a"])) {
-      size = 32;
-    } else if (getBooleanFromString(properties["_LOC_Gener"])) {
-      size = 16;
-    }
-    return {
-      iconUrl: "img/legends/voices.png",
-      iconSize: [size, size],
-      popupAnchor: point(186, 0),
-    };
-  };
+  getInterviewChildren(id: string): Layer[] {
+    return [
+      {
+        name: "Voix",
+        items: [
+          {
+            type: "url",
+            url: `interview/voix/int_${id}_voices_callout.geojson`,
+            style:
+              "interview/voix/symbol/symbol_constellation_voices_callout.sld",
+          },
+          {
+            type: "url",
+            url: `interview/voix/int_${id}_voices_pts.geojson`,
+            popupKey: "Text Content",
+            getIconOptions: function (feature: Feature): IconOptions {
+              const properties = feature.properties as Record<string, string>;
+              const farAway = properties["far_away"];
+              const popupAnchor = point(186, 0);
+              switch (farAway) {
+                case "false":
+                  return {
+                    iconUrl: "img/legends/voices.png",
+                    iconSize: [64, 64],
+                    popupAnchor: popupAnchor,
+                  };
+                case "in":
+                  return {
+                    iconUrl: "img/legends/voices-in.svg",
+                    iconSize: [16, 16],
+                    popupAnchor: popupAnchor,
+                  };
+                case "out":
+                  return {
+                    iconUrl: "img/legends/voices.png",
+                    iconSize: [32, 32],
+                    popupAnchor: popupAnchor,
+                  };
+              }
+              let size = 64;
+              if (getBooleanFromString(properties["_LOC_Far a"])) {
+                size = 32;
+              } else if (getBooleanFromString(properties["_LOC_Gener"])) {
+                size = 16;
+              }
+              return {
+                iconUrl: "img/legends/voices.png",
+                iconSize: [size, size],
+                popupAnchor: point(186, 0),
+              };
+            },
+          },
+        ],
+      },
+      {
+        name: "Parcours",
+        items: [
+          {
+            type: "url",
+            url: `interview/parcours/int_${id}_parcours.geojson`,
+            style: true,
+          },
+        ],
+      },
+      {
+        name: "Constellation",
+        items: [
+          {
+            type: "url",
+            url: `interview/constellation/${id}/metadata.json`,
+          },
+        ],
+      },
+      {
+        name: "Horizons",
+        items: [
+          {
+            type: "tile",
+            url: `interview/horizons/int_${id}_horizons/{z}/{x}/{y}.png`,
+            crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+              origin: [2493710.47854159307, 1121568.0334584068],
+              resolutions: [
+                27.0666760742400001, 13.5333380371200001, 6.76666901856000003,
+                3.38333450928000001, 1.69166725464000001, 0.845833627320000003,
+                0.422916813660000002,
+              ],
+              bounds: new Bounds(
+                [2493710.47854159307, 1121568.0334584068],
+                [2499704.47854159633, 1115574.03345840354]
+              ),
+            }),
+          },
+        ],
+      },
+    ];
+  }
   readonly categories: Category[] = [
     {
       id: "mapping",
@@ -394,511 +442,64 @@ export default class Plhebicite extends Vue {
       active: true,
       layers: [
         {
-          name: "Constellation bilinear",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/bilinear/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation cubic",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/cubic/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation cubicspline",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/cubicspline/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation lanczos",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/lanczos/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation med",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/med/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation mode",
-          items: [
-            {
-              type: "tile",
-              url: "test/constellation/mode/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation test A",
-          items: [
-            {
-              type: "tile",
-              url: "int_01_TEST/test-A_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-          ],
-        },
-        {
-          name: "Constellation test B",
-          items: [
-            {
-              type: "tile",
-              url: "int_01_TEST/test-B_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                origin: [2492448.39314908441, 1121288.76195859746],
-                resolutions: [
-                  53.9708821009920001, 26.9854410504960001, 13.492720525248,
-                  6.74636026262400001, 3.37318013131200001, 1.686590065656,
-                  0.843295032828000002,
-                ],
-                bounds: new Bounds(
-                  [2492448.39314908441, 1121288.76195859746],
-                  [2500922.87575773103, 1114808.25045507238]
-                ),
-              }),
-            },
-          ],
-        },
-        {
-          name: "Constellation test C",
-          items: [
-            {
-              type: "tile",
-              url: "int_01_TEST/test-C_int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-              crs: this.defaultCrs,
-            },
-            {
-              type: "url",
-              url: "int_01_TEST/test-C_int_01_BAIE_CONSTELLATIONS.geojson",
-              style: true,
-            },
-          ],
-        },
-        {
-          name: "Constellation vector",
-          items: [
-            {
-              type: "url",
-              url: "int_01_TEST/01_vector_export/int_01_foret.geojson",
-              style: true,
-            },
-            {
-              type: "url",
-              url: "int_01_TEST/01_vector_export/int_01_lines.geojson",
-              style: true,
-            },
-            {
-              type: "url",
-              url: "int_01_TEST/01_vector_export/int_01_parcours.geojson",
-              style: true,
-            },
-            {
-              type: "url",
-              url: "int_01_TEST/01_vector_export/int_01_reperes.geojson",
-              style: true,
-            },
-          ],
-        },
-        {
           name: "01 La forêt tropicale",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "interview/voix/int_01_constellation_callout.geojson",
-                  style:
-                    "interview/voix/symbol/symbol_constellation_voices_callout.sld",
-                },
-                {
-                  type: "url",
-                  url: "interview/voix/int_01_constellation_voices.geojson",
-                  popupKey: "Text Conte",
-                  getIconOptions: this.getIconOptions,
-                },
-              ],
-            },
-            {
-              name: "Parcours",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/parcours/int_01_parcours/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_01_BAIE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-            {
-              name: "Horizons",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/horizons/int_01_horizons/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("01"),
         },
         {
           name: "02 Ville-dortoir",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "interview/voix/int_02_PIPELINE_VOICES.geojson",
-                  popupKey: "Text Conte",
-                  getIconOptions: this.getIconOptions,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_02_PIPELINE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("02"),
         },
         {
           name: "03 Une barrière bleue",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "interview/voix/int_03_BARRIERE_VOICES.geojson",
-                  popupKey: "Text Conte",
-                  getIconOptions: this.getIconOptions,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_03_BARRIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("03"),
         },
         {
           name: "04 Passages secrets",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "interview/voix/int_04_SECRETS_VOICES.geojson",
-                  popupKey: "Text Conte",
-                  getIconOptions: this.getIconOptions,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_04_SECRETS_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("04"),
         },
         {
           name: "05 Delta & Archipels",
-          children: [
-            {
-              name: "Voix",
-              children: [
-                {
-                  name: "callout",
-                  items: [
-                    {
-                      type: "tile",
-                      url: "int_voix_test_symboles/int_05_voices_callout/{z}/{x}/{y}.png",
-                    },
-                  ],
-                },
-                {
-                  name: "int_05_voices",
-                  items: [
-                    {
-                      type: "url",
-                      url: "int_voix_test_symboles/int_05_voices.geojson",
-                      popupKey: "Text Conte",
-                      getIconOptions: this.getIconOptions,
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              name: "Parcours",
-              items: [
-                {
-                  type: "tile",
-                  url: "INTERVIEW/05_DELTA/trajectoire/plh_interview_05_trajectoire/{z}/{x}/{y}.png",
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_05_DELTA_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("05"),
         },
         {
           name: "06 Territoires DOM-TOM",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "interview/voix/int_06_DOMTOM_VOICES.geojson",
-                  popupKey: "Text Conte",
-                  getIconOptions: this.getIconOptions,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_06_DOM_TOM_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("06"),
         },
         {
           name: "07 Jeux de pistes",
-          children: [
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_IN.geojson",
-                  style: true,
-                  popupKey: "Text Conte",
-                },
-                {
-                  type: "url",
-                  url: "INTERVIEW/07_CROISIERE/voices/07_CROISIERE_VOICES_OUT.geojson",
-                  style: true,
-                  popupKey: "Text Content",
-                },
-              ],
-            },
-            {
-              name: "Parcours",
-              items: [
-                {
-                  type: "url",
-                  url: "INTERVIEW/07_CROISIERE/trajectories/07_CROISIERE_TRAJECTORIES.geojson",
-                  style: true,
-                },
-              ],
-            },
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_07_CROISIERE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-            {
-              name: "Horizons",
-              items: [
-                {
-                  type: "tile",
-                  url: "INTERVIEW/07_CROISIERE/220324_test_07_horizons/{z}/{x}/{y}.png",
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("07"),
         },
         {
           name: "08 Au plateau des pins",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_08_GLANEUSE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("08"),
         },
         {
           name: "09 Sous les pavés, la Cité",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_09_EPINGLES_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("09"),
         },
         {
           name: "10 Le nom des rues",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_10_GIACOMETTI_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("10"),
         },
         {
           name: "11 Une histoire de cailloux",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_11_GREUBE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("11"),
         },
         {
           name: "12 L'invention d'une ritournelle",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_12_RITOURNELLE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("12"),
         },
         {
           name: "13 La campagne Naville",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_13_VUACHE_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("13"),
         },
         {
           name: "14 Le coin de terre",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_14_ETANG_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("14"),
         },
         {
           name: "15 Là où l'on revient",
-          children: [
-            {
-              name: "Constellation",
-              items: [
-                {
-                  type: "tile",
-                  url: "interview/constellation/int_15_GREBATTES_CONSTELLATIONS/{z}/{x}/{y}.png",
-                  crs: this.defaultCrs,
-                },
-              ],
-            },
-          ],
+          children: this.getInterviewChildren("15"),
         },
       ],
     },
@@ -1052,7 +653,7 @@ export default class Plhebicite extends Vue {
               url: "general/background_repere/background_repere/{z}/{x}/{y}.png",
             },
           ],
-          selected: true,
+          selected: false,
         },
         {
           name: "repère geojson",
@@ -1063,7 +664,7 @@ export default class Plhebicite extends Vue {
               style: true,
             },
           ],
-          selected: true,
+          selected: false,
         },
       ],
     },
