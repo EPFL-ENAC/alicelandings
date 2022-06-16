@@ -571,6 +571,53 @@ export default class Plhebicite extends Vue {
         {
           name: "Political Ecologies",
         },
+        {
+          name: "Obstacles et Facilitateurs",
+          children: [
+            {
+              name: "Obstacles",
+              items: [
+                {
+                  type: "heatmap",
+                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                  latitude: "latitude",
+                  longitude: "longitude",
+                },
+              ],
+            },
+            {
+              name: "Facilitateurs",
+              items: [
+                {
+                  type: "heatmap",
+                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                  latitude: "latitude",
+                  longitude: "longitude",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "Carte d’accessibilité LASIG",
+          items: [
+            {
+              type: "tile",
+              url: "general/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
+              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                origin: [2493617.3434664933, 1120234.04876646609],
+                resolutions: [
+                  24.8222344368640009, 12.4111172184320004, 6.20555860921600022,
+                  3.10277930460800011, 1.55138965230400006,
+                ],
+                bounds: new Bounds(
+                  [2493617.3434664933, 1120234.04876646609],
+                  [2499058.06697712326, 1116386.60242875223]
+                ),
+              }),
+            },
+          ],
+        },
       ],
     },
     {
@@ -581,17 +628,6 @@ export default class Plhebicite extends Vue {
       active: false,
       layers: [
         {
-          name: "heatmap",
-          items: [
-            {
-              type: "heatmap",
-              url: "geojson_obstacles_20220518_tot_sel.geojson",
-              latitude: "latitude",
-              longitude: "longitude",
-            },
-          ],
-        },
-        {
           name: "Fond de carte ALICE ",
           items: [
             {
@@ -600,26 +636,6 @@ export default class Plhebicite extends Vue {
               options: {
                 tms: true,
               },
-            },
-          ],
-        },
-        {
-          name: "Carte d’accessibilité LASIG",
-          items: [
-            {
-              type: "tile",
-              url: "20220610_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL_IMAGE/{z}/{x}/{y}.png",
-              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                origin: [2493905.19190381095, 1120306.0438000001],
-                resolutions: [
-                  22.6755088089738841, 11.3377544044869421, 5.66887720224347103,
-                  2.83443860112173551, 1.41721930056086776,
-                ],
-                bounds: new Bounds(
-                  [2493905.19190381095, 1120306.0438000001],
-                  [2498875.37999087805, 1116791.33993460913]
-                ),
-              }),
             },
           ],
         },
