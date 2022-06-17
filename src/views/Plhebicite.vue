@@ -338,6 +338,7 @@ import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Feature } from "geojson";
 import { Bounds, IconOptions, point, Proj, TileLayerOptions } from "leaflet";
+import { random } from "lodash";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -766,6 +767,12 @@ export default class Plhebicite extends Vue {
   aboutDialog = false;
 
   created(): void {
+    const layers = this.categories[0].layers;
+    const preselectedIndex = random(layers.length);
+    layers[preselectedIndex].selected = true;
+  }
+
+  mounted(): void {
     this.selectedTreeviewItems = this.categories.map((category) =>
       this.getTreeviewItems(category.layers, (layer) => !!layer.selected)
     );
