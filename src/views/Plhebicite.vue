@@ -403,6 +403,7 @@ import WebMap, {
   UrlMapItem,
 } from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
+import { HeatLayerOptions } from "@/plugins/leaflet-heat";
 import { EPSG_2056, tileLayerProps } from "@/utils/leaflet";
 import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
@@ -696,6 +697,14 @@ export default class Plhebicite extends Vue {
                   url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
                   latitude: "latitude",
                   longitude: "longitude",
+                  options: {
+                    gradient: {
+                      0.2: "blue",
+                      0.4: "purple",
+                      0.6: "orange",
+                      1: "red",
+                    },
+                  },
                 },
                 {
                   type: "url",
@@ -942,7 +951,8 @@ export default class Plhebicite extends Vue {
           new HeatmapMapItem(
             layerItem.url,
             layerItem.latitude,
-            layerItem.longitude
+            layerItem.longitude,
+            layerItem.options
           ),
         ];
       default:
@@ -1023,6 +1033,7 @@ interface HeatmapLayerItem {
   url: string;
   latitude?: string;
   longitude?: string;
+  options?: HeatLayerOptions;
 }
 </script>
 

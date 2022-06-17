@@ -34,6 +34,7 @@
 </template>
 
 <script lang="ts">
+import { HeatLayerOptions } from "@/plugins/leaflet-heat";
 import {
   EPSG_2056,
   EPSG_21781,
@@ -513,8 +514,9 @@ export class RasterTileMapItem extends UrlMapItem {
 export class HeatmapMapItem extends UrlMapItem {
   constructor(
     geojsonUrl: string,
-    public latitude = "lat",
-    public longitude = "lng"
+    private latitude = "lat",
+    private longitude = "lng",
+    private options?: HeatLayerOptions
   ) {
     super(geojsonUrl);
   }
@@ -534,7 +536,7 @@ export class HeatmapMapItem extends UrlMapItem {
       .filter((point) => point !== undefined);
     // https://github.com/Leaflet/Leaflet.heat
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (L as any).heatLayer(points);
+    return (L as any).heatLayer(points, this.options);
   }
 }
 
