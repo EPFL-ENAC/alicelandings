@@ -480,7 +480,7 @@ export default class Plhebicite extends Vue {
               return {
                 iconUrl: "img/legends/voices.png",
                 iconSize: [size, size],
-                popupAnchor: point(186, 0),
+                popupAnchor: popupAnchor,
               };
             },
           },
@@ -675,6 +675,17 @@ export default class Plhebicite extends Vue {
                   latitude: "latitude",
                   longitude: "longitude",
                 },
+                {
+                  type: "url",
+                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                  popupKey: "De quoi s'agit-il?",
+                  getIconOptions: function (): IconOptions {
+                    return {
+                      iconUrl: "img/legends/blank.svg",
+                      iconSize: [16, 16],
+                    };
+                  },
+                },
               ],
             },
             {
@@ -685,6 +696,17 @@ export default class Plhebicite extends Vue {
                   url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
                   latitude: "latitude",
                   longitude: "longitude",
+                },
+                {
+                  type: "url",
+                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                  popupKey: "De quoi s'agit-il?",
+                  getIconOptions: function (): IconOptions {
+                    return {
+                      iconUrl: "img/legends/blank.svg",
+                      iconSize: [16, 16],
+                    };
+                  },
                 },
               ],
             },
