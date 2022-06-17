@@ -342,6 +342,9 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
       if (property) {
         const color = getText("./se:Fill/se:SvgParameter", textSymbolizerNode);
         const font = getObject("./se:Font/se:SvgParameter", textSymbolizerNode);
+        if (font["font-size"] !== undefined) {
+          font["font-size"] = font["font-size"] + "px";
+        }
         const style: Record<string, string | undefined> = {
           color: color,
           ...font,
