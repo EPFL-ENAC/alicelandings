@@ -12,6 +12,12 @@ html {
   padding-left: 0px;
 }
 
+.btn-left {
+  > .v-btn__content {
+    justify-content: start;
+  }
+}
+
 .btn-right {
   > .v-btn__content {
     justify-content: end;

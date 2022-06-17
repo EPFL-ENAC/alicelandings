@@ -58,20 +58,96 @@
           </v-list>
         </div>
         <v-divider></v-divider>
-        <v-dialog v-model="aboutDialog" width="1024">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              class="flex-grow-0 about-btn btn-right"
-              text
-              v-on="on"
-            >
-              A Propos
-            </v-btn>
-          </template>
-          <v-card class="text-justify">
-            <v-card-title>A Propos</v-card-title>
-            <v-card-text>
+        <div class="d-flex">
+          <simple-dialog class="flex-even" name="Infos">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" class="flex-even btn-left" text v-on="on">
+                Infos
+              </v-btn>
+            </template>
+            <template v-slot>
+              <h4>Le projet Plhebicite</h4>
+              <p>
+                Ce projet, fruit d'une collaboration entre ALICE (Atelier de la
+                Conception de l'Espace) et LASIG (Laboratoire des Systèmes
+                d'Information Géographique), aborde le changement climatique
+                sous l'angle de l'infrastructure paysagère en tant que solution
+                basée sur la nature capable de relier la connectivité urbaine,
+                la mobilité active et la santé et le bien-être psychophysiques.
+                Le paysage urbain joue un rôle infrastructurel clé, en soutenant
+                et en rendant possibles différentes pratiques et comportements,
+                et peut donc être instrumentalisé pour aborder l'interrelation
+                complexe entre espace, mobilité et santé dans la ville
+                contemporaine. Ce rôle est étudié en combinant l'approche de
+                LASIG sur les systèmes d'information géographique et la
+                modélisation territoriale avec l'approche sensible d'ALICE sur
+                l'espace urbain, l'infrastructure paysagère et les pratiques de
+                mobilité, et appliqué à la commune de Vernier (GE).
+                <a
+                  href="https://www.epfl.ch/schools/enac/les-defis-du-developpement-durable/clusters-fr/enac-interdisciplinary-cluster-grants-fr/enac-cluster-grants-selected-projects-2020/planning-for-healthier-and-biodiverse-cities-%e2%80%a8linking-neighbourhoods-through-active-mobility-and-landscape-infrastructure/"
+                  target="_blank"
+                >
+                  Link
+                </a>
+              </p>
+              <h4>Partenaires</h4>
+              <p>
+                Commune de Vernier<br />
+                Canton de Genève <br />
+                Hélène Mariéthoz<br />
+                <a
+                  href="https://www.epfl.ch/schools/enac/about/data-at-enac/enac-it4research/"
+                  target="_blank"
+                >
+                  ENAC-IT4R
+                </a>
+              </p>
+              <h4>Remerciements</h4>
+              <p>
+                Nous remercions les nombreuses personnes qui nous ont aidé dans
+                la recherche et qui ont participé au projet. En particuliers les
+                habitant.e.s nous ayant guidé à travers la commune durant les
+                entretiens en marchant. Nous remercions également le service de
+                la cohésion sociale, les contrats de quartiers, les personnes
+                rencontrées dans des associations ou dans les différents
+                quartiers, le service de la culture et communication, le service
+                de l’aménagement.
+              </p>
+              <h4>Equipe</h4>
+              <p>
+                Lucía Jalón Oyarzun (ALICE)<br />
+                Marco Vieira Ruas (LASIG)<br />
+                Emmanuelle Agustoni (ALICE)<br />
+                Aurèle Pulfer (ALICE)<br />
+                Charlotte Weil (ENAC-IT4R)<br />
+                David Tang (ENAC-IT4R)
+              </p>
+              <h4>Contact</h4>
+              <p>
+                N’hésitez-pas à nous contacter pour toute question ou remarque
+                concernant le projet et pour nous faire part de vos idées !
+                <br />
+                Nous serons heureux.ses de vous répondre par email ou téléphone.
+              </p>
+              <p>
+                <a href="mailto:lucia.jalonoyarzun@epfl.ch">Lucía</a>,
+                <a href="mailto:marco.vieiraruas@epfl.ch">Marco</a> and
+                <a href="mailto:emmanuelle.agustoni@epfl.ch">Emmanuelle</a>
+                <br />
+                ALICE Administration /
+                <a href="mailto:jaime.ruiz@epfl.ch">Jaime Ruiz</a> /
+                <a href="tel:+41216933203">+41 21 693 32 03</a>
+              </p>
+            </template>
+          </simple-dialog>
+          <v-divider vertical></v-divider>
+          <simple-dialog class="flex-even" name="A Propos">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" class="flex-even btn-right" text v-on="on">
+                A Propos
+              </v-btn>
+            </template>
+            <template v-slot>
               <h4>Le projet</h4>
               <p>
                 Pour relever les défis posés par le changement climatique dans
@@ -159,14 +235,9 @@
                 quartiers, le service de la culture et communication, le service
                 de l’aménagement.
               </p>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-              <v-btn icon @click="aboutDialog = false">
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+            </template>
+          </simple-dialog>
+        </div>
       </div>
       <v-divider vertical></v-divider>
       <div class="flex-grow-1 d-flex flex-column">
@@ -323,6 +394,7 @@
 
 <script lang="ts">
 import ColorBox from "@/components/ColorBox.vue";
+import SimpleDialog from "@/components/SimpleDialog.vue";
 import WebMap, {
   HeatmapMapItem,
   MapGroupItem,
@@ -345,6 +417,7 @@ import { mapMutations } from "vuex";
 @Component({
   components: {
     ColorBox,
+    SimpleDialog,
     WebMap,
   },
   methods: {
@@ -764,11 +837,10 @@ export default class Plhebicite extends Vue {
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
   selectedCategoryId: CategoryId = "mapping";
-  aboutDialog = false;
 
   created(): void {
     const layers = this.categories[0].layers;
-    const preselectedIndex = random(layers.length);
+    const preselectedIndex = random(layers.length - 1);
     layers[preselectedIndex].selected = true;
   }
 
