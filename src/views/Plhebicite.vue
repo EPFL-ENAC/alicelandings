@@ -2,10 +2,10 @@
   <div class="d-flex flex-column full-height text-justify">
     <div class="d-flex flex-row align-center ma-3">
       <div class="flex-grow-1">
-        <h1>An Atlas of Vernier Mobility Landscapes</h1>
+        <h1>Un atlas des paysages de mobilité à Vernier</h1>
         <span class="text-subtitle-1">
-          Un atlas des paysages de mobilité à vernier. Vers une lecture
-          affective de l’espace de la Commune de Vernier, Genève
+          Vers une lecture affective de l’espace de la Commune de Vernier,
+          Genève
         </span>
       </div>
       <a href="https://epfl.ch" target="_blank">
@@ -66,7 +66,7 @@
               text
               v-on="on"
             >
-              <h4>A Propos</h4>
+              A Propos
             </v-btn>
           </template>
           <v-card class="text-justify">
@@ -382,19 +382,19 @@ export default class Plhebicite extends Vue {
                 case "false":
                   return {
                     iconUrl: "img/legends/voices.png",
-                    iconSize: [64, 64],
+                    iconSize: [50, 50],
                     popupAnchor: popupAnchor,
                   };
                 case "in":
                   return {
                     iconUrl: "img/legends/voices-in.svg",
-                    iconSize: [16, 16],
+                    iconSize: [20, 20],
                     popupAnchor: popupAnchor,
                   };
                 case "out":
                   return {
                     iconUrl: "img/legends/voices.png",
-                    iconSize: [32, 32],
+                    iconSize: [25, 25],
                     popupAnchor: popupAnchor,
                   };
               }
@@ -536,19 +536,30 @@ export default class Plhebicite extends Vue {
           name: "Attachement au lieu et étendue spatiale",
           children: [
             {
-              name: "Attachement",
+              name: "Voix",
+              children: [
+                {
+                  name: "Attachement",
+                },
+                {
+                  name: "Lieux familiers (et affectionnés)",
+                },
+                {
+                  name: "Spatialités étendues",
+                },
+                {
+                  name: "Toponymes",
+                },
+                {
+                  name: "Voisinage",
+                },
+              ],
             },
             {
-              name: "Lieux familiers (et affectionnés)",
+              name: "Figures",
             },
             {
-              name: "Spatialités étendues",
-            },
-            {
-              name: "Toponymes",
-            },
-            {
-              name: "Voisinage",
+              name: "Cadre",
             },
           ],
         },

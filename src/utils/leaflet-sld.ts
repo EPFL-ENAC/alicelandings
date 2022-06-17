@@ -292,7 +292,7 @@ function castValue(key: keyof PathOptions, value?: string): unknown {
     case "dashArray":
       return value.split(" ").map((item) => Number(item));
     case "weight":
-      return Number(value) / 2.5;
+      return Number(value) / 3.5;
     default:
       return value;
   }
