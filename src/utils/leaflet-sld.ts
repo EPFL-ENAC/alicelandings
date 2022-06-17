@@ -9,6 +9,7 @@ import L, {
   PathOptions,
   Pattern,
   PatternCircle,
+  StripePattern,
   StyleFunction,
 } from "leaflet";
 import "leaflet.pattern";
@@ -234,8 +235,25 @@ function getPathOptions(ruleNode: Node): {
           pattern: pattern,
         };
       }
+      case "horline": {
+        const color = getText(
+          "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke']",
+          graphicNode
+        );
+        const pattern = new StripePattern({
+          color: color,
+          angle: -45,
+        });
+        return {
+          pathOptions: {
+            fillPattern: pattern,
+            stroke: false,
+          },
+          pattern: pattern,
+        };
+      }
       default:
-        throw Error(`Unknown WellKnownName ${wellKnownName}`);
+        throw Error(`Unknown pattern WellKnownName ${wellKnownName}`);
     }
   } else {
     return {
