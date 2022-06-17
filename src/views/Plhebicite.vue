@@ -353,7 +353,7 @@ import { mapMutations } from "vuex";
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
-  readonly minZoom = 21;
+  readonly minZoom = 20;
   readonly maxZoom = 25;
   readonly dems: string[] = [
     "04_DELTA_dem_tampon_1500.tif",
