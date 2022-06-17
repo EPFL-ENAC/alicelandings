@@ -274,6 +274,18 @@ function getSvgParameterPathOptions(
   return pathOptions;
 }
 
+function getObject(expression: string, node: Node): Record<string, string> {
+  return Object.fromEntries(
+    (select(expression, node) as Element[])
+      .map((element) => {
+        const name = element.getAttribute("name");
+        const value = element.firstChild?.nodeValue;
+        return [name, value];
+      })
+      .filter(([key, value]) => key != null && value != null)
+  );
+}
+
 type PointToLayer = (geoJsonPoint: Feature<Point>, latlng: LatLng) => Layer;
 
 function ratio(value?: number, ratio = 1 / 2.5): number | undefined {
@@ -328,12 +340,29 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
         textSymbolizerNode
       );
       if (property) {
+        const color = getText("./se:Fill/se:SvgParameter", textSymbolizerNode);
+        const font = getObject("./se:Font/se:SvgParameter", textSymbolizerNode);
+        const style: Record<string, string | undefined> = {
+          color: color,
+          ...font,
+        };
+        const styleText = Object.entries(style)
+          .filter(([, value]) => value !== undefined)
+          .map(([key, value]) => `${key}:${value};`)
+          .join("");
         return (geoJsonPoint, latlng) => {
           const properties = geoJsonPoint.properties;
           if (properties) {
-            return marker(latlng).bindTooltip(properties[property], {
-              permanent: true,
-            });
+            const text: string = properties[property];
+            return marker(latlng, { opacity: 0 }).bindTooltip(
+              `<div style='${styleText}'>${text}</div>`,
+              {
+                className: "text-point-tooltip",
+                direction: "center",
+                permanent: true,
+                offset: [-16, 16],
+              }
+            );
           } else {
             return marker(latlng);
           }
