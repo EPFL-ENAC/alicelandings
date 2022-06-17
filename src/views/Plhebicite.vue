@@ -140,7 +140,6 @@
               </p>
             </template>
           </simple-dialog>
-          <v-divider vertical></v-divider>
           <simple-dialog class="flex-even" name="A Propos">
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-right" text v-on="on">
