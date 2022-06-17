@@ -212,19 +212,36 @@ function getPathOptions(ruleNode: Node): {
     const wellKnownName = getText("./se:Mark/se:WellKnownName", graphicNode);
     switch (wellKnownName) {
       case "circle": {
-        const size = getNumber("./se:Size", graphicNode);
-        const color = getText(
+        const size = getNumber("./se:Size", graphicNode) ?? 1;
+        const fillColor = getText(
           "./se:Mark/se:Fill/se:SvgParameter[@name='fill']",
           graphicNode
         );
+        const color = getText(
+          "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke']",
+          graphicNode
+        );
+        const weight = getNumber(
+          "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke-width']",
+          graphicNode
+        );
+        const roundSize = size / 1.5;
+        const roundDistance = 1;
+        const circleOffset = roundSize + 2;
         const shape = new PatternCircle({
-          radius: size,
+          x: circleOffset,
+          y: circleOffset,
+          radius: roundSize,
           color: color,
-          fillColor: color,
+          fill: true,
+          fillColor: fillColor,
+          fillOpacity: 1,
+          weight: weight,
         });
+        const patternSize = (roundSize + roundDistance) * 2;
         const pattern = new Pattern({
-          width: size,
-          height: size,
+          width: patternSize,
+          height: patternSize,
         });
         pattern.addShape(shape);
         return {
@@ -240,9 +257,15 @@ function getPathOptions(ruleNode: Node): {
           "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke']",
           graphicNode
         );
+        const rotation = getNumber("./se:Rotation/ogc:Literal", graphicNode);
+        const weight = getNumber(
+          "./se:Mark/se:Stroke/se:SvgParameter[@name='stroke-width']",
+          graphicNode
+        );
         const pattern = new StripePattern({
+          angle: ratio(rotation, -1),
           color: color,
-          angle: -45,
+          weight: ratio(weight, 1 / 4),
         });
         return {
           pathOptions: {
