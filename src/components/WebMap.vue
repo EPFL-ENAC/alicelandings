@@ -294,7 +294,7 @@ export interface MapGroupItem {
 
 interface MapItemOption {
   color?: Color;
-  popupKey?: string;
+  popup?: string | ((properties: Record<string, string>) => string | undefined);
   styleUrl?: string;
   getIconOptions?: (feature: Feature) => IconOptions;
 }
@@ -306,8 +306,11 @@ export abstract class MapItem {
     return this.option?.color;
   }
 
-  get popupKey(): string | undefined {
-    return this.option?.popupKey;
+  get popup():
+    | string
+    | ((properties: Record<string, string>) => string | undefined)
+    | undefined {
+    return this.option?.popup;
   }
 
   get getIconOptions(): ((feature: Feature) => IconOptions) | undefined {
@@ -336,15 +339,18 @@ export abstract class MapItem {
   private async getGeoJsonLayer(
     json: Proj4GeoJSONFeature
   ): Promise<LeafletLayer> {
-    const popupKey = this.popupKey;
+    const popup = this.popup;
     const styleText: string | undefined = await this.style();
     const { style, onAdd, onRemove } = getStyle(styleText);
     const getIconOptions = this.getIconOptions;
     const geoJson = Proj.geoJson(json, {
-      onEachFeature: popupKey
+      onEachFeature: popup
         ? (feature, l) => {
             if (feature.properties) {
-              const property: string | undefined = feature.properties[popupKey];
+              const property: string | undefined =
+                typeof popup === "string"
+                  ? feature.properties[popup]
+                  : popup(feature.properties);
               if (property) {
                 l.bindPopup(property.replaceAll("\n", "<br>"));
                 l.on("mouseover", () => l.openPopup());

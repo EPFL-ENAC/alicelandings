@@ -447,7 +447,7 @@ export default class Plhebicite extends Vue {
           {
             type: "url",
             url: `interview/voix/int_${id}_voices_pts.geojson`,
-            popupKey: "Text Content",
+            popup: "Text Content",
             getIconOptions: function (feature: Feature): IconOptions {
               const properties = feature.properties as Record<string, string>;
               const farAway = properties["far_away"];
@@ -679,7 +679,14 @@ export default class Plhebicite extends Vue {
                 {
                   type: "url",
                   url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
-                  popupKey: "De quoi s'agit-il?",
+                  popup: function (
+                    properties: Record<string, string>
+                  ): string | undefined {
+                    return `De quoi s'agit-il?
+                    ${properties["De quoi s'agit-il?"]}
+                    En quoi aide-t-il à la mobilité?
+                    ${properties["En quoi aide-t-il à la mobilité?"]}`;
+                  },
                   getIconOptions: function (): IconOptions {
                     return {
                       iconUrl: "img/legends/blank.svg",
@@ -709,7 +716,14 @@ export default class Plhebicite extends Vue {
                 {
                   type: "url",
                   url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
-                  popupKey: "De quoi s'agit-il?",
+                  popup: function (
+                    properties: Record<string, string>
+                  ): string | undefined {
+                    return `De quoi s'agit-il?
+                    ${properties["De quoi s'agit-il?"]}
+                    En quoi aide-t-il à la mobilité?
+                    ${properties["En quoi fait-il obstacle à la mobilité ?"]}`;
+                  },
                   getIconOptions: function (): IconOptions {
                     return {
                       iconUrl: "img/legends/blank.svg",
@@ -738,7 +752,7 @@ export default class Plhebicite extends Vue {
                   type: "url",
                   url: "atlas/voix/atlas_voices_mobility_experiences.geojson",
                   style: true,
-                  popupKey: "Text Content",
+                  popup: "Text Content",
                 },
               ],
             },
@@ -927,7 +941,7 @@ export default class Plhebicite extends Vue {
           return [
             new UrlMapItem(layerItem.url, {
               styleUrl: styleUrl,
-              popupKey: layerItem.popupKey,
+              popup: layerItem.popup,
               getIconOptions: layerItem.getIconOptions,
             }),
           ];
@@ -1018,7 +1032,7 @@ type LayerItem = UrlLayerItem | TileLayerItem | HeatmapLayerItem;
 interface UrlLayerItem {
   type: "url";
   url: string;
-  popupKey?: string;
+  popup?: string | ((properties: Record<string, string>) => string | undefined);
   style?: boolean | string;
   getIconOptions?: (feature: Feature) => IconOptions;
 }
