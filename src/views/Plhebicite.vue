@@ -433,17 +433,21 @@ export default class Plhebicite extends Vue {
     "04_DELTA_dem_tampon_1500.tif",
     "07_MD_dem_tampon_1500.tif",
   ].map((filename) => this.getDataUrl(filename));
-  getInterviewChildren(id: string): Layer[] {
+  getInterviewChildren(id: string, voiceCallout = true): Layer[] {
     return [
       {
         name: "Voix",
         items: [
-          {
-            type: "url",
-            url: `interview/voix/int_${id}_voices_callout.geojson`,
-            style:
-              "interview/voix/symbol/symbol_constellation_voices_callout.sld",
-          },
+          ...(voiceCallout
+            ? [
+                {
+                  type: "url",
+                  url: `interview/voix/int_${id}_voices_callout.geojson`,
+                  style:
+                    "interview/voix/symbol/symbol_constellation_voices_callout.sld",
+                } as LayerItem,
+              ]
+            : []),
           {
             type: "url",
             url: `interview/voix/int_${id}_voices_pts.geojson`,
@@ -571,7 +575,7 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "09 Sous les pavés, la Cité",
-          children: this.getInterviewChildren("09"),
+          children: this.getInterviewChildren("09", false),
         },
         {
           name: "10 Le nom des rues",
@@ -583,7 +587,7 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "12 L'invention d'une ritournelle",
-          children: this.getInterviewChildren("12"),
+          children: this.getInterviewChildren("12", false),
         },
         {
           name: "13 La campagne Naville",
