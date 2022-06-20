@@ -24,5 +24,8 @@ deploy-prod:
 upload-data:
 	rsync -av --delete ./public/data/ root@enacvm0080.xaas.epfl.ch:/opt/plhebicite-webmap/public/data/
 
+UID := $(shell id -u)
+GID := $(shell id -g)
+
 process-data:
-	cd data; docker-compose up --build
+	cd data; OWNER="${UID}.${GID}" docker-compose up --build

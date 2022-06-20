@@ -31,3 +31,7 @@ for file in $(find $RAW_ROOT -name "*.pgw"); do
     end_time=$(date +%s)
     echo "execution time was $(expr $end_time - $start_time) s."
 done
+
+if [ ! -z "${OWNER}" ]; then
+    chown -R ${OWNER} ${OUT_ROOT}
+fi

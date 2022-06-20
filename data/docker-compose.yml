@@ -1,6 +1,8 @@
 services:
   processor:
     build: ./
+    environment:
+      - OWNER
     volumes:
       - ../../alicelandings-data/raw:/opt/raw:ro
       - ../../alicelandings-data/out:/opt/out:rw
