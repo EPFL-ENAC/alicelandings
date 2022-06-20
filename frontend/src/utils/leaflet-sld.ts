@@ -13,6 +13,7 @@ import L, {
   StyleFunction,
 } from "leaflet";
 import "leaflet.pattern";
+import { round } from "lodash";
 import "proj4leaflet";
 import { colors } from "vuetify/lib";
 import { DOMParser } from "xmldom";
@@ -384,7 +385,7 @@ export function getPointToLayer(style?: string): PointToLayer | undefined {
         const color = getText("./se:Fill/se:SvgParameter", textSymbolizerNode);
         const font = getObject("./se:Font/se:SvgParameter", textSymbolizerNode);
         if (font["font-size"] !== undefined) {
-          font["font-size"] = font["font-size"] + "px";
+          font["font-size"] = `${round(Number(font["font-size"]) * 0.8)}px`;
         }
         const style: Record<string, string | undefined> = {
           color: color,

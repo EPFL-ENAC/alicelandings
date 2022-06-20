@@ -428,7 +428,7 @@ export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
   readonly center = [46.2107, 6.0946];
   readonly minZoom = 20;
-  readonly maxZoom = 25;
+  readonly maxZoom = 26;
   readonly dems: string[] = [
     "general/dem_altitude/swisssurface3d-raster_2019_merged.tif",
   ].map((filename) => this.getDataUrl(filename));
@@ -459,7 +459,7 @@ export default class Plhebicite extends Vue {
                 case "false":
                   return {
                     iconUrl: "img/legends/voices.png",
-                    iconSize: [50, 50],
+                    iconSize: [40, 40],
                     popupAnchor: popupAnchor,
                   };
                 case "in":
@@ -471,7 +471,7 @@ export default class Plhebicite extends Vue {
                 case "out":
                   return {
                     iconUrl: "img/legends/voices.png",
-                    iconSize: [25, 25],
+                    iconSize: [20, 20],
                     popupAnchor: popupAnchor,
                   };
               }
