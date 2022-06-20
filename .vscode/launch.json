@@ -10,7 +10,7 @@
       "request": "launch",
       "name": "vuejs: chrome",
       "url": "http://localhost:8080",
-      "webRoot": "${workspaceFolder}",
+      "webRoot": "${workspaceFolder}/frontend",
       "breakOnLoad": true,
       "preLaunchTask": "serve",
       "sourceMapPathOverrides": {
@@ -19,7 +19,7 @@
         "/src/*": "${webRoot}/*",
         "/*": "*",
         "/./~/*": "${webRoot}/node_modules/*"
-      },
+      }
     }
   ]
 }

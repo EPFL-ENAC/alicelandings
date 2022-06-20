@@ -21,7 +21,7 @@ services:
       - ./traefik.yaml:/configuration/traefik.yml
       - /etc/ssl:/etc/ssl
   frontend:
-    build: ./
+    build: ./frontend
     labels:
       - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"

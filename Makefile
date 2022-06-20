@@ -1,15 +1,14 @@
 install:
-	npm install
+	$(MAKE) -C frontend install
 
 run:
-	npm run serve
+	$(MAKE) -C frontend run
 
 test:
-	npm run test:unit
+	$(MAKE) -C frontend test
 
 lint:
-	npm run lint
-
+	$(MAKE) -C frontend lint
 
 deploy:
 	docker-compose build --parallel --pull
