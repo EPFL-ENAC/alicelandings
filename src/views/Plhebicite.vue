@@ -682,9 +682,10 @@ export default class Plhebicite extends Vue {
                   popup: function (
                     properties: Record<string, string>
                   ): string | undefined {
-                    return `De quoi s'agit-il?
+                    return `<b>De quoi s'agit-il?</b>
                     ${properties["De quoi s'agit-il?"]}
-                    En quoi aide-t-il à la mobilité?
+
+                    <b>En quoi aide-t-il à la mobilité?</b>
                     ${properties["En quoi aide-t-il à la mobilité?"]}`;
                   },
                   getIconOptions: function (): IconOptions {
@@ -719,9 +720,10 @@ export default class Plhebicite extends Vue {
                   popup: function (
                     properties: Record<string, string>
                   ): string | undefined {
-                    return `De quoi s'agit-il?
+                    return `<b>De quoi s'agit-il?</b>
                     ${properties["De quoi s'agit-il?"]}
-                    En quoi aide-t-il à la mobilité?
+
+                    <b>En quoi aide-t-il à la mobilité?</b>
                     ${properties["En quoi fait-il obstacle à la mobilité ?"]}`;
                   },
                   getIconOptions: function (): IconOptions {
