@@ -430,8 +430,7 @@ export default class Plhebicite extends Vue {
   readonly minZoom = 20;
   readonly maxZoom = 25;
   readonly dems: string[] = [
-    "04_DELTA_dem_tampon_1500.tif",
-    "07_MD_dem_tampon_1500.tif",
+    "general/dem_altitude/swisssurface3d-raster_2019_merged.tif",
   ].map((filename) => this.getDataUrl(filename));
   getInterviewChildren(id: string, voiceCallout = true): Layer[] {
     return [
@@ -655,7 +654,7 @@ export default class Plhebicite extends Vue {
               items: [
                 {
                   type: "tile",
-                  url: "general/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
+                  url: "atlas/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
                   crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
                     origin: [2493617.3434664933, 1120234.04876646609],
                     resolutions: [
@@ -676,13 +675,13 @@ export default class Plhebicite extends Vue {
               items: [
                 {
                   type: "heatmap",
-                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                  url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
                   latitude: "latitude",
                   longitude: "longitude",
                 },
                 {
                   type: "url",
-                  url: "general/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                  url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
                   popup: function (
                     properties: Record<string, string>
                   ): string | undefined {
@@ -706,7 +705,7 @@ export default class Plhebicite extends Vue {
               items: [
                 {
                   type: "heatmap",
-                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                  url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
                   latitude: "latitude",
                   longitude: "longitude",
                   options: {
@@ -720,7 +719,7 @@ export default class Plhebicite extends Vue {
                 },
                 {
                   type: "url",
-                  url: "general/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                  url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
                   popup: function (
                     properties: Record<string, string>
                   ): string | undefined {
@@ -750,35 +749,6 @@ export default class Plhebicite extends Vue {
             },
             {
               name: "Lieux impopulaires",
-            },
-            {
-              name: "Voix",
-              items: [
-                {
-                  type: "url",
-                  url: "atlas/voix/atlas_voices_mobility_experiences.geojson",
-                  style: true,
-                  popup: "Text Content",
-                },
-              ],
-            },
-            {
-              name: "Cadre",
-              items: [
-                {
-                  type: "tile",
-                  url: "ATLAS/mobility/cadre/plh_atlas_mobility_cadre/{z}/{x}/{y}.png",
-                },
-              ],
-            },
-            {
-              name: "Overlay",
-              items: [
-                {
-                  type: "tile",
-                  url: "ATLAS/mobility/overlay/plh_atlas_mobility_overlay/{z}/{x}/{y}.png",
-                },
-              ],
             },
           ],
         },
@@ -814,10 +784,19 @@ export default class Plhebicite extends Vue {
           items: [
             {
               type: "tile",
-              url: "general/basemap/{z}/{x}/{y}.png",
-              options: {
-                tms: true,
-              },
+              url: "general/basemap/general_basemap/{z}/{x}/{y}.png",
+              crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                origin: [2491284.60725472914, 1123583.6651326362],
+                resolutions: [
+                  54.1325883203840021, 27.0662941601920011, 13.5331470800960005,
+                  6.76657354004800027, 3.38328677002400013, 1.69164338501200007,
+                  0.845821692506000034,
+                ],
+                bounds: new Bounds(
+                  [2491284.60725472914, 1123583.6651326362],
+                  [2501274.60726491734, 1113593.66512244777]
+                ),
+              }),
             },
           ],
         },
@@ -838,21 +817,22 @@ export default class Plhebicite extends Vue {
           name: "Grille kilométrique",
           items: [
             {
-              type: "tile",
-              url: "general/grid_swisstopo/grid_swisstopo/{z}/{x}/{y}.png",
+              type: "url",
+              url: "general/grid/general_grid_km.geojson",
+              style: true,
             },
           ],
         },
         {
-          name: "Repère (TODO)",
+          name: "Repère",
           items: [
             {
               type: "url",
-              url: "general/repere/GEOJSON/background_repere.geojson",
+              url: "general/repere/general_background_repere.geojson",
               style: true,
             },
           ],
-          selected: false,
+          selected: true,
         },
       ],
     },
