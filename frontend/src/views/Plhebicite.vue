@@ -45,13 +45,14 @@
               <v-treeview
                 v-model="selectedTreeviewItems[index]"
                 dense
-                :items="getTreeviewItems(item.layers)"
+                :items="getTreeviewItems(item.layers, item.id)"
                 off-icon="mdi-square-outline"
                 on-icon="mdi-square"
                 indeterminate-icon="mdi-square"
                 return-object
                 selectable
                 selected-color="secondary"
+                @input="clickLayer"
               >
               </v-treeview>
             </v-list-group>
@@ -350,38 +351,347 @@
                 </p>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
-                <h4>Description du cadre</h4>
-                <p>
-                  Réseau piéton de la commune de Vernier et dessin de la
-                  signalétique au sol (bus, piéton, vélo, TIM) révélant les
-                  relations et conflits entre les différents moyens de transport
-                  ainsi que leurs chorégraphies communes.
-                </p>
-                <p>Sources : Openstreemap / SITG</p>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Attachement au lieu et étendue spatiale'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    L'attachement affectif au territoire qui nous entoure
+                    soutient et définit notre vie quotidienne. Les activités,
+                    les relations et les expériences y sont ancrées, de même que
+                    notre capacité à nous relier aux expériences passées et à
+                    nous projeter, individuellement et collectivement, dans
+                    l'avenir. Il est également à l'origine de pratiques de
+                    respect de l'environnement et soins sociétaux essentiels à
+                    la transition écologique. Cependant, cette spatialité
+                    affective est difficile à définir par une simple ligne. Où
+                    commence et s’arrête l’espace du quotidien ? Et nos affects
+                    ? Le sentiment d’attachement à un lieu s’exprime au travers
+                    de la proximité usagère, affective ou symbolique aux objets
+                    architecturaux, au patrimoine naturel, aux noms donnés aux
+                    lieux ou aux pratiques sociales partagées.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>Carte des toponymes superposés</p>
+                  <ul>
+                    <li>Communes et quartiers</li>
+                    <li>Arrêts de bus</li>
+                    <li>Cours d’eau</li>
+                    <li>Lieux-dits datant de 1828, Plan Edmond Pictet</li>
+                  </ul>
+                  <br />
+                  <p class="text-caption">
+                    Souces : Swisstopo / SITG / Livre Profil de Vernier, Pierre
+                    Pittard, 1975
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Identité de la commune'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Est-ce qu’il y a une identité verniolane ? Cette collection
+                    révèle les identités multiples se déployant à Vernier, de
+                    l’échelle communale (les éléments représentatifs d'une
+                    identité propre à la commune, son paysage culturel et
+                    symbolique) jusqu’à l'échelle des quartiers et des
+                    expériences quotidiennes (les signes et repères importants
+                    marquant certaines expériences partagées et parcours
+                    habituels).
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>
+                    Inventaire des objets principaux du patrimoine culturel,
+                    architectural et bâti selon les sources SITG et les archives
+                    de la commune.
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Imaginaires et savoirs oraux'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    L’expérience d’un territoire passe par des canaux
+                    immatériels qui se transmettent et se déplacent de corps à
+                    corps à l’intérieur de la commune. Cette série s’articule
+                    autour des récits collectifs, des interrogations et
+                    spéculations individuelles collectés durant les entretiens.
+                    La circulation de savoirs oraux et la construction d’un
+                    imaginaire commun sont des moyens d’extraire les
+                    connaissances d’un territoire vécu et de redonner la parole
+                    aux savoirs locaux.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>
+                    Cette carte transpose la matière brute de fragments
+                    d’entretiens là où ils ont été évoqués.
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Expériences de mobilité'
+                    )
+                  "
+                >
+                  <template
+                    v-if="
+                      lastSelectedLayerId.startsWith(
+                        'atlas/Expériences de mobilité/Accessibilité'
+                      )
+                    "
+                  >
+                    <h4>Légende</h4>
+                    <p>
+                      <span
+                        v-for="item in lasiglegendItems"
+                        :key="item.color"
+                        style="display: block"
+                      >
+                        <color-box :color="item.color"></color-box>
+                        {{ item.text }}
+                      </span>
+                    </p>
+                    <p>
+                      Un carré vert montre que la zone favorise le déplacement à
+                      pied. A l’inverse un carré rouge montre qu’il est
+                      difficile de circuler à pied.
+                    </p>
+                    <p>
+                      Quelques paramètres de l’index : largeur des trottoirs,
+                      continuité des trottoirs, bruit routier, degré de
+                      connectivité au réseau, densité de chemins parcourables à
+                      pied, distance à un espace vert...
+                    </p>
+                  </template>
+                  <template v-else>
+                    <h4>Description de la thématique</h4>
+                    <p>
+                      Les pratiques de mobilité peuvent être soit encouragées,
+                      soit bloquées par l'environnement matériel et
+                      physiologique dans lequel nous vivons. Expériences de
+                      mobilité se compose de sept codes qui étudient les
+                      manières et raisons de se déplacer, les paramètres
+                      influençant la qualité et fréquence des déplacements ainsi
+                      que les itinéraires choisis ou évités dans la mobilité
+                      douce.
+                    </p>
+                    <h4>Description du cadre</h4>
+                    <p>
+                      Réseau piéton de la commune de Vernier et dessin de la
+                      signalétique piétonne au sol révélant les relations et
+                      conflits entre les différents moyens de transport et les
+                      continuités/discontinuités lors des déplacements.
+                    </p>
+                    <p class="text-caption">Sources : Openstreemap / SITG</p>
+                  </template>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Sensibilité(s), au-delà du visuel'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Nos cartes ont tendance à ne prendre en compte que l’aspect
+                    visuel des choses, invisibilisant ainsi beaucoup d'autres
+                    effets de l'environnement sur nos corps et nos affects..
+                    Cette collection vise à mettre à la disposition de notre
+                    perception plusieurs dimensions non visuelles comme le son
+                    et l’olfaction, autant présentes et conditionnantes à la
+                    réalité de l'environnement habité. Par exemple, certaines
+                    citations décrivent l’attention accordée aux types de
+                    végétaux, essences d’arbres, changements saisonniers, et
+                    présence de multiples êtres vivants lors des parcours
+                    quotidiens, appelant à appréhender le territoire à juste
+                    titre comme un objet vivant et multisensoriel.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <ul>
+                    <li>
+                      Bruit : Extraction du bruit routier mesuré aux façades des
+                      bâtiments, bruit de l'aéroport (surface définie à
+                      l'intérieur des courbes enveloppantes du degré de
+                      sensibilité OPB II)
+                    </li>
+                    <li>
+                      Olfaction : sources d’odeurs venant des parfums
+                      caractéristique des industries locales et du kérosène
+                    </li>
+                  </ul>
+                  <p class="text-caption">
+                    Sources : SITG / Enquête sur les nuisances olfactives à
+                    Vernier en 1983
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Mémoire et temporalités plurielles'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Cette série explore la diversité des mémoires et
+                    temporalités actives sur le territoire, celles qui
+                    permettent de le reconnaître et de marquer son habitabilité.
+                    Tout comme l’identité, la mémoire est à la fois collective
+                    et individuelle. En plus, la mémoire active les moments
+                    présents et l’entrelace avec les possibilités de l’avenir,
+                    ainsi qu’avec les perceptions temporelles de nos voisins. On
+                    explore ici également les rythmes et cycles quotidiens ou
+                    saisonniers afin d’appréhender les variations des mobilités
+                    et des pratiques situées.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>
+                    La carte historique Siegfried datant de 1899 et la carte des
+                    Inventaire des voies de communication historiques de la
+                    Suisse (IVS)
+                  </p>
+                  <p class="text-caption">Sources : SITG / Swisstopo</p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'atlas/Bien-être et perception des risques'
+                    )
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Une nature diversifiée, culturellement riche et accessible
+                    peut jouer un grand rôle sur le bien-être et la santé des
+                    habitants et augmenter leur puissance d’agir. Où cela
+                    dynamise t-'il d'aller dans la Commune ? Quels sont les
+                    lieux qui ressourcent ? Où l'environnement contribue-t-il à
+                    nous dissuader d'aller ?
+                  </p>
+                  <p>
+                    En parallèle, la commune contient un imaginaire important
+                    lié à divers risques présents et intégrés au quotidien des
+                    habitants. La coexistence des personnes avec ces lieux
+                    demande à trouver un potentiel équilibre à négocier et
+                    adresser constamment. La perception des risques peut influer
+                    sur le bien-être et la sérénité sur le long terme. Les
+                    comprendre en détail en nous demandant comment ils affectent
+                    les pratiques, la mobilité ou les relations sociales est
+                    essentiel pour rendre le territoire non seulement habitable,
+                    mais aussi accueillant.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>
+                    Recensement des espaces verts et espaces naturels de la
+                    commune
+                  </p>
+                  <p>
+                    Risques : Sites industriels (en particulier citernes et
+                    sites chimiques), train et transport de chlore, SIG,
+                    autoroute, trafic routier et pollution sur les grands axes,
+                    passage d’avions et aéroport
+                  </p>
+                  <p class="text-caption">Sources : SITG</p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith('atlas/Pratiques situées')
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Cette collection témoigne de la diversité des habitudes, des
+                    rituels et des pratiques localisées et reliées au territoire
+                    de la commune. Qu'elles soient de l’ordre du public, du
+                    groupé ou de l’intime, les pratiques entraînent et
+                    déterminent tout un réseau de parcours et de trajets
+                    (loisirs, courses, rencontres, promenade…) ainsi que des
+                    nœuds d’intensité ou au contraire de vides. La carte trace
+                    des lieux du quotidien, révélant les zones d’occupations et
+                    d’usage, les espaces communs entre les quartiers.
+                  </p>
+                  <h4>Description du cadre</h4>
+                </template>
+                <template
+                  v-if="lastSelectedLayerId.startsWith('atlas/Territorialité')"
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Qu'est-ce qui est ressenti comme le centre de la commune ?
+                    Qu'est-ce qui fait limite, frontière ? Qu'est-ce qui est
+                    perçu comme au-delà, inaccessible ou invisible dans la
+                    commune ? La superposition des calques fait apparaître un
+                    territoire centrifuge, à l’intérieur duquel s’agencent des
+                    foyers de vie souvent reliés au dehors des limites
+                    communales, avec le Rhône en plein cœur. Le territoire n’est
+                    pas une entité abstraite et donnée. Le territoire est
+                    construit dans la pratique, et c’est donc depuis celle-ci
+                    que l' on peut le comprendre et le rendre visible.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>
+                    Couche topographique (tous les 1m), perceptions multiples et
+                    diffuses des frontières de la commune, barrières linéaires
+                    sur le territoire communal.
+                  </p>
+                  <p class="text-caption">
+                    Sources : SITG, entretiens réalisés sur la commune, …
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith('atlas/Écologies politiques')
+                  "
+                >
+                  <h4>Description de la thématique</h4>
+                  <p>
+                    Nos territoires ne sont pas un fait acquis, ce sont des
+                    entités affectives et effectives construites collectivement
+                    qui nous demandent chaque jour un effort de négociation.
+                    Différents agents, responsabilités, besoins et savoirs
+                    convergent pour établir un terrain d'échange où nous
+                    déciderons comment nous voulons vivre ensemble. C'est là que
+                    le conflit et le désir se rejoignent pour façonner l'avenir
+                    de nos biens communs.
+                  </p>
+                  <h4>Description du cadre</h4>
+                  <p>Parcellaires publics et privés (...)</p>
+                  <p class="text-caption">Sources : SITG</p>
+                </template>
               </template>
               <template v-if="selectedCategoryId === 'environment'">
-                <h4>Légende</h4>
-                <p>
-                  <span
-                    v-for="item in lasiglegendItems"
-                    :key="item.color"
-                    style="display: block"
-                  >
-                    <color-box :color="item.color"></color-box>
-                    {{ item.text }}
-                  </span>
-                </p>
-                <p>
-                  Un carré vert montre que la zone favorise le déplacement à
-                  pied. A l’inverse un carré rouge montre qu’il est difficile de
-                  circuler à pied.
-                </p>
-                <p>
-                  Quelques paramètres de l’index : largeur des trottoirs,
-                  continuité des trottoirs, bruit routier, degré de connectivité
-                  au réseau, densité de chemins parcourables à pied, distance à
-                  un espace vert...
-                </p>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'environment/Fond de carte ALICE'
+                    )
+                  "
+                >
+                  <h4>Description de la carte</h4>
+                  <p>
+                    Pour différentes études sur le territoire genevois, le
+                    laboratoire ALICE développe depuis plusieurs années des
+                    outils et techniques de dessin transcalaire à partir du
+                    Modèle Numérique de Surface (MNS) disponible auprès du
+                    guichet cartographique genevois (SITG). Le traitement et
+                    l'intégration de ces données permet une vision inédite du
+                    territoire.
+                  </p>
+                </template>
               </template>
             </div>
           </div>
@@ -410,7 +720,7 @@ import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Feature } from "geojson";
 import { Bounds, IconOptions, point, Proj, TileLayerOptions } from "leaflet";
-import { random } from "lodash";
+import { chain, random } from "lodash";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -1133,6 +1443,8 @@ export default class Plhebicite extends Vue {
   selectedTreeviewItems: TreeviewItem<Layer>[][] = [];
   mapItems: MapGroupItem[] = [];
   selectedCategoryId: CategoryId = "mapping";
+  lastSelectedLayerIds: Set<string> = new Set();
+  lastSelectedLayerId = "";
 
   created(): void {
     const layers = this.categories[0].layers;
@@ -1142,7 +1454,11 @@ export default class Plhebicite extends Vue {
 
   mounted(): void {
     this.selectedTreeviewItems = this.categories.map((category) =>
-      this.getTreeviewItems(category.layers, (layer) => !!layer.selected)
+      this.getTreeviewItems(
+        category.layers,
+        category.id,
+        (layer) => !!layer.selected
+      )
     );
   }
 
@@ -1164,7 +1480,9 @@ export default class Plhebicite extends Vue {
           children: mapItems,
         } as MapGroupItem;
       });
-    Promise.all(promises).then((mapItems) => (this.mapItems = mapItems));
+    Promise.all(promises).then((mapItems) => {
+      this.mapItems = mapItems;
+    });
   }
 
   private async getMapItem(layerItem: LayerItem): Promise<MapItem[]> {
@@ -1232,15 +1550,23 @@ export default class Plhebicite extends Vue {
 
   getTreeviewItems(
     layers: Layer[],
+    idPrefix: string,
     predicate: (layer: Layer) => boolean = () => true,
     parents: Layer[] = []
   ): TreeviewItem<Layer>[] {
     return layers.filter(predicate).map((layer) => {
       const parentLayers = [...parents, layer];
       const children = layer.children
-        ? this.getTreeviewItems(layer.children, predicate, parentLayers)
+        ? this.getTreeviewItems(
+            layer.children,
+            idPrefix,
+            predicate,
+            parentLayers
+          )
         : undefined;
-      const id = parentLayers.map((parent) => parent.name).join("/");
+      const parentNames = parentLayers.map((parent) => parent.name);
+      parentNames.unshift(idPrefix);
+      const id = parentNames.join("/");
       const disabled =
         layer.disabled ||
         (!layer.items && (children?.every((child) => child.disabled) ?? true));
@@ -1265,6 +1591,26 @@ export default class Plhebicite extends Vue {
           this.$set(this.selectedTreeviewItems, 0, []);
           break;
       }
+    }
+  }
+
+  clickLayer(): void {
+    const selectedLayerIds = this.selectedTreeviewItems
+      .flat()
+      .map((item) => item.id);
+    let newIds = new Set(
+      selectedLayerIds.filter((id) => !this.lastSelectedLayerIds.has(id))
+    );
+    this.lastSelectedLayerIds = new Set(selectedLayerIds);
+    while (newIds.size > 1) {
+      const index = chain(Array.from(newIds))
+        .map((id) => id.lastIndexOf("/"))
+        .max()
+        .value();
+      newIds = new Set(Array.from(newIds).map((id) => id.substring(0, index)));
+    }
+    if (newIds.size > 0) {
+      this.lastSelectedLayerId = newIds.values().next().value;
     }
   }
 }
