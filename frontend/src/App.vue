@@ -4,8 +4,7 @@
       <v-app-bar-title>Alice Landings</v-app-bar-title>
       <v-tabs>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
-        <v-tab to="/playground">Playground</v-tab>
-        <v-tab to="/about">Infos</v-tab>
+        <v-tab to="/about">A Propos</v-tab>
       </v-tabs>
     </v-app-bar>
     <v-main>
