@@ -860,8 +860,8 @@ export default class Plhebicite extends Vue {
           items: [
             {
               type: "url",
-              url: `atlas/voix/${id}_${name}/atlas_voices_${id}_${voice.id}.geojson`,
-              style: `atlas/voix/${id}_${name}/atlas_voices_${id}_${name}.sld`,
+              url: `atlas/voix/${id}_${name}/atlas_${id}_${name}_${voice.id}.geojson`,
+              style: `atlas/voix/${id}_${name}/atlas_${id}_${name}_voices.sld`,
               popup: function (
                 properties: Record<string, string>
               ): string | undefined {
@@ -1010,23 +1010,23 @@ export default class Plhebicite extends Vue {
           children: this.getAtlasChildren("01", "attachment", [
             {
               name: "Attachement",
-              id: "place_attachment",
+              id: "attachment",
             },
             {
               name: "Lieux familiers (et affectionnés)",
-              id: "place_familiar",
+              id: "familiar",
             },
             {
               name: "Spatialités étendues",
-              id: "place_extended_spatialities",
+              id: "extended_spatialities",
             },
             {
               name: "Toponymes",
-              id: "place_toponymes",
+              id: "toponymes",
             },
             {
               name: "Voisinage",
-              id: "place_voisinage",
+              id: "voisinage",
             },
           ]),
         },
@@ -1035,15 +1035,15 @@ export default class Plhebicite extends Vue {
           children: this.getAtlasChildren("02", "identity", [
             {
               name: "Identité générale de la commune",
-              id: "identity_of_commune",
+              id: "of_commune",
             },
             {
               name: "Appartenance et appropriation",
-              id: "identity_appartenance",
+              id: "appartenance",
             },
             {
               name: "Paysage et patrimoine culturel",
-              id: "identity_patrimoine",
+              id: "patrimoine",
             },
           ]),
         },
@@ -1052,19 +1052,19 @@ export default class Plhebicite extends Vue {
           children: this.getAtlasChildren("03", "imaginary", [
             {
               name: "Expressions, histoires et mystères",
-              id: "imaginary_expressions",
+              id: "expressions",
             },
             {
               name: "Images, analogies et métaphores",
-              id: "imaginary_analogies",
+              id: "analogies",
             },
             {
               name: "Spéculations et futures",
-              id: "imaginary_speculations",
+              id: "speculations",
             },
             {
               name: "Lieux imaginaires",
-              id: "imaginary_places",
+              id: "places",
             },
           ]),
         },
@@ -1170,20 +1170,24 @@ export default class Plhebicite extends Vue {
               "mobility",
               [
                 {
+                  name: "Mobilité",
+                  id: "gen",
+                },
+                {
                   name: "Rythmes et occurrences",
-                  id: "mobility_rythm",
+                  id: "rythm",
                 },
                 {
                   name: "Routes et chemins",
-                  id: "mobility_roads",
+                  id: "roads",
                 },
                 {
                   name: "(Des)orientations",
-                  id: "mobility_orientation",
+                  id: "orientation",
                 },
                 {
                   name: "Lieux impopulaires",
-                  id: "mobility_unpopular_places",
+                  id: "unpopular_places",
                 },
               ],
               true
@@ -1198,11 +1202,11 @@ export default class Plhebicite extends Vue {
             [
               {
                 name: "Attention au paysage",
-                id: "non_visual_awareness",
+                id: "awareness",
               },
               {
                 name: "Son et olfaction",
-                id: "non_visual_senses",
+                id: "senses",
               },
             ],
             true,
@@ -1217,23 +1221,23 @@ export default class Plhebicite extends Vue {
             [
               {
                 name: "Mémoire",
-                id: "plural_temporalities_memory",
+                id: "memory",
               },
               {
                 name: "Réalité plurielle et frictions",
-                id: "plural_temporalities_friction",
+                id: "friction",
               },
               {
                 name: "Lieux disparus et traces",
-                id: "plural_temporalities_traces",
+                id: "traces",
               },
               {
                 name: "Transformations et mutations",
-                id: "plural_temporalities_mutations",
+                id: "mutations",
               },
               {
                 name: "Temporalités plurielles",
-                id: "plural_temporalities_plural",
+                id: "plural",
               },
             ],
             true
@@ -1247,15 +1251,15 @@ export default class Plhebicite extends Vue {
             [
               {
                 name: "Nuisances",
-                id: "risk_nuisances",
+                id: "nuisances",
               },
               {
                 name: "Perception des risques",
-                id: "risk_perception",
+                id: "perception",
               },
               {
                 name: "Bien-être (et mal-être)",
-                id: "risk_wellbeing",
+                id: "wellbeing",
               },
             ],
             true
@@ -1266,15 +1270,15 @@ export default class Plhebicite extends Vue {
           children: this.getAtlasChildren("08", "situated", [
             {
               name: "Paysage animé",
-              id: "situated_landscape",
+              id: "landscape",
             },
             {
               name: "Rituels et habitudes",
-              id: "situated_rituals",
+              id: "rituals",
             },
             {
               name: "Pratiques situées",
-              id: "situated_practices",
+              id: "practices",
             },
           ]),
         },
@@ -1286,43 +1290,43 @@ export default class Plhebicite extends Vue {
             [
               {
                 name: "Infrastructures et industries (fantômes)",
-                id: "territoriality_ghosted",
+                id: "ghosted",
               },
               {
                 name: "Interfaces et sols communs",
-                id: "territoriality_interfaces",
+                id: "interfaces",
               },
               {
                 name: "Archipel et micro-territoires",
-                id: "territoriality_archipel",
+                id: "archipel",
               },
               {
                 name: "Centrifuge et centripète",
-                id: "territoriality_centrifuge",
+                id: "centrifuge",
               },
               {
                 name: "Continuité et discontinuité",
-                id: "territoriality_continuity",
+                id: "continuity",
               },
               {
                 name: "Îles inaccessibles",
-                id: "territoriality_islands",
+                id: "islands",
               },
               {
                 name: "Frontières et limites",
-                id: "territoriality_borders",
+                id: "borders",
               },
               {
                 name: "Territoires inexplorés",
-                id: "territoriality_uncharted",
+                id: "uncharted",
               },
               {
                 name: "Matérialités (attention aux détails)",
-                id: "territoriality_materialities",
+                id: "materialities",
               },
               {
                 name: "Qualité spatiale",
-                id: "territoriality_spatial_quality",
+                id: "spatial_quality",
               },
             ],
             true
@@ -1336,23 +1340,23 @@ export default class Plhebicite extends Vue {
             [
               {
                 name: "Sphère politique",
-                id: "political_ecologies_realms",
+                id: "realms",
               },
               {
                 name: "Promoteurs, investisseurs et densification",
-                id: "political_ecologies_promotors",
+                id: "promotors",
               },
               {
                 name: "Propriété (privé/public)",
-                id: "political_ecologies_property",
+                id: "property",
               },
               {
                 name: "Savoirs-faire, initiatives et résistances",
-                id: "political_ecologies_savoirfaires",
+                id: "savoirfaires",
               },
               {
                 name: "Panorama social",
-                id: "political_ecologies_social_spectrum",
+                id: "social",
               },
             ],
             true
