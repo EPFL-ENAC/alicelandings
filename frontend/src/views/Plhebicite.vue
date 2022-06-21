@@ -465,15 +465,33 @@
                       </span>
                     </p>
                     <p>
-                      Un carré vert montre que la zone favorise le déplacement à
-                      pied. A l’inverse un carré rouge montre qu’il est
-                      difficile de circuler à pied.
+                      L’index de mobilité piétonne est issu d’une analyse
+                      statistique spatiale. Il se sert de trente éléments qui
+                      affairent à la mobilité piétonne pour permettre de
+                      quantifier à quel point chaque morceau du territoire de la
+                      commune de Vernier, lorsqu’il est scindé en une grille
+                      hectométrique (100 x 100 mètres), se prête à la mobilité
+                      douce.
                     </p>
                     <p>
-                      Quelques paramètres de l’index : largeur des trottoirs,
-                      continuité des trottoirs, bruit routier, degré de
-                      connectivité au réseau, densité de chemins parcourables à
-                      pied, distance à un espace vert...
+                      Parmi les trente éléments ayant servi à l’élaboration de
+                      l’index de mobilité, on retrouve, entre autres, des
+                      caractéristiques de connectivité du réseau de circulation
+                      piétonne et routière (longueur du réseau, densité, nombre
+                      d’intersections etc…), le nombre de trottoirs, leur
+                      longueur, ainsi que leurs discontinuités, des éléments
+                      associés à l’environnement (densité de végétation, bruit
+                      routier), et des distances à des lieux essentiels de la
+                      circulation piétonne que sont les parcs publics ainsi que
+                      les berges du Rhône.
+                    </p>
+                    <p>
+                      L’analyse statistique de l’ensemble de ces éléments a
+                      permis d’attribuer un score à chaque carré de la grille
+                      divisant la commune de Vernier, allant de 0 (carré vert,
+                      espace particulièrement favorable à la mobilité piétonne)
+                      à 1 (carré rouge, espace totalement défavorable à la
+                      mobilité piétonne).
                     </p>
                   </template>
                   <template v-else>
