@@ -849,7 +849,8 @@ export default class Plhebicite extends Vue {
       name: string;
       id: string;
     }[],
-    cadreTile = false
+    cadreTile = false,
+    figure = true
   ): Layer[] {
     return [
       {
@@ -872,27 +873,32 @@ export default class Plhebicite extends Vue {
           ],
         })),
       },
-      {
-        name: "Figures",
-        items: [
-          {
-            type: "tile",
-            url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
-            crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-              origin: [2493818.1657315176, 1121636.39419185673],
-              resolutions: [
-                27.0671535440639985, 13.5335767720319993, 6.76678838601599963,
-                3.38339419300799982, 1.69169709650399991, 0.845848548251999954,
-                0.422924274125999977,
+      ...(figure
+        ? [
+            {
+              name: "Figures",
+              items: [
+                {
+                  type: "tile",
+                  url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
+                  crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                    origin: [2493818.1657315176, 1121636.39419185673],
+                    resolutions: [
+                      27.0671535440639985, 13.5335767720319993,
+                      6.76678838601599963, 3.38339419300799982,
+                      1.69169709650399991, 0.845848548251999954,
+                      0.422924274125999977,
+                    ],
+                    bounds: new Bounds(
+                      [2493818.1657315176, 1121636.39419185673],
+                      [2499146.16573695699, 1116308.39418641734]
+                    ),
+                  }),
+                },
               ],
-              bounds: new Bounds(
-                [2493818.1657315176, 1121636.39419185673],
-                [2499146.16573695699, 1116308.39418641734]
-              ),
-            }),
-          },
-        ],
-      },
+            } as Layer,
+          ]
+        : []),
       {
         name: "Cadre",
         items: [
@@ -1199,7 +1205,8 @@ export default class Plhebicite extends Vue {
                 id: "non_visual_senses",
               },
             ],
-            true
+            true,
+            false
           ),
         },
         {
