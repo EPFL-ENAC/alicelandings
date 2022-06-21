@@ -1257,6 +1257,14 @@ export default class Plhebicite extends Vue {
   clickCategory(category: Category): void {
     if (!category.active) {
       this.selectedCategoryId = category.id;
+      switch (category.id) {
+        case "mapping":
+          this.$set(this.selectedTreeviewItems, 1, []);
+          break;
+        case "atlas":
+          this.$set(this.selectedTreeviewItems, 0, []);
+          break;
+      }
     }
   }
 }
