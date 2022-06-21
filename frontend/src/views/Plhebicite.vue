@@ -1473,17 +1473,6 @@ export default class Plhebicite extends Vue {
             },
           ],
         },
-        {
-          name: "Repère",
-          items: [
-            {
-              type: "url",
-              url: "general/repere/general_background_repere.geojson",
-              style: true,
-            },
-          ],
-          selected: true,
-        },
       ],
     },
   ];
@@ -1556,6 +1545,20 @@ export default class Plhebicite extends Vue {
         } as MapGroupItem;
       });
     Promise.all(promises).then((mapItems) => {
+      mapItems.push({
+        id: "repere",
+        zIndex: zIndex--,
+        children: [
+          new UrlMapItem(
+            this.getDataUrl("general/repere/general_background_repere.geojson"),
+            {
+              styleUrl: this.getDataUrl(
+                "general/repere/general_background_repere.sld"
+              ),
+            }
+          ),
+        ],
+      });
       this.mapItems = mapItems;
     });
   }
