@@ -1,6 +1,7 @@
 import { Feature, Point } from "geojson";
 import L, {
   circleMarker,
+  CircleMarkerOptions,
   LatLng,
   Layer,
   LeafletEvent,
@@ -352,68 +353,67 @@ function castValue(key: keyof PathOptions, value?: string): unknown {
   }
 }
 
-export function getPointToLayer(style?: string): PointToLayer | undefined {
-  if (style) {
-    const doc = new DOMParser().parseFromString(style);
-    // TODO: rule filter ?
-    const graphicNode = select(
-      "//se:PointSymbolizer/se:Graphic",
-      doc,
-      true
-    ) as Node;
-    if (graphicNode) {
-      const options: PathOptions = getSvgParameterPathOptions(
-        "./se:Mark/*/se:SvgParameter",
-        graphicNode
-      );
-      switch (getText("./se:Mark/se:WellKnownName", graphicNode)) {
-        case "circle":
-          return (_, latlng) =>
-            circleMarker(latlng, {
-              ...options,
-              radius: ratio(getNumber("./se:Size", graphicNode)),
-            });
-      }
-    }
-    const textSymbolizerNode = select("//se:TextSymbolizer", doc, true) as Node;
-    if (textSymbolizerNode) {
-      const property = getText(
-        "./se:Label/ogc:PropertyName",
-        textSymbolizerNode
-      );
-      if (property) {
-        const color = getText("./se:Fill/se:SvgParameter", textSymbolizerNode);
-        const font = getObject("./se:Font/se:SvgParameter", textSymbolizerNode);
-        if (font["font-size"] !== undefined) {
-          font["font-size"] = `${round(Number(font["font-size"]) * 0.8)}px`;
-        }
-        const style: Record<string, string | undefined> = {
-          color: color,
-          ...font,
+export function getPointToLayer(
+  style: string,
+  options?: PathOptions
+): PointToLayer | undefined {
+  const doc = new DOMParser().parseFromString(style);
+  // TODO: rule filter ?
+  const graphicNode = select(
+    "//se:PointSymbolizer/se:Graphic",
+    doc,
+    true
+  ) as Node;
+  if (graphicNode) {
+    const pathOptions: PathOptions = getSvgParameterPathOptions(
+      "./se:Mark/*/se:SvgParameter",
+      graphicNode
+    );
+    switch (getText("./se:Mark/se:WellKnownName", graphicNode)) {
+      case "circle": {
+        const circleMarkerOptions: CircleMarkerOptions = {
+          ...pathOptions,
+          radius: ratio(getNumber("./se:Size", graphicNode)),
+          ...options,
         };
-        const styleText = Object.entries(style)
-          .filter(([, value]) => value !== undefined)
-          .map(([key, value]) => `${key}:${value};`)
-          .join("");
-        return (geoJsonPoint, latlng) => {
-          const properties = geoJsonPoint.properties;
-          if (properties) {
-            const text: string = properties[property];
-            return marker(latlng, { opacity: 0 }).bindTooltip(
-              `<div style='${styleText}'>${text}</div>`,
-              {
-                className: "text-point-tooltip",
-                direction: "center",
-                permanent: true,
-                offset: [-16, 16],
-              }
-            );
-          } else {
-            return marker(latlng);
-          }
-        };
+        return (_, latlng) => circleMarker(latlng, circleMarkerOptions);
       }
     }
   }
-  return undefined;
+  const textSymbolizerNode = select("//se:TextSymbolizer", doc, true) as Node;
+  if (textSymbolizerNode) {
+    const property = getText("./se:Label/ogc:PropertyName", textSymbolizerNode);
+    if (property) {
+      const color = getText("./se:Fill/se:SvgParameter", textSymbolizerNode);
+      const font = getObject("./se:Font/se:SvgParameter", textSymbolizerNode);
+      if (font["font-size"] !== undefined) {
+        font["font-size"] = `${round(Number(font["font-size"]) * 0.8)}px`;
+      }
+      const style: Record<string, string | undefined> = {
+        color: color,
+        ...font,
+      };
+      const styleText = Object.entries(style)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => `${key}:${value};`)
+        .join("");
+      return (geoJsonPoint, latlng) => {
+        const properties = geoJsonPoint.properties;
+        if (properties) {
+          const text: string = properties[property];
+          return marker(latlng, { opacity: 0 }).bindTooltip(
+            `<div style='${styleText}'>${text}</div>`,
+            {
+              className: "text-point-tooltip",
+              direction: "center",
+              permanent: true,
+              offset: [-16, 16],
+            }
+          );
+        } else {
+          return marker(latlng);
+        }
+      };
+    }
+  }
 }

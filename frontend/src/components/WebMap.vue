@@ -64,6 +64,7 @@ import L, {
   Map,
   MapOptions,
   marker,
+  PathOptions,
   Proj,
   TileLayer,
   TileLayerOptions,
@@ -296,6 +297,7 @@ interface MapItemOption {
   color?: Color;
   popup?: string | ((properties: Record<string, string>) => string | undefined);
   styleUrl?: string;
+  pathOptions?: PathOptions;
   getIconOptions?: (feature: Feature) => IconOptions;
 }
 
@@ -365,7 +367,9 @@ export abstract class MapItem {
             marker(latlng, {
               icon: icon(getIconOptions(feature)),
             })
-        : getPointToLayer(styleText),
+        : styleText
+        ? getPointToLayer(styleText, this.option?.pathOptions)
+        : undefined,
     });
     if (onAdd) {
       return geoJson.on("add", onAdd);

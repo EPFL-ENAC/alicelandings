@@ -719,7 +719,14 @@ import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
 import { Feature } from "geojson";
-import { Bounds, IconOptions, point, Proj, TileLayerOptions } from "leaflet";
+import {
+  Bounds,
+  IconOptions,
+  PathOptions,
+  point,
+  Proj,
+  TileLayerOptions,
+} from "leaflet";
 import { chain, random } from "lodash";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { mapMutations } from "vuex";
@@ -862,6 +869,9 @@ export default class Plhebicite extends Vue {
               type: "url",
               url: `atlas/voix/${id}_${name}/atlas_${id}_${name}_${voice.id}.geojson`,
               style: `atlas/voix/${id}_${name}/atlas_${id}_${name}_voices.sld`,
+              options: {
+                fillOpacity: 0.8,
+              },
               popup: function (
                 properties: Record<string, string>
               ): string | undefined {
@@ -1516,6 +1526,7 @@ export default class Plhebicite extends Vue {
             (layer) =>
               new UrlMapItem(prefix + layer.geojson, {
                 styleUrl: prefix + layer.sld,
+                pathOptions: layerItem.options,
               })
           );
         } else {
@@ -1527,6 +1538,7 @@ export default class Plhebicite extends Vue {
           return [
             new UrlMapItem(layerItem.url, {
               styleUrl: styleUrl,
+              pathOptions: layerItem.options,
               popup: layerItem.popup,
               getIconOptions: layerItem.getIconOptions,
             }),
@@ -1656,6 +1668,7 @@ interface UrlLayerItem {
   url: string;
   popup?: string | ((properties: Record<string, string>) => string | undefined);
   style?: boolean | string;
+  options?: PathOptions;
   getIconOptions?: (feature: Feature) => IconOptions;
 }
 interface TileLayerItem {
