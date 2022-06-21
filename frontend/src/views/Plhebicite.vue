@@ -449,7 +449,7 @@
                   <template
                     v-if="
                       lastSelectedLayerId.startsWith(
-                        'atlas/Expériences de mobilité/Accessibilité'
+                        'atlas/Expériences de mobilité/Analyses/Accessibilité'
                       )
                     "
                   >
@@ -1066,91 +1066,96 @@ export default class Plhebicite extends Vue {
           name: "Expériences de mobilité",
           children: [
             {
-              name: "Accessibilité",
-              items: [
+              name: "Analyses",
+              children: [
                 {
-                  type: "tile",
-                  url: "atlas/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
-                  crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                    origin: [2493617.3434664933, 1120234.04876646609],
-                    resolutions: [
-                      24.8222344368640009, 12.4111172184320004,
-                      6.20555860921600022, 3.10277930460800011,
-                      1.55138965230400006,
-                    ],
-                    bounds: new Bounds(
-                      [2493617.3434664933, 1120234.04876646609],
-                      [2499058.06697712326, 1116386.60242875223]
-                    ),
-                  }),
-                },
-              ],
-            },
-            {
-              name: "Facilitateurs",
-              items: [
-                {
-                  type: "heatmap",
-                  url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
-                  latitude: "latitude",
-                  longitude: "longitude",
+                  name: "Accessibilité",
+                  items: [
+                    {
+                      type: "tile",
+                      url: "atlas/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
+                      crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                        origin: [2493617.3434664933, 1120234.04876646609],
+                        resolutions: [
+                          24.8222344368640009, 12.4111172184320004,
+                          6.20555860921600022, 3.10277930460800011,
+                          1.55138965230400006,
+                        ],
+                        bounds: new Bounds(
+                          [2493617.3434664933, 1120234.04876646609],
+                          [2499058.06697712326, 1116386.60242875223]
+                        ),
+                      }),
+                    },
+                  ],
                 },
                 {
-                  type: "url",
-                  url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
-                  popup: function (
-                    properties: Record<string, string>
-                  ): string | undefined {
-                    return `<b>De quoi s'agit-il?</b>
+                  name: "Facilitateurs",
+                  items: [
+                    {
+                      type: "heatmap",
+                      url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                      latitude: "latitude",
+                      longitude: "longitude",
+                    },
+                    {
+                      type: "url",
+                      url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                      popup: function (
+                        properties: Record<string, string>
+                      ): string | undefined {
+                        return `<b>De quoi s'agit-il?</b>
                     ${properties["De quoi s'agit-il?"]}
 
                     <b>En quoi aide-t-il à la mobilité?</b>
                     ${properties["En quoi aide-t-il à la mobilité?"]}`;
-                  },
-                  getIconOptions: function (): IconOptions {
-                    return {
-                      iconUrl: "img/legends/blank.svg",
-                      iconSize: [16, 16],
-                    };
-                  },
-                },
-              ],
-            },
-            {
-              name: "Obstacles",
-              items: [
-                {
-                  type: "heatmap",
-                  url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
-                  latitude: "latitude",
-                  longitude: "longitude",
-                  options: {
-                    gradient: {
-                      0.2: "blue",
-                      0.4: "purple",
-                      0.6: "orange",
-                      1: "red",
+                      },
+                      getIconOptions: function (): IconOptions {
+                        return {
+                          iconUrl: "img/legends/blank.svg",
+                          iconSize: [16, 16],
+                        };
+                      },
                     },
-                  },
+                  ],
                 },
                 {
-                  type: "url",
-                  url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
-                  popup: function (
-                    properties: Record<string, string>
-                  ): string | undefined {
-                    return `<b>De quoi s'agit-il?</b>
+                  name: "Obstacles",
+                  items: [
+                    {
+                      type: "heatmap",
+                      url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                      latitude: "latitude",
+                      longitude: "longitude",
+                      options: {
+                        gradient: {
+                          0.2: "blue",
+                          0.4: "purple",
+                          0.6: "orange",
+                          1: "red",
+                        },
+                      },
+                    },
+                    {
+                      type: "url",
+                      url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                      popup: function (
+                        properties: Record<string, string>
+                      ): string | undefined {
+                        return `<b>De quoi s'agit-il?</b>
                     ${properties["De quoi s'agit-il?"]}
 
                     <b>En quoi aide-t-il à la mobilité?</b>
                     ${properties["En quoi fait-il obstacle à la mobilité ?"]}`;
-                  },
-                  getIconOptions: function (): IconOptions {
-                    return {
-                      iconUrl: "img/legends/blank.svg",
-                      iconSize: [16, 16],
-                    };
-                  },
+                      },
+                      getIconOptions: function (): IconOptions {
+                        return {
+                          iconUrl: "img/legends/blank.svg",
+                          iconSize: [16, 16],
+                        };
+                      },
+                    },
+                  ],
                 },
               ],
             },
