@@ -907,6 +907,26 @@ export default class Plhebicite extends Vue {
                 },
               ],
             } as Layer,
+            {
+              name: "Figures heavy",
+              items: [
+                {
+                  type: "url",
+                  url: `atlas/figure/GEOJSON/test_01_heavy/atlas_${id}_${name}_figure.geojson`,
+                  style: true,
+                },
+              ],
+            } as Layer,
+            {
+              name: "Figures light",
+              items: [
+                {
+                  type: "url",
+                  url: `atlas/figure/GEOJSON/test_02_light/atlas_${id}_${name}_figure.geojson`,
+                  style: true,
+                },
+              ],
+            } as Layer,
           ]
         : []),
       {
