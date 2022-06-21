@@ -16,13 +16,23 @@
           width="100px"
         ></v-img>
       </a>
+      <v-btn
+        icon
+        color="primary"
+        class="ml-3"
+        @click="fullscreen = !fullscreen"
+      >
+        <v-icon x-large>{{
+          fullscreen ? "mdi-fullscreen-exit" : "mdi-fullscreen"
+        }}</v-icon>
+      </v-btn>
       <v-btn icon color="primary" class="ml-3" @click="toggleAppBar">
         <v-icon x-large>mdi-menu</v-icon>
       </v-btn>
     </div>
     <v-divider></v-divider>
     <div class="flex-grow-1 d-flex flex-row">
-      <div class="d-flex flex-column">
+      <div v-if="!fullscreen" class="d-flex flex-column">
         <div class="flex-even">
           <v-list dense width="330" height="100%">
             <v-list-group
@@ -251,7 +261,7 @@
           :zoom.sync="zoom"
         ></web-map>
         <v-divider></v-divider>
-        <div class="d-flex flex-row">
+        <div v-if="!fullscreen" class="d-flex flex-row">
           <div class="flex-even legend">
             <div class="ma-3">
               <template v-if="selectedCategoryId === 'mapping'">
@@ -1509,6 +1519,7 @@ export default class Plhebicite extends Vue {
   selectedCategoryId: CategoryId = "mapping";
   lastSelectedLayerIds: Set<string> = new Set();
   lastSelectedLayerId = "";
+  fullscreen = false;
 
   created(): void {
     const layers = this.categories[0].layers;
