@@ -133,6 +133,8 @@ export default class WebMap extends Vue {
   readonly maxZoom!: number;
   @PropSync("zoom", { type: Number, default: 11 })
   syncedZoom!: number;
+  @Prop({ type: Boolean, default: false })
+  readonly printable!: boolean;
 
   loading = false;
   layers: MapLayer[] = [];
@@ -195,17 +197,19 @@ export default class WebMap extends Vue {
         (e.layer as Layer & { options: BaseTileLayerOptions }).options.crs ??
         this.defaultCrs;
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (control as any).browserPrint().addTo(this.map);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (Control as any).BrowserPrint.Utils.registerLayer(
-      GeoRasterLayer,
-      "GeoRasterLayer",
+    if (this.printable) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      function (layer: any) {
-        return new GeoRasterLayer(layer.options);
-      }
-    );
+      (control as any).browserPrint().addTo(this.map);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (Control as any).BrowserPrint.Utils.registerLayer(
+        GeoRasterLayer,
+        "GeoRasterLayer",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        function (layer: any) {
+          return new GeoRasterLayer(layer.options);
+        }
+      );
+    }
 
     // new DebugLayer().addTo(this.map).bringToFront();
 

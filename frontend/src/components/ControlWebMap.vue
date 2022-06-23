@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="8">
       <v-responsive aspect-ratio="1">
-        <web-map ref="webMap" :items="mapItems"></web-map>
+        <web-map ref="webMap" :items="mapItems" printable></web-map>
       </v-responsive>
     </v-col>
     <v-col cols="4">
