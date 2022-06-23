@@ -649,6 +649,53 @@
                       mobilité piétonne).
                     </p>
                   </template>
+                  <template
+                    v-else-if="
+                      lastSelectedLayerId.startsWith(
+                        'atlas/Expériences de mobilité/Analyses/Facilitateurs'
+                      )
+                    "
+                  >
+                    <p>
+                      Le heat map des "facilitateurs" est issu des réponses
+                      fournies par les Verniolans à un questionnaire
+                      participatif, lors duquel il leur a été demandé de placer
+                      sur une carte des aménagements qui facilitent ou
+                      encouragent la mobilité douce. En zoomant sur la carte, on
+                      distingue des nuages de points plus ou moins grands, selon
+                      que les réponses ont été placées aux mêmes endroits par
+                      plusieurs répondants.
+                    </p>
+                    <p>
+                      En survolant les points au moyen de la souris, il est
+                      possible d'obtenir plus de précisions sur la nature de
+                      l'aménagement, et en quoi celui-ci permet d'améliorer la
+                      mobilité douce.
+                    </p>
+                  </template>
+                  <template
+                    v-else-if="
+                      lastSelectedLayerId.startsWith(
+                        'atlas/Expériences de mobilité/Analyses/Obstacles'
+                      )
+                    "
+                  >
+                    <p>
+                      Le heat map des "obstacles" est issu des réponses fournies
+                      par les Verniolans à un questionnaire participatif, lors
+                      duquel il leur a été demandé de placer sur une carte des
+                      aménagements qui découragent voire bloquent la mobilité
+                      douce. En zoomant sur la carte, on distingue des nuages de
+                      points plus ou moins grands, selon que les réponses ont
+                      été placées aux mêmes endroits par plusieurs répondants.
+                    </p>
+                    <p>
+                      En survolant les points au moyen de la souris, il est
+                      possible d'obtenir plus de précisions sur la nature de
+                      l'aménagement, et en quoi celui-ci réduit la qualité de la
+                      mobilité douce.
+                    </p>
+                  </template>
                   <template v-else>
                     <p>
                       Réseau piéton de la commune de Vernier et dessin de la
@@ -1190,21 +1237,21 @@ export default class Plhebicite extends Vue {
                   items: [
                     {
                       type: "heatmap",
-                      url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                      url: "atlas/heatmaps/geojson_facilitateurs_20220622_tot_selection.geojson",
                       latitude: "latitude",
                       longitude: "longitude",
                     },
                     {
                       type: "url",
-                      url: "atlas/heatmaps/geojson_facilitateurs_20220614_tot_selection.geojson",
+                      url: "atlas/heatmaps/geojson_facilitateurs_20220622_tot_selection.geojson",
                       popup: function (
                         properties: Record<string, string>
                       ): string | undefined {
                         return `<b>De quoi s'agit-il?</b>
-                    ${properties["De quoi s'agit-il?"]}
+                    ${properties["what"]}
 
                     <b>En quoi aide-t-il à la mobilité?</b>
-                    ${properties["En quoi aide-t-il à la mobilité?"]}`;
+                    ${properties["why"]}`;
                       },
                       getIconOptions: function (): IconOptions {
                         return {
@@ -1220,7 +1267,7 @@ export default class Plhebicite extends Vue {
                   items: [
                     {
                       type: "heatmap",
-                      url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                      url: "atlas/heatmaps/geojson_obstacles_20220622_tot_selection.geojson",
                       latitude: "latitude",
                       longitude: "longitude",
                       options: {
@@ -1234,15 +1281,15 @@ export default class Plhebicite extends Vue {
                     },
                     {
                       type: "url",
-                      url: "atlas/heatmaps/geojson_obstacles_20220614_tot_selection.geojson",
+                      url: "atlas/heatmaps/geojson_obstacles_20220622_tot_selection.geojson",
                       popup: function (
                         properties: Record<string, string>
                       ): string | undefined {
                         return `<b>De quoi s'agit-il?</b>
-                    ${properties["De quoi s'agit-il?"]}
+                    ${properties["what"]}
 
                     <b>En quoi aide-t-il à la mobilité?</b>
-                    ${properties["En quoi fait-il obstacle à la mobilité ?"]}`;
+                    ${properties["why"]}`;
                       },
                       getIconOptions: function (): IconOptions {
                         return {
