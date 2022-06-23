@@ -987,7 +987,7 @@ export default class Plhebicite extends Vue {
               url: `atlas/voix/${id}_${name}/atlas_${id}_${name}_${voice.id}.geojson`,
               style: `atlas/voix/${id}_${name}/atlas_${id}_${name}_voices.sld`,
               options: {
-                fillOpacity: 0.8,
+                fillOpacity: 0.66,
               },
               popup: function (
                 properties: Record<string, string>
@@ -1186,24 +1186,29 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "Imaginaires et savoirs oraux",
-          children: this.getAtlasChildren("03", "imaginary", [
-            {
-              name: "Expressions, histoires et mystères",
-              id: "expressions",
-            },
-            {
-              name: "Images, analogies et métaphores",
-              id: "analogies",
-            },
-            {
-              name: "Spéculations et futures",
-              id: "speculations",
-            },
-            {
-              name: "Lieux imaginaires",
-              id: "places",
-            },
-          ]),
+          children: this.getAtlasChildren(
+            "03",
+            "imaginary",
+            [
+              {
+                name: "Expressions, histoires et mystères",
+                id: "expressions",
+              },
+              {
+                name: "Images, analogies et métaphores",
+                id: "analogies",
+              },
+              {
+                name: "Spéculations et futures",
+                id: "speculations",
+              },
+              {
+                name: "Lieux imaginaires",
+                id: "places",
+              },
+            ],
+            true
+          ),
         },
         {
           name: "Expériences de mobilité",
@@ -1346,7 +1351,7 @@ export default class Plhebicite extends Vue {
                 id: "senses",
               },
             ],
-            true,
+            false,
             false
           ),
         },
