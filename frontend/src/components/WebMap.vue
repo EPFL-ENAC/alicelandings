@@ -71,7 +71,7 @@ import L, {
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import "leaflet.heat";
-import { clone } from "lodash";
+import { sortBy } from "lodash";
 import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
@@ -224,42 +224,45 @@ export default class WebMap extends Vue {
 
   @Watch("items")
   onItemsChanged(): void {
-    const newIds: Set<string> = new Set(this.items.map((item) => item.id));
     const oldIds: Set<string> = new Set(this.layers.map((layer) => layer.id));
-    clone(this.layers).forEach((layer) => {
-      if (!newIds.has(layer.id)) {
-        this.deleteLayer(layer.id);
-      }
-    });
-    this.items
+    const existingLayers: Promise<MapLayer>[] = this.items
       .filter((item) => oldIds.has(item.id))
-      .forEach((item) => {
-        this.getLayer(item.id)[0].layerGroup.setZIndex(item.zIndex);
+      .map(async (item) => {
+        const layer = this.getLayer(item.id)[0];
+        layer.layerGroup.setZIndex(item.zIndex);
+        layer.zIndex = item.zIndex;
+        return layer;
       });
-    const newItems: MapGroupItem[] = this.items.filter(
-      (item) => !oldIds.has(item.id)
-    );
-    if (newItems.length > 0) {
-      this.loading = true;
-      const promises: Promise<void>[] = newItems.map(async (item) => {
+    const newLayers: Promise<MapLayer>[] = this.items
+      .filter((item) => !oldIds.has(item.id))
+      .map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
         layerGroup.setZIndex(item.zIndex);
-        item.children.forEach((itemLayer) =>
-          itemLayer.getLayer().then((layer) => {
-            if (layer.setZIndex) {
-              layer.setZIndex(item.zIndex);
-            }
-            layerGroup.addLayer(layer);
-          })
+        (
+          await Promise.all(
+            item.children.map((itemLayer) => itemLayer.getLayer())
+          )
+        ).forEach((layer) => layerGroup.addLayer(layer));
+        const mapLayer = new MapLayer(
+          item.id,
+          item.id,
+          layerGroup,
+          item.zIndex
         );
-        this.map.addLayer(layerGroup);
-        const mapLayer = new MapLayer(item.id, item.id, layerGroup);
-        this.layers.unshift(mapLayer);
+        return mapLayer;
       });
-      Promise.allSettled(promises).finally(() => {
-        this.loading = false;
-      });
-    }
+    this.loading = true;
+    Promise.all([...existingLayers, ...newLayers])
+      .then((layers) => {
+        this.layers.forEach((layer) => this.map.removeLayer(layer.layerGroup));
+        // https://github.com/Leaflet/Leaflet/issues/3427
+        layers = sortBy(layers, (layer) => layer.zIndex);
+        layers.forEach((mapLayer) => {
+          this.map.addLayer(mapLayer.layerGroup);
+        });
+        this.layers = layers;
+      })
+      .finally(() => (this.loading = false));
   }
 
   /**
@@ -554,7 +557,8 @@ export class MapLayer {
   constructor(
     public id: string,
     public name: string,
-    public layerGroup: LayerGroup
+    public layerGroup: LayerGroup,
+    public zIndex: number
   ) {}
 
   get layers(): LeafletLayer[] {
