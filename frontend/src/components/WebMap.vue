@@ -71,7 +71,7 @@ import L, {
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import "leaflet.heat";
-import { sortBy } from "lodash";
+import { clone, sortBy } from "lodash";
 import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
@@ -224,7 +224,13 @@ export default class WebMap extends Vue {
 
   @Watch("items")
   onItemsChanged(): void {
+    const newIds: Set<string> = new Set(this.items.map((item) => item.id));
     const oldIds: Set<string> = new Set(this.layers.map((layer) => layer.id));
+    clone(this.layers).forEach((layer) => {
+      if (!newIds.has(layer.id)) {
+        this.deleteLayer(layer.id);
+      }
+    });
     const existingLayers: Promise<MapLayer>[] = this.items
       .filter((item) => oldIds.has(item.id))
       .map(async (item) => {
@@ -238,29 +244,32 @@ export default class WebMap extends Vue {
       .map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
         layerGroup.setZIndex(item.zIndex);
-        (
-          await Promise.all(
-            item.children.map((itemLayer) => itemLayer.getLayer())
-          )
-        ).forEach((layer) => layerGroup.addLayer(layer));
         const mapLayer = new MapLayer(
           item.id,
           item.id,
           layerGroup,
           item.zIndex
         );
-        return mapLayer;
+        this.map.addLayer(layerGroup);
+        this.layers.push(mapLayer);
+        return Promise.all(
+          item.children.map((itemLayer) =>
+            itemLayer.getLayer().then((layer) => layerGroup.addLayer(layer))
+          )
+        ).then(() => mapLayer);
       });
     this.loading = true;
     Promise.all([...existingLayers, ...newLayers])
       .then((layers) => {
-        this.layers.forEach((layer) => this.map.removeLayer(layer.layerGroup));
         // https://github.com/Leaflet/Leaflet/issues/3427
         layers = sortBy(layers, (layer) => layer.zIndex);
         layers.forEach((mapLayer) => {
-          this.map.addLayer(mapLayer.layerGroup);
+          mapLayer.layers.forEach((layer) => {
+            if (layer.bringToFront) {
+              layer.bringToFront();
+            }
+          });
         });
-        this.layers = layers;
       })
       .finally(() => (this.loading = false));
   }
