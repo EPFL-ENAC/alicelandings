@@ -478,15 +478,7 @@
                   </p>
                 </template>
               </template>
-              <template v-if="selectedCategoryId === 'environment'">
-                <h4>Description</h4>
-                <p>
-                  La carte d'accessibilité est une mesure environnementale sur
-                  une grille de 100x100m d’après un index de 17 paramètres
-                  facilitant ou obstruant la mobilité piétonne. Elle a été
-                  effectuée par le laboratoire LASIG.
-                </p>
-              </template>
+              <template v-if="selectedCategoryId === 'environment'"></template>
             </div>
           </div>
           <v-divider vertical></v-divider>
@@ -549,7 +541,7 @@
                 </p>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
-                <h4>Description du cadre</h4>
+                <h4>Légende du cadre</h4>
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith(
@@ -1058,7 +1050,7 @@ export default class Plhebicite extends Vue {
           children: this.getInterviewChildren("01"),
         },
         {
-          name: "02 Ville-dortoir",
+          name: "02 L'envers des citernes",
           children: this.getInterviewChildren("02"),
         },
         {
