@@ -10,6 +10,7 @@ import {
   Proj,
   TileLayer,
   TileLayerOptions,
+  ZoomAnimEvent,
 } from "leaflet";
 import { range } from "lodash";
 import "proj4leaflet";
@@ -172,6 +173,7 @@ declare module "leaflet" {
     _retainChildren(x: number, y: number, z: number, minZoom: number): void;
     _removeTile(key: string): void;
     _resetView(): void;
+    _animateZoom(e: ZoomAnimEvent): void;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -225,6 +227,10 @@ export class RasterTileLayer extends TileLayer {
       throw new Error("map should have crs");
     }
     return this._map.options.crs;
+  }
+
+  _animateZoom(): void {
+    // no zoom animation
   }
 
   _getTiledPixelBounds(): Bounds {
