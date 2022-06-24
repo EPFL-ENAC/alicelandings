@@ -7,7 +7,6 @@
       :crs="crs"
       :options="mapOptions"
       :zoom.sync="syncedZoom"
-      :zoom-animation="false"
     >
       <l-control-layers
         v-if="baseTileLayers.length > 1"

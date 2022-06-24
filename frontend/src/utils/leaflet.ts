@@ -231,6 +231,7 @@ export class RasterTileLayer extends TileLayer {
 
   _animateZoom(): void {
     // no zoom animation
+    this._removeAllTiles();
   }
 
   _getTiledPixelBounds(): Bounds {
