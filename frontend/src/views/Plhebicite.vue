@@ -1604,6 +1604,11 @@ export default class Plhebicite extends Vue {
     );
   }
 
+  @Watch("fullscreen")
+  onFullscreenChanged(): void {
+    window.dispatchEvent(new Event("resize"));
+  }
+
   @Watch("selectedTreeviewItems")
   onSelectedTreeviewItemsChanged(): void {
     let zIndex = 0;
