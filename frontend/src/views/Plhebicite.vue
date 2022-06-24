@@ -973,9 +973,13 @@ export default class Plhebicite extends Vue {
       name: string;
       id: string;
     }[],
-    cadreTile = false,
-    figure = true
+    option?: {
+      cadreType?: "url" | "tile";
+      figure?: string[];
+    }
   ): Layer[] {
+    const cadreType = option?.cadreType ?? "url";
+    const figure = option?.figure ?? [""];
     return [
       {
         name: "Voix",
@@ -1000,46 +1004,22 @@ export default class Plhebicite extends Vue {
           ],
         })),
       },
-      ...(figure
+      ...(figure.length > 0
         ? [
             {
               name: "Figures",
-              items: [
-                {
-                  type: "tile",
-                  url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
-                  crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                    origin: [2493818.1657315176, 1121636.39419185673],
-                    resolutions: [
-                      27.0671535440639985, 13.5335767720319993,
-                      6.76678838601599963, 3.38339419300799982,
-                      1.69169709650399991, 0.845848548251999954,
-                      0.422924274125999977,
-                    ],
-                    bounds: new Bounds(
-                      [2493818.1657315176, 1121636.39419185673],
-                      [2499146.16573695699, 1116308.39418641734]
-                    ),
-                  }),
-                },
-              ],
-            } as Layer,
-            {
-              name: "Figures light",
-              items: [
-                {
-                  type: "url",
-                  url: `atlas/figure/GEOJSON/test_02_light/atlas_${id}_${name}_figure.geojson`,
-                  style: true,
-                },
-              ],
+              items: (option?.figure ?? [""]).map((suffix) => ({
+                type: "url",
+                url: `atlas/figure/GEOJSON/test_02_light/atlas_${id}_${name}${suffix}_figure.geojson`,
+                style: true,
+              })),
             } as Layer,
           ]
         : []),
       {
         name: "Cadre",
         items: [
-          cadreTile
+          cadreType === "tile"
             ? {
                 type: "tile",
                 url: `atlas/cadre/${id}/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
@@ -1207,7 +1187,9 @@ export default class Plhebicite extends Vue {
                 id: "places",
               },
             ],
-            true
+            {
+              cadreType: "tile",
+            }
           ),
         },
         {
@@ -1332,7 +1314,9 @@ export default class Plhebicite extends Vue {
                   id: "unpopular_places",
                 },
               ],
-              true
+              {
+                cadreType: "tile",
+              }
             ),
           ],
         },
@@ -1351,8 +1335,9 @@ export default class Plhebicite extends Vue {
                 id: "senses",
               },
             ],
-            false,
-            false
+            {
+              figure: [],
+            }
           ),
         },
         {
@@ -1382,7 +1367,9 @@ export default class Plhebicite extends Vue {
                 id: "plural",
               },
             ],
-            true
+            {
+              cadreType: "tile",
+            }
           ),
         },
         {
@@ -1404,7 +1391,9 @@ export default class Plhebicite extends Vue {
                 id: "wellbeing",
               },
             ],
-            true
+            {
+              cadreType: "tile",
+            }
           ),
         },
         {
@@ -1471,7 +1460,10 @@ export default class Plhebicite extends Vue {
                 id: "spatial_quality",
               },
             ],
-            true
+            {
+              cadreType: "tile",
+              figure: ["_niv", "_route"],
+            }
           ),
         },
         {
@@ -1501,7 +1493,9 @@ export default class Plhebicite extends Vue {
                 id: "social",
               },
             ],
-            true
+            {
+              cadreType: "tile",
+            }
           ),
         },
       ],
