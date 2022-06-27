@@ -361,7 +361,7 @@
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith(
-                      'atlas/Sensibilité(s), au-delà du visuel'
+                      'atlas/Dimensions non visuelles'
                     )
                   "
                 >
@@ -486,59 +486,39 @@
             <div class="ma-3">
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Légende</h4>
-                <p class="d-flex">
-                  <v-img
-                    src="img/legends/voices.png"
-                    contain
-                    width="32"
-                  ></v-img>
-                  <span>
+                <legend-item image-src="img/legends/voices.png">
+                  <template>
                     <span class="font-weight-bold">Voix. </span>Recueille des
                     fragments de récits tout au long du parcours effectué,
                     parlant de lieux directement visibles, proches ou lointains
                     qui apparaissent dans la discussion.
-                  </span>
-                </p>
-                <p class="d-flex">
-                  <v-img
-                    src="img/legends/parcours.png"
-                    contain
-                    width="32"
-                  ></v-img>
-                  <span>
+                  </template>
+                </legend-item>
+                <legend-item image-src="img/legends/parcours.png">
+                  <template>
                     <span class="font-weight-bold">Parcours. </span>L’itinéraire
                     de l’entretien effectué. La largeur fluctue selon la vitesse
                     de marche, la couleur selon la pente du parcours. Les
                     entretiens durent entre 50 minutes et 3 heures.
-                  </span>
-                </p>
-                <p class="d-flex">
-                  <v-img
-                    src="img/legends/constellation.png"
-                    contain
-                    width="32"
-                  ></v-img>
-                  <span>
+                  </template>
+                </legend-item>
+                <legend-item image-src="img/legends/constellation.png">
+                  <template>
                     <span class="font-weight-bold">Constellation. </span
                     >Rassemblent une série de lieux significatifs pour chaque
                     récit, montrant l'étendue et la nature discontinue de notre
                     expérience vécue et les différents territoires que cela
                     dessine.
-                  </span>
-                </p>
-                <p class="d-flex">
-                  <v-img
-                    src="img/legends/horizons.png"
-                    contain
-                    width="32"
-                  ></v-img>
-                  <span>
+                  </template>
+                </legend-item>
+                <legend-item image-src="img/legends/horizons.png">
+                  <template>
                     <span class="font-weight-bold">Horizons. </span>Succession
                     de points de vue visibles depuis l’itinéraire. Révèle la
                     profondeur de l’espace affecté par notre mobilité et
                     l’étendue variable du regard selon les lieux.
-                  </span>
-                </p>
+                  </template>
+                </legend-item>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
                 <h4>Légende du cadre</h4>
@@ -550,17 +530,25 @@
                   "
                 >
                   <p>Carte des toponymes superposés</p>
-                  <ul>
-                    <li>Communes et quartiers</li>
-                    <li>Arrêts de bus</li>
-                    <li>Cours d’eau</li>
-                    <li>Lieux-dits datant de 1828, Plan Edmond Pictet</li>
-                  </ul>
-                  <br />
-                  <p class="text-caption">
-                    Souces : Swisstopo / SITG / Livre Profil de Vernier, Pierre
-                    Pittard, 1975
-                  </p>
+                  <legend-item
+                    image-src="img/legends/Atlas_01_A.png"
+                    text="Nomenclature des noms locaux"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_01_B.png"
+                    text="Lieux-dits datant de 1828, Plan Edmond Pictet "
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_01_C.png"
+                    text="Offices postaux"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_01_D.png"
+                    text="Cours d’eau"
+                  ></legend-item>
+                  <legend-source
+                    text="Swisstopo / SITG / Livre Profil de Vernier, Pierre Pittard, 1975"
+                  ></legend-source>
                 </template>
                 <template
                   v-if="
@@ -569,11 +557,22 @@
                     )
                   "
                 >
-                  <p>
-                    Inventaire des objets principaux du patrimoine culturel,
-                    architectural et bâti selon les sources SITG et les archives
-                    de la commune.
-                  </p>
+                  <p>Carte des toponymes superposés</p>
+                  <legend-item
+                    image-src="img/legends/Atlas_02_A.png"
+                    text="Inventaire des objets principaux du patrimoine culturel et architectural"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_02_B.png"
+                    text="Inventaire du patrimoine industriel"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_02_C.png"
+                    text="Inventaire du patrimoine naturel"
+                  ></legend-item>
+                  <legend-source
+                    text="SITG et les archives de la commune (coll. Ville de Vernier)."
+                  ></legend-source>
                 </template>
                 <template
                   v-if="
@@ -582,10 +581,10 @@
                     )
                   "
                 >
-                  <p>
-                    Cette carte transpose la matière brute de fragments
-                    d’entretiens là où ils ont été évoqués.
-                  </p>
+                  <legend-item
+                    image-src="img/legends/Atlas_03_A.png"
+                    text="Cette carte transpose la matière brute de fragments d’entretiens là où ils ont été évoqués."
+                  ></legend-item>
                 </template>
                 <template
                   v-if="
@@ -648,22 +647,34 @@
                       )
                     "
                   >
-                    <p>
-                      Le heat map des "facilitateurs" est issu des réponses
-                      fournies par les Verniolans à un questionnaire
-                      participatif, lors duquel il leur a été demandé de placer
-                      sur une carte des aménagements qui facilitent ou
-                      encouragent la mobilité douce. En zoomant sur la carte, on
-                      distingue des nuages de points plus ou moins grands, selon
-                      que les réponses ont été placées aux mêmes endroits par
-                      plusieurs répondants.
-                    </p>
+                    <legend-item
+                      image-src="img/legends/Atlas_04_Facilitateurs_A.png"
+                    >
+                      <template>
+                        Le heat map des "facilitateurs" est issu des réponses
+                        fournies par les Verniolans à un questionnaire
+                        participatif, lors duquel il leur a été demandé de
+                        placer sur une carte des aménagements qui facilitent ou
+                        encouragent la mobilité douce. En zoomant sur la carte,
+                        on distingue des nuages de points plus ou moins grands,
+                        selon que les réponses ont été placées aux mêmes
+                        endroits par plusieurs répondants.
+                      </template>
+                    </legend-item>
                     <p>
                       En survolant les points au moyen de la souris, il est
                       possible d'obtenir plus de précisions sur la nature de
                       l'aménagement, et en quoi celui-ci permet d'améliorer la
                       mobilité douce.
                     </p>
+                    <p>
+                      Un facilitateur est une caractéristique environnementale,
+                      naturelle ou humaine, qui encourage ou aide les pratiques
+                      de mobilité active.
+                    </p>
+                    <legend-source
+                      text="Maptionnaire en ligne, plus d'informations dans A PROPOS"
+                    ></legend-source>
                   </template>
                   <template
                     v-else-if="
@@ -672,55 +683,73 @@
                       )
                     "
                   >
-                    <p>
-                      Le heat map des "obstacles" est issu des réponses fournies
-                      par les Verniolans à un questionnaire participatif, lors
-                      duquel il leur a été demandé de placer sur une carte des
-                      aménagements qui découragent voire bloquent la mobilité
-                      douce. En zoomant sur la carte, on distingue des nuages de
-                      points plus ou moins grands, selon que les réponses ont
-                      été placées aux mêmes endroits par plusieurs répondants.
-                    </p>
+                    <legend-item
+                      image-src="img/legends/Atlas_04_Obstacles_A.png"
+                    >
+                      <template>
+                        Le heat map des "obstacles" est issu des réponses
+                        fournies par les Verniolans à un questionnaire
+                        participatif, lors duquel il leur a été demandé de
+                        placer sur une carte des aménagements qui découragent
+                        voire bloquent la mobilité douce. En zoomant sur la
+                        carte, on distingue des nuages de points plus ou moins
+                        grands, selon que les réponses ont été placées aux mêmes
+                        endroits par plusieurs répondants.
+                      </template>
+                    </legend-item>
                     <p>
                       En survolant les points au moyen de la souris, il est
                       possible d'obtenir plus de précisions sur la nature de
                       l'aménagement, et en quoi celui-ci réduit la qualité de la
                       mobilité douce.
                     </p>
+                    <p>
+                      Un obstacle est une caractéristique environnementale,
+                      naturelle ou humaine, qui décourage ou entrave les
+                      pratiques de mobilité active.
+                    </p>
+                    <legend-source
+                      text="Maptionnaire en ligne, plus d'informations dans A PROPOS"
+                    ></legend-source>
                   </template>
                   <template v-else>
-                    <p>
-                      Réseau piéton de la commune de Vernier et dessin de la
-                      signalétique piétonne au sol révélant les relations et
-                      conflits entre les différents moyens de transport et les
-                      continuités/discontinuités lors des déplacements.
-                    </p>
-                    <p class="text-caption">Sources : Openstreemap / SITG</p>
+                    <legend-item
+                      image-src="img/legends/Atlas_04_A.png"
+                      text="réseau piéton de la commune de Vernier"
+                    ></legend-item>
+                    <legend-item
+                      image-src="img/legends/Atlas_04_B.png"
+                      text="dessin de la signalétique piétonne au sol révélant les relations et conflits entre les différents moyens de transport et les continuités/discontinuités lors des déplacements."
+                    ></legend-item>
+                    <legend-source text="Openstreemap / SITG"></legend-source>
                   </template>
                 </template>
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith(
-                      'atlas/Sensibilité(s), au-delà du visuel'
+                      'atlas/Dimensions non visuelles'
                     )
                   "
                 >
-                  <ul>
-                    <li>
-                      Bruit : Extraction du bruit routier mesuré aux façades des
-                      bâtiments, bruit de l'aéroport (surface définie à
-                      l'intérieur des courbes enveloppantes du degré de
-                      sensibilité OPB II)
-                    </li>
-                    <li>
-                      Olfaction : sources d’odeurs venant des parfums
-                      caractéristique des industries locales et du kérosène
-                    </li>
-                  </ul>
-                  <p class="text-caption">
-                    Sources : SITG / Enquête sur les nuisances olfactives à
-                    Vernier en 1983
-                  </p>
+                  <legend-item
+                    image-src="img/legends/Atlas_05_A.png"
+                    text="Bruit : Extraction du bruit routier mesuré aux façades des bâtiments"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_05_B.png"
+                    text="Bruit de l'aéroport (surface définie à l'intérieur des courbes enveloppantes du degré de sensibilité OPB II) / Bruit voies ferroviaires"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_05_C.png"
+                    text="Olfaction : sources d’odeurs venant des parfums des industries locales"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_05_D.png"
+                    text="Olfaction : sources d’odeurs de kérosène"
+                  ></legend-item>
+                  <legend-source
+                    text="SITG / Enquête sur les nuisances olfactives à Vernier en 1983, par le service cantonal d'écotoxicologie"
+                  ></legend-source>
                 </template>
                 <template
                   v-if="
@@ -729,12 +758,15 @@
                     )
                   "
                 >
-                  <p>
-                    La carte historique Siegfried datant de 1899 et la carte des
-                    Inventaire des voies de communication historiques de la
-                    Suisse (IVS)
-                  </p>
-                  <p class="text-caption">Sources : SITG / Swisstopo</p>
+                  <legend-item
+                    image-src="img/legends/Atlas_06_A.png"
+                    text="Carte historique Siegfried datant de 1899"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_06_B.png"
+                    text="Carte des Inventaire des voies de communication historiques de la Suisse (IVS) "
+                  ></legend-item>
+                  <legend-source text="SITG / Swisstopo"></legend-source>
                 </template>
                 <template
                   v-if="
@@ -743,43 +775,105 @@
                     )
                   "
                 >
-                  <p>
-                    Recensement des espaces verts et espaces naturels de la
-                    commune
-                  </p>
-                  <p>
-                    Risques : Sites industriels (en particulier citernes et
-                    sites chimiques), train et transport de chlore, SIG,
-                    autoroute, trafic routier et pollution sur les grands axes,
-                    passage d’avions et aéroport
-                  </p>
-                  <p class="text-caption">Sources : SITG</p>
+                  <legend-item
+                    image-src="img/legends/Atlas_07_A.png"
+                    text="Recensement des espaces verts et sportifs de la commune"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_07_B.png"
+                    text="Recensement des espaces naturels de la commune"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_07_C.png"
+                    text="Risques : Sites industriels (en particulier citernes et sites chimiques), SIG et différentes conduites"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_07_D.png"
+                    text="Risques : trafic routier et pollution sur les grands axes, train et transport de chlore"
+                  ></legend-item>
+                  <legend-source text="SITG"></legend-source>
                 </template>
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith('atlas/Pratiques situées')
                   "
                 >
+                  <p>Equipements publics :</p>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_A.png"
+                    text="administration"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_B.png"
+                    text="culture"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_C.png"
+                    text="enseignement"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_D.png"
+                    text="santé-social"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_E.png"
+                    text="sécurité"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_08_F.png"
+                    text="sport et loisirs"
+                  ></legend-item>
+                  <legend-source text="SITG"></legend-source>
                 </template>
                 <template
                   v-if="lastSelectedLayerId.startsWith('atlas/Territorialité')"
                 >
-                  <p>
-                    Couche topographique (tous les 1m), perceptions multiples et
-                    diffuses des frontières de la commune, barrières linéaires
-                    sur le territoire communal.
-                  </p>
-                  <p class="text-caption">
-                    Sources : SITG, entretiens réalisés sur la commune, …
-                  </p>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_A.png"
+                    text="Topographie"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_B.png"
+                    text="Perceptions multiples et diffuses des frontières de la commune"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_C.png"
+                    text="Barrières linéaires sur le territoire communal (routes et voies ferrées)"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_D.png"
+                    text="Quai gare"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_E.png"
+                    text="Arrêt TPG"
+                  ></legend-item>
+                  <legend-item
+                    image-src="img/legends/Atlas_09_F.png"
+                    text="Débarcadère"
+                  ></legend-item>
+                  <legend-source
+                    text="SITG et entretiens réalisés sur la commune"
+                  ></legend-source>
                 </template>
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith('atlas/Écologies politiques')
                   "
                 >
-                  <p>Parcellaires publics et privés (...)</p>
-                  <p class="text-caption">Sources : SITG</p>
+                  <legend-item
+                    image-src="img/legends/Atlas_10_A.png"
+                    text="Equipements publics"
+                  ></legend-item
+                  ><legend-item
+                    image-src="img/legends/Atlas_10_B.png"
+                    text="Dépendances"
+                  ></legend-item
+                  ><legend-item
+                    image-src="img/legends/Atlas_10_C.png"
+                    text="Propriétés publiques (CFF, CIA, SIG…)"
+                  ></legend-item>
+                  <legend-source text="SITG"></legend-source>
                 </template>
               </template>
               <template v-if="selectedCategoryId === 'environment'">
@@ -812,6 +906,8 @@
 
 <script lang="ts">
 import ColorBox from "@/components/ColorBox.vue";
+import LegendItem from "@/components/LegendItem.vue";
+import LegendSource from "@/components/LegendSource.vue";
 import SimpleDialog from "@/components/SimpleDialog.vue";
 import WebMap, {
   HeatmapMapItem,
@@ -843,6 +939,8 @@ import { mapMutations } from "vuex";
 @Component({
   components: {
     ColorBox,
+    LegendItem,
+    LegendSource,
     SimpleDialog,
     WebMap,
   },
@@ -1313,7 +1411,7 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
-          name: "Sensibilité(s), au-delà du visuel",
+          name: "Dimensions non visuelles",
           children: this.getAtlasChildren(
             "05",
             "non_visual",
@@ -1549,7 +1647,7 @@ export default class Plhebicite extends Vue {
   readonly lasiglegendItems: { color: string; text: string }[] = [
     {
       color: "#1a9641",
-      text: "0.00000 - 0.07692",
+      text: "0.00000 - 0.07692 : espace particulièrement favorable à la mobilité piétonne",
     },
     {
       color: "#a6d96a",
@@ -1565,7 +1663,7 @@ export default class Plhebicite extends Vue {
     },
     {
       color: "#d7191c",
-      text: "0.59601 - 1.00000",
+      text: "0.59601 - 1.00000 : espace particulièrement défavorable à la mobilité piétonne",
     },
   ];
 
