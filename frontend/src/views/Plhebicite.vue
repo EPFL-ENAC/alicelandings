@@ -70,14 +70,16 @@
         </div>
         <v-divider></v-divider>
         <div class="d-flex">
-          <simple-dialog class="flex-even" name="Infos">
+          <simple-dialog class="flex-even">
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-left" text v-on="on">
                 Infos
               </v-btn>
             </template>
             <template v-slot>
-              <h4>Le projet Plhebicite</h4>
+              <h1>INFOS _________________________________</h1>
+              <br />
+              <h2>Le projet Plhebicite</h2>
               <p>
                 Ce projet, fruit d'une collaboration entre ALICE (Atelier de la
                 Conception de l'Espace) et LASIG (Laboratoire des Systèmes
@@ -101,7 +103,7 @@
                   Link
                 </a>
               </p>
-              <h4>Partenaires</h4>
+              <h2>Partenaires</h2>
               <p>
                 Commune de Vernier<br />
                 Canton de Genève <br />
@@ -113,52 +115,101 @@
                   ENAC-IT4R
                 </a>
               </p>
-              <h4>Remerciements</h4>
+              <h2>Remerciements</h2>
               <p>
-                Nous remercions les nombreuses personnes qui nous ont aidé dans
-                la recherche et qui ont participé au projet. En particuliers les
-                habitant.e.s nous ayant guidé à travers la commune durant les
-                entretiens en marchant. Nous remercions également le service de
-                la cohésion sociale, les contrats de quartiers, les personnes
-                rencontrées dans des associations ou dans les différents
-                quartiers, le service de la culture et communication, le service
-                de l’aménagement.
+                Nous remercions les nombreuses personnes qui nous ont aidé au
+                cours de la recherche, qui ont participé aux différentes phases
+                et rendu ce projet possible. Un merci particulier aux
+                habitant.e.s de la commune nous ayant guidé à travers Vernier
+                durant les entretiens en marchant.<br />
+                Nous remercions également à Vernier : le Service de la Cohésion
+                Sociale, les Contrats de Quartiers, les personnes rencontrées
+                dans des associations, le Service de la Culture et
+                Communication, le Service de l’Aménagement.<br />
+                Nous remercions tous les habitant.e.s qui ont répondu au
+                questionnaire en ligne.<br />
+                Merci finalement à Julien Heil pour ses photographies, à Nagy
+                Makhlouf, Yann Bergeot et Camille Claessens Vallet.
               </p>
-              <h4>Equipe</h4>
+              <h2>Equipe</h2>
               <p>
-                Lucía Jalón Oyarzun (ALICE)<br />
-                Marco Vieira Ruas (LASIG)<br />
-                Emmanuelle Agustoni (ALICE)<br />
-                Aurèle Pulfer (ALICE)<br />
-                Charlotte Weil (ENAC-IT4R)<br />
-                David Tang (ENAC-IT4R)
+                <a
+                  href="https://people.epfl.ch/lucia.jalonoyarzun"
+                  target="_blank"
+                  >Lucía Jalón Oyarzun (ALICE)</a
+                ><br />
+                <a
+                  href="https://people.epfl.ch/marco.vieiraruas"
+                  target="_blank"
+                  >Marco Vieira Ruas (LASIG)</a
+                ><br />
+                <a
+                  href="https://people.epfl.ch/emmanuelle.agustoni"
+                  target="_blank"
+                  >Emmanuelle Agustoni (ALICE)</a
+                ><br />
+                <a href="https://people.epfl.ch/aurele.pulfer" target="_blank"
+                  >Aurèle Pulfer (ALICE)</a
+                ><br />
+                <a href="https://people.epfl.ch/david.tang" target="_blank"
+                  >David Tang (IT4R)</a
+                ><br />
+                <a href="https://people.epfl.ch/charlotte.weil" target="_blank"
+                  >Charlotte Weil (IT4R)</a
+                ><br />
+                <a href="https://people.epfl.ch/antonin.mack" target="_blank"
+                  >Antonin Mack (ALICE)</a
+                ><br />
+                Valentin Moullet (IT4R)
               </p>
-              <h4>Contact</h4>
+              <h2>Contact</h2>
               <p>
                 N’hésitez-pas à nous contacter pour toute question ou remarque
-                concernant le projet et pour nous faire part de vos idées !
-                <br />
-                Nous serons heureux.ses de vous répondre par email ou téléphone.
-              </p>
-              <p>
-                <a href="mailto:lucia.jalonoyarzun@epfl.ch">Lucía</a>,
-                <a href="mailto:marco.vieiraruas@epfl.ch">Marco</a> and
-                <a href="mailto:emmanuelle.agustoni@epfl.ch">Emmanuelle</a>
-                <br />
-                ALICE Administration /
-                <a href="mailto:jaime.ruiz@epfl.ch">Jaime Ruiz</a> /
+                concernant le projet et pour nous faire part de vos idées !<br />
+                Nous serons heureux.ses de vous répondre par email ou
+                téléphone.<br />
+                <a href="mailto:alice.news@epfl.ch">alice.news@epfl.ch</a><br />
+                ALICE Administration / Jaime Ruiz /
                 <a href="tel:+41216933203">+41 21 693 32 03</a>
               </p>
+              <div class="d-flex">
+                <a href="https://epfl.ch/" target="_blank">
+                  <v-img
+                    contain
+                    src="/logo/EPFL_Logo_184X53.svg"
+                    height="50px"
+                    width="100px"
+                  ></v-img>
+                </a>
+                <a href="https://www.epfl.ch/labs/alice/" target="_blank">
+                  <v-img
+                    contain
+                    src="/logo/alice.png"
+                    height="50px"
+                    width="100px"
+                  ></v-img>
+                </a>
+                <a href="https://www.epfl.ch/labs/lasig/" target="_blank">
+                  <v-img
+                    contain
+                    src="/logo/lasig.png"
+                    height="50px"
+                    width="100px"
+                  ></v-img>
+                </a>
+              </div>
             </template>
           </simple-dialog>
-          <simple-dialog class="flex-even" name="A Propos">
+          <simple-dialog class="flex-even">
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-right" text v-on="on">
                 A Propos
               </v-btn>
             </template>
             <template v-slot>
-              <h4>Le projet</h4>
+              <h1>A PROPOS _________________________________</h1>
+              <br />
+              <h2>Le projet</h2>
               <p>
                 Pour relever les défis posés par le changement climatique dans
                 nos villes, il est essentiel de reconnaître le rôle que joue
@@ -177,7 +228,7 @@
                 d'importance à nos communautés dans les conversations sur
                 l'avenir de nos villes.
               </p>
-              <h4>Cartographies affectives</h4>
+              <h2>Cartographies affectives</h2>
               <p>
                 La série des cartographies affectives propose une manière
                 alternative à la représentation de l'espace urbain de la commune
@@ -195,7 +246,7 @@
                 transformées, nous pouvons élargir nos imaginaires urbains et
                 améliorer la façon dont nous planifions et concevons nos villes.
               </p>
-              <h4>Atlas des paysages de la mobilité</h4>
+              <h2>Atlas des paysages de la mobilité</h2>
               <p>
                 L'Atlas des paysages de mobilité est une série de témoignages de
                 citoyen.ne.s et de données d'information géographique rassemblés
@@ -214,10 +265,25 @@
               </p>
               <p>
                 L’Atlas inclut également quelques premières analyses du
-                questionnaire participatif (MAPTIONNAIRE) venant de clore et
-                réalisé sur la commune de Vernier entre février et juin 2022.
-                Une analyse plus approfondie du questionnaire sera réalisée par
-                la suite.
+                questionnaire participatif (MAPTIONNAIRE) venant de clore. Il
+                visait à recueillir les pratiques de mobilité, les déplacements
+                quotidiens et les attachements affectifs des habitant.e.s. Il a
+                été réalisé sur la commune de Vernier entre février et juin
+                2022. Une analyse plus approfondie du questionnaire sera
+                réalisée par la suite.
+              </p>
+              <h2>Navigation sur le site</h2>
+              <p>
+                Les onglets sur la gauche sont extensibles et permettent
+                d’entrer dans les couches pour comprendre les superpositions
+                d’information. Il y a deux voire parfois trois niveaux de
+                navigation possibles. Les onglets se referment facilement en
+                cliquant à nouveau sur le triangle.<br />
+                Les descriptifs et légendes en bas de page donnent des
+                informations supplémentaires pour chaque carte ou chapitre.
+                <br />
+                L'icône carré en haut à droite permet de voir les cartes en
+                pleine page.
               </p>
               <p>
                 Cet outil de visualisation a été créé grâce à la participation
@@ -234,16 +300,13 @@
                 que le bien-être et la santé physique et psychologique des
                 habitant.e.s de la commune de Vernier dans le canton de Genève.
               </p>
-              <h4>Remerciements</h4>
               <p>
-                Nous remercions les nombreuses personnes qui nous ont aidé dans
-                la recherche et qui ont participé au projet. En particuliers les
-                habitant.e.s nous ayant guidé à travers la commune durant les
-                entretiens en marchant. Nous remercions également le service de
-                la cohésion sociale, les contrats de quartiers, les personnes
-                rencontrées dans des associations ou dans les différents
-                quartiers, le service de la culture et communication, le service
-                de l’aménagement.
+                Les chercheurs d'ALICE et de LASIG assument la responsabilité
+                d'avoir les droits d'afficher publiquement les informations
+                partagées sur ce site web.<br />
+                Les chercheurs ont veillé à ce que les droits de tous les
+                participant.e.s au projet soient respectés, en assurant
+                l’anonymat complet des données.
               </p>
             </template>
           </simple-dialog>

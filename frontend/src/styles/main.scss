@@ -41,15 +41,23 @@ html {
   padding-right: 12px !important;
 }
 
-.theme--light.v-btn {
-  color: var(--v-primary-base);
-}
-
 .text-point-tooltip {
   background: none;
   border: none;
   box-shadow: none;
   white-space: break-spaces;
+}
+
+.theme--light.v-btn {
+  color: var(--v-primary-base) !important;
+}
+
+.theme--light.v-card {
+  color: var(--v-primary-base) !important;
+
+  & > .v-card__text {
+    color: var(--v-primary-base) !important;
+  }
 }
 
 /* https://www.digitalocean.com/community/tutorials/css-scrollbars */
