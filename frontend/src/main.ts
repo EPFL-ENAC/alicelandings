@@ -4,6 +4,7 @@ import { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Vue from "vue";
 import App from "./App.vue";
+import "./plugins/gtag";
 import vuetify from "./plugins/vuetify";
 import "./registerServiceWorker";
 import router from "./router";

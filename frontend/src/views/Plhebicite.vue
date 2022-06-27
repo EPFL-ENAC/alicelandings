@@ -308,6 +308,18 @@
                 participant.e.s au projet soient respectés, en assurant
                 l’anonymat complet des données.
               </p>
+              <p>
+                <a
+                  href="https://www.epfl.ch/about/overview/fr/reglements-et-directives/mentions-legales/"
+                  target="_blank"
+                  >Mentions légales</a
+                ><br />
+                <a
+                  href="https://go.epfl.ch/protection-des-donnees/"
+                  target="_blank"
+                  >Protection des données</a
+                >
+              </p>
             </template>
           </simple-dialog>
         </div>
