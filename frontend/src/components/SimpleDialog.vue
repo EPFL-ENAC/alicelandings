@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" :width="width">
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ on, attrs }">
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>
     <v-card class="text-justify">

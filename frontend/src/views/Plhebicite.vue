@@ -43,7 +43,7 @@
               no-action
               @click="clickCategory(item)"
             >
-              <template v-slot:activator>
+              <template #activator>
                 <v-list-item-content>
                   <v-list-item-title class="font-weight-black">
                     <h3>{{ item.name }}</h3>
@@ -71,12 +71,12 @@
         <v-divider></v-divider>
         <div class="d-flex">
           <simple-dialog class="flex-even">
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-left" text v-on="on">
                 Infos
               </v-btn>
             </template>
-            <template v-slot>
+            <template #default>
               <h1>INFOS _________________________________</h1>
               <br />
               <h2>Le projet Plhebicite</h2>
@@ -209,12 +209,12 @@
             </template>
           </simple-dialog>
           <simple-dialog class="flex-even">
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-right" text v-on="on">
                 A Propos
               </v-btn>
             </template>
-            <template v-slot>
+            <template #default>
               <h1>A PROPOS _________________________________</h1>
               <br />
               <h2>Le projet</h2>
@@ -578,37 +578,29 @@
               <template v-if="selectedCategoryId === 'mapping'">
                 <h4>Légende</h4>
                 <legend-item image-src="img/legends/voices.png">
-                  <template>
-                    <span class="font-weight-bold">Voix. </span>Recueille des
-                    fragments de récits tout au long du parcours effectué,
-                    parlant de lieux directement visibles, proches ou lointains
-                    qui apparaissent dans la discussion.
-                  </template>
+                  <span class="font-weight-bold">Voix. </span>Recueille des
+                  fragments de récits tout au long du parcours effectué, parlant
+                  de lieux directement visibles, proches ou lointains qui
+                  apparaissent dans la discussion.
                 </legend-item>
                 <legend-item image-src="img/legends/parcours.png">
-                  <template>
-                    <span class="font-weight-bold">Parcours. </span>L’itinéraire
-                    de l’entretien effectué. La largeur fluctue selon la vitesse
-                    de marche, la couleur selon la pente du parcours. Les
-                    entretiens durent entre 50 minutes et 3 heures.
-                  </template>
+                  <span class="font-weight-bold">Parcours. </span>L’itinéraire
+                  de l’entretien effectué. La largeur fluctue selon la vitesse
+                  de marche, la couleur selon la pente du parcours. Les
+                  entretiens durent entre 50 minutes et 3 heures.
                 </legend-item>
                 <legend-item image-src="img/legends/constellation.png">
-                  <template>
-                    <span class="font-weight-bold">Constellation. </span
-                    >Rassemblent une série de lieux significatifs pour chaque
-                    récit, montrant l'étendue et la nature discontinue de notre
-                    expérience vécue et les différents territoires que cela
-                    dessine.
-                  </template>
+                  <span class="font-weight-bold">Constellation. </span
+                  >Rassemblent une série de lieux significatifs pour chaque
+                  récit, montrant l'étendue et la nature discontinue de notre
+                  expérience vécue et les différents territoires que cela
+                  dessine.
                 </legend-item>
                 <legend-item image-src="img/legends/horizons.png">
-                  <template>
-                    <span class="font-weight-bold">Horizons. </span>Succession
-                    de points de vue visibles depuis l’itinéraire. Révèle la
-                    profondeur de l’espace affecté par notre mobilité et
-                    l’étendue variable du regard selon les lieux.
-                  </template>
+                  <span class="font-weight-bold">Horizons. </span>Succession de
+                  points de vue visibles depuis l’itinéraire. Révèle la
+                  profondeur de l’espace affecté par notre mobilité et l’étendue
+                  variable du regard selon les lieux.
                 </legend-item>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
@@ -742,11 +734,9 @@
                     <legend-item
                       image-src="img/legends/Atlas_04_Facilitateurs_A.png"
                     >
-                      <template>
-                        Un facilitateur est une caractéristique
-                        environnementale, naturelle ou humaine, qui encourage ou
-                        aide les pratiques de mobilité active.
-                      </template>
+                      Un facilitateur est une caractéristique environnementale,
+                      naturelle ou humaine, qui encourage ou aide les pratiques
+                      de mobilité active.
                     </legend-item>
                     <p>
                       Le heat map des "facilitateurs" est issu des réponses
@@ -778,11 +768,9 @@
                     <legend-item
                       image-src="img/legends/Atlas_04_Obstacles_A.png"
                     >
-                      <template>
-                        Un obstacle est une caractéristique environnementale,
-                        naturelle ou humaine, qui encourage ou aide les
-                        pratiques de mobilité active.
-                      </template>
+                      Un obstacle est une caractéristique environnementale,
+                      naturelle ou humaine, qui encourage ou aide les pratiques
+                      de mobilité active.
                     </legend-item>
                     <p>
                       Le heat map des "obstacles" est issu des réponses fournies
