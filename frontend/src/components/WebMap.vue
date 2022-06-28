@@ -370,7 +370,9 @@ export abstract class MapItem {
                   ? feature.properties[popup]
                   : popup(feature.properties);
               if (property) {
-                l.bindPopup(property.replaceAll("\n", "<br>"));
+                l.bindPopup(property.replaceAll("\n", "<br>"), {
+                  autoPan: false,
+                });
                 l.on("mouseover", () => l.openPopup());
                 l.on("mouseout", () => l.closePopup());
               }

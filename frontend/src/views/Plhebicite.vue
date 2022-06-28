@@ -126,6 +126,10 @@
                 Sociale, les Contrats de Quartiers, les personnes rencontrées
                 dans des associations, le Service de la Culture et
                 Communication, le Service de l’Aménagement.<br />
+                Nous remercions, de la même façon, au canton, Frédéric Josselin,
+                Chef de service, République et Canton de Genève, Département du
+                territoire (DT), Office de l'urbanisme et Service concertation
+                communication.<br />
                 Nous remercions tous les habitant.e.s qui ont répondu au
                 questionnaire en ligne.<br />
                 Merci finalement à Julien Heil pour ses photographies, à Nagy
@@ -160,7 +164,11 @@
                 <a href="https://people.epfl.ch/antonin.mack" target="_blank"
                   >Antonin Mack (ALICE)</a
                 ><br />
-                Valentin Moullet (IT4R)
+                <a
+                  href="https://www.linkedin.com/in/valentin-moullet-a4a93566/"
+                  target="_blank"
+                  >Valentin Moullet (civiliste chez IT4R)</a
+                >
               </p>
               <h2>Contact</h2>
               <p>
@@ -264,7 +272,15 @@
                 imaginaires et perceptions collectives qui les animent.
               </p>
               <p>
-                L’Atlas inclut également quelques premières analyses du
+                L’Atlas inclut également un index de mobilité qui est issu d’une
+                analyse spatiale d’éléments caractéristiques de l’espace urbain,
+                de la mobilité piétonne et de l’environnement tels que la
+                longueur du réseau piéton, la qualité des trottoirs, la densité
+                de végétation, la distance aux espaces verts et aux berges du
+                Rhône ou encore la mesure du bruit routier, entre autres.
+              </p>
+              <p>
+                Enfin, l'Atlas inclut également quelques premières analyses du
                 questionnaire participatif (MAPTIONNAIRE) venant de clore. Il
                 visait à recueillir les pratiques de mobilité, les déplacements
                 quotidiens et les attachements affectifs des habitant.e.s. Il a
@@ -675,6 +691,7 @@
                       )
                     "
                   >
+                    <p>Index de mobilité</p>
                     <p>
                       <span
                         v-for="item in lasiglegendItems"
@@ -726,26 +743,26 @@
                       image-src="img/legends/Atlas_04_Facilitateurs_A.png"
                     >
                       <template>
-                        Le heat map des "facilitateurs" est issu des réponses
-                        fournies par les Verniolans à un questionnaire
-                        participatif, lors duquel il leur a été demandé de
-                        placer sur une carte des aménagements qui facilitent ou
-                        encouragent la mobilité douce. En zoomant sur la carte,
-                        on distingue des nuages de points plus ou moins grands,
-                        selon que les réponses ont été placées aux mêmes
-                        endroits par plusieurs répondants.
+                        Un facilitateur est une caractéristique
+                        environnementale, naturelle ou humaine, qui encourage ou
+                        aide les pratiques de mobilité active.
                       </template>
                     </legend-item>
+                    <p>
+                      Le heat map des "facilitateurs" est issu des réponses
+                      fournies par les Verniolans à un questionnaire
+                      participatif, lors duquel il leur a été demandé de placer
+                      sur une carte des aménagements qui facilitent ou
+                      encouragent la mobilité douce. En zoomant sur la carte, on
+                      distingue des nuages de points plus ou moins grands, selon
+                      que les réponses ont été placées aux mêmes endroits par
+                      plusieurs répondants.
+                    </p>
                     <p>
                       En survolant les points au moyen de la souris, il est
                       possible d'obtenir plus de précisions sur la nature de
                       l'aménagement, et en quoi celui-ci permet d'améliorer la
                       mobilité douce.
-                    </p>
-                    <p>
-                      Un facilitateur est une caractéristique environnementale,
-                      naturelle ou humaine, qui encourage ou aide les pratiques
-                      de mobilité active.
                     </p>
                     <legend-source
                       text="Maptionnaire en ligne, plus d'informations dans A PROPOS"
@@ -762,26 +779,25 @@
                       image-src="img/legends/Atlas_04_Obstacles_A.png"
                     >
                       <template>
-                        Le heat map des "obstacles" est issu des réponses
-                        fournies par les Verniolans à un questionnaire
-                        participatif, lors duquel il leur a été demandé de
-                        placer sur une carte des aménagements qui découragent
-                        voire bloquent la mobilité douce. En zoomant sur la
-                        carte, on distingue des nuages de points plus ou moins
-                        grands, selon que les réponses ont été placées aux mêmes
-                        endroits par plusieurs répondants.
+                        Un obstacle est une caractéristique environnementale,
+                        naturelle ou humaine, qui encourage ou aide les
+                        pratiques de mobilité active.
                       </template>
                     </legend-item>
+                    <p>
+                      Le heat map des "obstacles" est issu des réponses fournies
+                      par les Verniolans à un questionnaire participatif, lors
+                      duquel il leur a été demandé de placer sur une carte des
+                      aménagements qui découragent voire bloquent la mobilité
+                      douce. En zoomant sur la carte, on distingue des nuages de
+                      points plus ou moins grands, selon que les réponses ont
+                      été placées aux mêmes endroits par plusieurs répondants.
+                    </p>
                     <p>
                       En survolant les points au moyen de la souris, il est
                       possible d'obtenir plus de précisions sur la nature de
                       l'aménagement, et en quoi celui-ci réduit la qualité de la
                       mobilité douce.
-                    </p>
-                    <p>
-                      Un obstacle est une caractéristique environnementale,
-                      naturelle ou humaine, qui décourage ou entrave les
-                      pratiques de mobilité active.
                     </p>
                     <legend-source
                       text="Maptionnaire en ligne, plus d'informations dans A PROPOS"
@@ -1722,23 +1738,23 @@ export default class Plhebicite extends Vue {
   readonly lasiglegendItems: { color: string; text: string }[] = [
     {
       color: "#1a9641",
-      text: "0.00000 - 0.07692 : espace particulièrement favorable à la mobilité piétonne",
+      text: "0.00 - 0.08 : espace particulièrement favorable à la mobilité piétonne",
     },
     {
       color: "#a6d96a",
-      text: "0.07692 - 0.22260",
+      text: "0.08 - 0.22",
     },
     {
       color: "#ffffc0",
-      text: "0.22260 - 0.37318",
+      text: "0.22 - 0.37",
     },
     {
       color: "#fdae61",
-      text: "0.37318 - 0.59601",
+      text: "0.37 - 0.60",
     },
     {
       color: "#d7191c",
-      text: "0.59601 - 1.00000 : espace particulièrement défavorable à la mobilité piétonne",
+      text: "0.60 - 1.00 : espace particulièrement défavorable à la mobilité piétonne",
     },
   ];
 

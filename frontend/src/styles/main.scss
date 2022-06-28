@@ -48,6 +48,10 @@ html {
   white-space: break-spaces;
 }
 
+.v-treeview-node__label {
+  height: 1.2rem;
+}
+
 .theme--light.v-btn {
   color: var(--v-primary-base) !important;
 }
