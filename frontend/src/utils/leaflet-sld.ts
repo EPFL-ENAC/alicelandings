@@ -1,3 +1,4 @@
+import { DOMParser } from "@xmldom/xmldom";
 import { Feature, Point } from "geojson";
 import L, {
   circleMarker,
@@ -17,7 +18,6 @@ import "leaflet.pattern";
 import { round } from "lodash";
 import "proj4leaflet";
 import { colors } from "vuetify/lib";
-import { DOMParser } from "xmldom";
 import xpath from "xpath";
 
 const select = xpath.useNamespaces({
