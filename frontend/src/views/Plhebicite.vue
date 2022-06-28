@@ -1143,7 +1143,7 @@ export default class Plhebicite extends Vue {
       id: string;
     }[],
     option?: {
-      cadreType?: "url" | "tile";
+      cadreType?: "url" | "tile" | "all";
       figureType?: "url" | "tile";
       figure?: string[];
     }
@@ -1151,6 +1151,31 @@ export default class Plhebicite extends Vue {
     const cadreType = option?.cadreType ?? "url";
     const figureType = option?.figureType ?? "url";
     const figure = option?.figure ?? [""];
+    const cadreItems: LayerItem[] = [];
+    if (cadreType === "url" || cadreType === "all") {
+      cadreItems.push({
+        type: "url",
+        url: `atlas/cadre/${id}/metadata.json`,
+      });
+    }
+    if (cadreType === "tile" || cadreType === "all") {
+      cadreItems.push({
+        type: "tile",
+        url: `atlas/cadre/${id}/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
+        crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+          origin: [2491284.74821705418, 1123583.5241703114],
+          resolutions: [
+            72.1788214780160047, 36.0894107390080023, 18.0447053695040012,
+            9.02235268475200058, 4.51117634237600029, 2.25558817118800015,
+            1.12779408559400007, 0.563897042797000037,
+          ],
+          bounds: new Bounds(
+            [2491284.74821705418, 1123583.5241703114],
+            [2501274.74822724564, 1113593.5241601197]
+          ),
+        }),
+      });
+    }
     return [
       {
         name: "Voix",
@@ -1210,30 +1235,7 @@ export default class Plhebicite extends Vue {
         : []),
       {
         name: "Cadre",
-        items: [
-          cadreType === "tile"
-            ? {
-                type: "tile",
-                url: `atlas/cadre/${id}/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
-                crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                  origin: [2491284.74821705418, 1123583.5241703114],
-                  resolutions: [
-                    72.1788214780160047, 36.0894107390080023,
-                    18.0447053695040012, 9.02235268475200058,
-                    4.51117634237600029, 2.25558817118800015,
-                    1.12779408559400007, 0.563897042797000037,
-                  ],
-                  bounds: new Bounds(
-                    [2491284.74821705418, 1123583.5241703114],
-                    [2501274.74822724564, 1113593.5241601197]
-                  ),
-                }),
-              }
-            : {
-                type: "url",
-                url: `atlas/cadre/${id}/metadata.json`,
-              },
-        ],
+        items: cadreItems,
       },
     ];
   }
@@ -1532,6 +1534,7 @@ export default class Plhebicite extends Vue {
               },
             ],
             {
+              cadreType: "all",
               figure: [],
             }
           ),
@@ -1595,20 +1598,27 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "Pratiques situées",
-          children: this.getAtlasChildren("08", "situated", [
+          children: this.getAtlasChildren(
+            "08",
+            "situated",
+            [
+              {
+                name: "Paysage animé",
+                id: "landscape",
+              },
+              {
+                name: "Rituels et habitudes",
+                id: "rituals",
+              },
+              {
+                name: "Pratiques situées",
+                id: "practices",
+              },
+            ],
             {
-              name: "Paysage animé",
-              id: "landscape",
-            },
-            {
-              name: "Rituels et habitudes",
-              id: "rituals",
-            },
-            {
-              name: "Pratiques situées",
-              id: "practices",
-            },
-          ]),
+              cadreType: "all",
+            }
+          ),
         },
         {
           name: "Territorialité",
@@ -1658,7 +1668,7 @@ export default class Plhebicite extends Vue {
               },
             ],
             {
-              cadreType: "tile",
+              cadreType: "all",
               figure: ["_niv", "_route"],
             }
           ),
