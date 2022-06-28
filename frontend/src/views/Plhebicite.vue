@@ -1144,10 +1144,12 @@ export default class Plhebicite extends Vue {
     }[],
     option?: {
       cadreType?: "url" | "tile";
+      figureType?: "url" | "tile";
       figure?: string[];
     }
   ): Layer[] {
     const cadreType = option?.cadreType ?? "url";
+    const figureType = option?.figureType ?? "url";
     const figure = option?.figure ?? [""];
     return [
       {
@@ -1177,11 +1179,32 @@ export default class Plhebicite extends Vue {
         ? [
             {
               name: "Figures",
-              items: (option?.figure ?? [""]).map((suffix) => ({
-                type: "url",
-                url: `atlas/figure/GEOJSON/test_02_light/atlas_${id}_${name}${suffix}_figure.geojson`,
-                style: true,
-              })),
+              items:
+                figureType === "url"
+                  ? (option?.figure ?? [""]).map((suffix) => ({
+                      type: "url",
+                      url: `atlas/figure/atlas_${id}_${name}${suffix}_figure.geojson`,
+                      style: true,
+                    }))
+                  : [
+                      {
+                        type: "tile",
+                        url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
+                        crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+                          origin: [2493818.1657315176, 1121636.39419185673],
+                          resolutions: [
+                            27.0671535440639985, 13.5335767720319993,
+                            6.76678838601599963, 3.38339419300799982,
+                            1.69169709650399991, 0.845848548251999954,
+                            0.422924274125999977,
+                          ],
+                          bounds: new Bounds(
+                            [2493818.1657315176, 1121636.39419185673],
+                            [2499146.16573695699, 1116308.39418641734]
+                          ),
+                        }),
+                      },
+                    ],
             } as Layer,
           ]
         : []),
@@ -1193,16 +1216,16 @@ export default class Plhebicite extends Vue {
                 type: "tile",
                 url: `atlas/cadre/${id}/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
                 crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                  origin: [2491284.60721891979, 1123583.6651326362],
+                  origin: [2491284.74821705418, 1123583.5241703114],
                   resolutions: [
-                    54.1371719434240006, 27.0685859717120003,
-                    13.5342929858560002, 6.76714649292800008,
-                    3.38357324646400004, 1.69178662323200002,
-                    0.84589331161600001,
+                    72.1788214780160047, 36.0894107390080023,
+                    18.0447053695040012, 9.02235268475200058,
+                    4.51117634237600029, 2.25558817118800015,
+                    1.12779408559400007, 0.563897042797000037,
                   ],
                   bounds: new Bounds(
-                    [2491284.60721891979, 1123583.6651326362],
-                    [2501275.45312241651, 1113592.81922913971]
+                    [2491284.74821705418, 1123583.5241703114],
+                    [2501274.74822724564, 1113593.5241601197]
                   ),
                 }),
               }
@@ -1538,6 +1561,7 @@ export default class Plhebicite extends Vue {
             ],
             {
               cadreType: "tile",
+              figureType: "tile",
             }
           ),
         },
