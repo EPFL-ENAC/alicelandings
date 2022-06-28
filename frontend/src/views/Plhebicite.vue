@@ -1395,7 +1395,7 @@ export default class Plhebicite extends Vue {
                   items: [
                     {
                       type: "tile",
-                      url: "atlas/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
+                      url: "atlas/analyses/mobility_index/20220614_hexa_range_code_grid_tot_vn_2056_v17_shp_df_weighted_20210917_ALL/{z}/{x}/{y}.png",
                       crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
                         origin: [2493617.3434664933, 1120234.04876646609],
                         resolutions: [
@@ -1416,13 +1416,15 @@ export default class Plhebicite extends Vue {
                   items: [
                     {
                       type: "heatmap",
-                      url: "atlas/heatmaps/geojson_facilitateurs_20220622_tot_selection.geojson",
+                      url: "atlas/analyses/facilitators_obstacles/geojson_facilitateurs_20220622_tot_selection.geojson",
                       latitude: "latitude",
                       longitude: "longitude",
                     },
                     {
                       type: "url",
-                      url: "atlas/heatmaps/geojson_facilitateurs_20220622_tot_selection.geojson",
+                      url: "atlas/analyses/facilitators_obstacles/geojson_facilitateurs_20220622_tot_selection.geojson",
+                      style:
+                        "atlas/analyses/facilitators_obstacles/20220627_facilitators_circles.sld",
                       popup: function (
                         properties: Record<string, string>
                       ): string | undefined {
@@ -1432,12 +1434,12 @@ export default class Plhebicite extends Vue {
                     <b>En quoi aide-t-il à la mobilité?</b>
                     ${properties["why"]}`;
                       },
-                      getIconOptions: function (): IconOptions {
-                        return {
-                          iconUrl: "img/legends/blank.svg",
-                          iconSize: [16, 16],
-                        };
-                      },
+                      // getIconOptions: function (): IconOptions {
+                      //   return {
+                      //     iconUrl: "img/legends/blank.svg",
+                      //     iconSize: [16, 16],
+                      //   };
+                      // },
                     },
                   ],
                 },
@@ -1446,7 +1448,7 @@ export default class Plhebicite extends Vue {
                   items: [
                     {
                       type: "heatmap",
-                      url: "atlas/heatmaps/geojson_obstacles_20220622_tot_selection.geojson",
+                      url: "atlas/analyses/facilitators_obstacles/geojson_obstacles_20220622_tot_selection.geojson",
                       latitude: "latitude",
                       longitude: "longitude",
                       options: {
@@ -1460,7 +1462,9 @@ export default class Plhebicite extends Vue {
                     },
                     {
                       type: "url",
-                      url: "atlas/heatmaps/geojson_obstacles_20220622_tot_selection.geojson",
+                      url: "atlas/analyses/facilitators_obstacles/geojson_obstacles_20220622_tot_selection.geojson",
+                      // style:
+                      //   "atlas/analyses/facilitators_obstacles/20220627_obstacles_cross.sld",
                       popup: function (
                         properties: Record<string, string>
                       ): string | undefined {
@@ -1750,23 +1754,23 @@ export default class Plhebicite extends Vue {
   readonly lasiglegendItems: { color: string; text: string }[] = [
     {
       color: "#1a9641",
-      text: "0.00 - 0.08 : espace particulièrement favorable à la mobilité piétonne",
+      text: "0.000 - 0.077 : Espace particulièrement favorable à la mobilité piétonne",
     },
     {
       color: "#a6d96a",
-      text: "0.08 - 0.22",
+      text: "0.077 - 0.223 : Espace modérément favorable à la mobilité piétonne",
     },
     {
       color: "#ffffc0",
-      text: "0.22 - 0.37",
+      text: "0.223 - 0.373 : Espace neutre en termes de mobilité piétonne",
     },
     {
       color: "#fdae61",
-      text: "0.37 - 0.60",
+      text: "0.373 - 0.596 : Espace modérément défavorable à la mobilité piétonne",
     },
     {
       color: "#d7191c",
-      text: "0.60 - 1.00 : espace particulièrement défavorable à la mobilité piétonne",
+      text: "0.596 - 1.000 : Espace particulièrement défavorable à la mobilité piétonne",
     },
   ];
 

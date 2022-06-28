@@ -94,11 +94,11 @@ export function getStyle(style?: string): {
           const property = getText("./ogc:PropertyName", node);
           const literal = getNumberOrText("./ogc:Literal", node);
           if (!property) {
-            throw "Expected ogc:PropertyName";
+            throw Error("Expected ogc:PropertyName");
           }
           const operator = operatorMapping.get(node.localName);
           if (!operator) {
-            throw `Unknown operator ${node.localName}`;
+            throw Error(`Unknown operator ${node.localName}`);
           }
           return {
             property: property,
@@ -369,7 +369,8 @@ export function getPointToLayer(
       "./se:Mark/*/se:SvgParameter",
       graphicNode
     );
-    switch (getText("./se:Mark/se:WellKnownName", graphicNode)) {
+    const wellKnownName = getText("./se:Mark/se:WellKnownName", graphicNode);
+    switch (wellKnownName) {
       case "circle": {
         const circleMarkerOptions: CircleMarkerOptions = {
           ...pathOptions,
@@ -378,6 +379,8 @@ export function getPointToLayer(
         };
         return (_, latlng) => circleMarker(latlng, circleMarkerOptions);
       }
+      default:
+        throw Error(`Unknown wellKnownName ${wellKnownName}`);
     }
   }
   const textSymbolizerNode = select("//se:TextSymbolizer", doc, true) as Node;
