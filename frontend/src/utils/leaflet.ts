@@ -259,7 +259,7 @@ export class RasterTileLayer extends TileLayer {
   }
 
   getTileSize(): Point {
-    const size = super.getTileSize().multiplyBy(this.tileSizeScale).round();
+    const size = super.getTileSize().multiplyBy(this.tileSizeScale).ceil();
     return size;
   }
 
