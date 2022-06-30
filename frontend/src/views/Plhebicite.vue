@@ -1195,12 +1195,12 @@ export default class Plhebicite extends Vue {
     }[],
     option?: {
       cadreType?: "url" | "tile" | "all";
-      figureType?: "url" | "tile";
+      figureType?: "url" | "tile" | "none";
       figure?: string[];
     }
   ): Layer[] {
-    const cadreType = option?.cadreType ?? "url";
-    const figureType = option?.figureType ?? "url";
+    const cadreType = option?.cadreType ?? "tile";
+    const figureType = option?.figureType ?? "tile";
     const figure = option?.figure ?? [""];
     const cadreItems: LayerItem[] = [];
     if (cadreType === "url" || cadreType === "all") {
@@ -1212,7 +1212,38 @@ export default class Plhebicite extends Vue {
     if (cadreType === "tile" || cadreType === "all") {
       cadreItems.push({
         type: "tile",
-        url: `atlas/cadre/${id}/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
+        url: `atlas/cadre/atlas_${id}_${name}_cadre/{z}/{x}/{y}.png`,
+        crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
+          origin: [2491284.74821705418, 1123583.5241703114],
+          resolutions: [
+            72.1788214780160047, 36.0894107390080023, 18.0447053695040012,
+            9.02235268475200058, 4.51117634237600029, 2.25558817118800015,
+            1.12779408559400007, 0.563897042797000037,
+          ],
+          bounds: new Bounds(
+            [2491284.74821705418, 1123583.5241703114],
+            [2501274.74822724564, 1113593.5241601197]
+          ),
+        }),
+      });
+    }
+    const figureItems: LayerItem[] = [];
+    if (figureType === "url") {
+      figureItems.push(
+        ...figure.map(
+          (suffix) =>
+            ({
+              type: "url",
+              url: `atlas/figure/atlas_${id}_${name}${suffix}_figure.geojson`,
+              style: true,
+            } as LayerItem)
+        )
+      );
+    }
+    if (figureType === "tile") {
+      figureItems.push({
+        type: "tile",
+        url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
         crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
           origin: [2491284.74821705418, 1123583.5241703114],
           resolutions: [
@@ -1251,36 +1282,11 @@ export default class Plhebicite extends Vue {
           ],
         })),
       },
-      ...(figure.length > 0
+      ...(figureItems.length > 0
         ? [
             {
               name: "Figures",
-              items:
-                figureType === "url"
-                  ? (option?.figure ?? [""]).map((suffix) => ({
-                      type: "url",
-                      url: `atlas/figure/atlas_${id}_${name}${suffix}_figure.geojson`,
-                      style: true,
-                    }))
-                  : [
-                      {
-                        type: "tile",
-                        url: `atlas/figure/atlas_${id}_${name}_figure/{z}/{x}/{y}.png`,
-                        crs: new Proj.CRS("EPSG:2056", EPSG_2056, {
-                          origin: [2493818.1657315176, 1121636.39419185673],
-                          resolutions: [
-                            27.0671535440639985, 13.5335767720319993,
-                            6.76678838601599963, 3.38339419300799982,
-                            1.69169709650399991, 0.845848548251999954,
-                            0.422924274125999977,
-                          ],
-                          bounds: new Bounds(
-                            [2493818.1657315176, 1121636.39419185673],
-                            [2499146.16573695699, 1116308.39418641734]
-                          ),
-                        }),
-                      },
-                    ],
+              items: figureItems,
             } as Layer,
           ]
         : []),
@@ -1411,31 +1417,24 @@ export default class Plhebicite extends Vue {
         },
         {
           name: "Imaginaires et savoirs oraux",
-          children: this.getAtlasChildren(
-            "03",
-            "imaginary",
-            [
-              {
-                name: "Expressions, histoires et mystères",
-                id: "expressions",
-              },
-              {
-                name: "Images, analogies et métaphores",
-                id: "analogies",
-              },
-              {
-                name: "Spéculations et futures",
-                id: "speculations",
-              },
-              {
-                name: "Lieux imaginaires",
-                id: "places",
-              },
-            ],
+          children: this.getAtlasChildren("03", "imaginary", [
             {
-              cadreType: "tile",
-            }
-          ),
+              name: "Expressions, histoires et mystères",
+              id: "expressions",
+            },
+            {
+              name: "Images, analogies et métaphores",
+              id: "analogies",
+            },
+            {
+              name: "Spéculations et futures",
+              id: "speculations",
+            },
+            {
+              name: "Lieux imaginaires",
+              id: "places",
+            },
+          ]),
         },
         {
           name: "Expériences de mobilité",
@@ -1538,35 +1537,28 @@ export default class Plhebicite extends Vue {
                 },
               ],
             },
-            ...this.getAtlasChildren(
-              "04",
-              "mobility",
-              [
-                {
-                  name: "Mobilité",
-                  id: "gen",
-                },
-                {
-                  name: "Rythmes et occurrences",
-                  id: "rythm",
-                },
-                {
-                  name: "Routes et chemins",
-                  id: "roads",
-                },
-                {
-                  name: "(Des)orientations",
-                  id: "orientation",
-                },
-                {
-                  name: "Lieux impopulaires",
-                  id: "unpopular_places",
-                },
-              ],
+            ...this.getAtlasChildren("04", "mobility", [
               {
-                cadreType: "tile",
-              }
-            ),
+                name: "Mobilité",
+                id: "gen",
+              },
+              {
+                name: "Rythmes et occurrences",
+                id: "rythm",
+              },
+              {
+                name: "Routes et chemins",
+                id: "roads",
+              },
+              {
+                name: "(Des)orientations",
+                id: "orientation",
+              },
+              {
+                name: "Lieux impopulaires",
+                id: "unpopular_places",
+              },
+            ]),
           ],
         },
         {
@@ -1585,176 +1577,138 @@ export default class Plhebicite extends Vue {
               },
             ],
             {
-              cadreType: "all",
-              figure: [],
+              figureType: "none",
             }
           ),
         },
         {
           name: "Mémoire et temporalités plurielles",
-          children: this.getAtlasChildren(
-            "06",
-            "memory",
-            [
-              {
-                name: "Mémoire",
-                id: "memory",
-              },
-              {
-                name: "Réalité plurielle et frictions",
-                id: "friction",
-              },
-              {
-                name: "Lieux disparus et traces",
-                id: "traces",
-              },
-              {
-                name: "Transformations et mutations",
-                id: "mutations",
-              },
-              {
-                name: "Temporalités plurielles",
-                id: "plural",
-              },
-            ],
+          children: this.getAtlasChildren("06", "memory", [
             {
-              cadreType: "tile",
-              figureType: "tile",
-            }
-          ),
+              name: "Mémoire",
+              id: "memory",
+            },
+            {
+              name: "Réalité plurielle et frictions",
+              id: "friction",
+            },
+            {
+              name: "Lieux disparus et traces",
+              id: "traces",
+            },
+            {
+              name: "Transformations et mutations",
+              id: "mutations",
+            },
+            {
+              name: "Temporalités plurielles",
+              id: "plural",
+            },
+          ]),
         },
         {
           name: "Bien-être et perception des risques",
-          children: this.getAtlasChildren(
-            "07",
-            "risk",
-            [
-              {
-                name: "Nuisances",
-                id: "nuisances",
-              },
-              {
-                name: "Perception des risques",
-                id: "perception",
-              },
-              {
-                name: "Bien-être (et mal-être)",
-                id: "wellbeing",
-              },
-            ],
+          children: this.getAtlasChildren("07", "risk", [
             {
-              cadreType: "tile",
-            }
-          ),
+              name: "Nuisances",
+              id: "nuisances",
+            },
+            {
+              name: "Perception des risques",
+              id: "perception",
+            },
+            {
+              name: "Bien-être (et mal-être)",
+              id: "wellbeing",
+            },
+          ]),
         },
         {
           name: "Pratiques situées",
-          children: this.getAtlasChildren(
-            "08",
-            "situated",
-            [
-              {
-                name: "Paysage animé",
-                id: "landscape",
-              },
-              {
-                name: "Rituels et habitudes",
-                id: "rituals",
-              },
-              {
-                name: "Pratiques situées",
-                id: "practices",
-              },
-            ],
+          children: this.getAtlasChildren("08", "situated", [
             {
-              cadreType: "all",
-            }
-          ),
+              name: "Paysage animé",
+              id: "landscape",
+            },
+            {
+              name: "Rituels et habitudes",
+              id: "rituals",
+            },
+            {
+              name: "Pratiques situées",
+              id: "practices",
+            },
+          ]),
         },
         {
           name: "Territorialité",
-          children: this.getAtlasChildren(
-            "09",
-            "territoriality",
-            [
-              {
-                name: "Infrastructures et industries (fantômes)",
-                id: "ghosted",
-              },
-              {
-                name: "Interfaces et sols communs",
-                id: "interfaces",
-              },
-              {
-                name: "Archipel et micro-territoires",
-                id: "archipel",
-              },
-              {
-                name: "Centrifuge et centripète",
-                id: "centrifuge",
-              },
-              {
-                name: "Continuité et discontinuité",
-                id: "continuity",
-              },
-              {
-                name: "Îles inaccessibles",
-                id: "islands",
-              },
-              {
-                name: "Frontières et limites",
-                id: "borders",
-              },
-              {
-                name: "Territoires inexplorés",
-                id: "uncharted",
-              },
-              {
-                name: "Matérialités (attention aux détails)",
-                id: "materialities",
-              },
-              {
-                name: "Qualité spatiale",
-                id: "spatial_quality",
-              },
-            ],
+          children: this.getAtlasChildren("09", "territoriality", [
             {
-              cadreType: "all",
-              figure: ["_niv", "_route"],
-            }
-          ),
+              name: "Infrastructures et industries (fantômes)",
+              id: "ghosted",
+            },
+            {
+              name: "Interfaces et sols communs",
+              id: "interfaces",
+            },
+            {
+              name: "Archipel et micro-territoires",
+              id: "archipel",
+            },
+            {
+              name: "Centrifuge et centripète",
+              id: "centrifuge",
+            },
+            {
+              name: "Continuité et discontinuité",
+              id: "continuity",
+            },
+            {
+              name: "Îles inaccessibles",
+              id: "islands",
+            },
+            {
+              name: "Frontières et limites",
+              id: "borders",
+            },
+            {
+              name: "Territoires inexplorés",
+              id: "uncharted",
+            },
+            {
+              name: "Matérialités (attention aux détails)",
+              id: "materialities",
+            },
+            {
+              name: "Qualité spatiale",
+              id: "spatial_quality",
+            },
+          ]),
         },
         {
           name: "Écologies politiques",
-          children: this.getAtlasChildren(
-            "10",
-            "political",
-            [
-              {
-                name: "Sphère politique",
-                id: "realms",
-              },
-              {
-                name: "Promoteurs, investisseurs et densification",
-                id: "promotors",
-              },
-              {
-                name: "Propriété (privé/public)",
-                id: "property",
-              },
-              {
-                name: "Savoirs-faire, initiatives et résistances",
-                id: "savoirfaires",
-              },
-              {
-                name: "Panorama social",
-                id: "social",
-              },
-            ],
+          children: this.getAtlasChildren("10", "political", [
             {
-              cadreType: "tile",
-            }
-          ),
+              name: "Sphère politique",
+              id: "realms",
+            },
+            {
+              name: "Promoteurs, investisseurs et densification",
+              id: "promotors",
+            },
+            {
+              name: "Propriété (privé/public)",
+              id: "property",
+            },
+            {
+              name: "Savoirs-faire, initiatives et résistances",
+              id: "savoirfaires",
+            },
+            {
+              name: "Panorama social",
+              id: "social",
+            },
+          ]),
         },
       ],
     },
