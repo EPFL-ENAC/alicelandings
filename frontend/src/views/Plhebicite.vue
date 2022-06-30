@@ -956,6 +956,7 @@
                 </template>
               </template>
               <template v-if="selectedCategoryId === 'environment'">
+                <h4>Description</h4>
                 <template
                   v-if="
                     lastSelectedLayerId.startsWith(
@@ -963,7 +964,6 @@
                     )
                   "
                 >
-                  <h4>Description de la carte</h4>
                   <p>
                     Pour différentes études sur le territoire genevois, le
                     laboratoire ALICE développe depuis plusieurs années des
@@ -972,6 +972,57 @@
                     guichet cartographique genevois (SITG). Le traitement et
                     l'intégration de ces données permet une vision inédite du
                     territoire.
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'environment/Carte Nationale'
+                    )
+                  "
+                >
+                  <p>
+                    La carte nationale au 1:25’000 est la carte topographique
+                    suisse avec une représentation très détaillée des voies de
+                    communications, des surfaces bâties, de l’hydrographie, du
+                    terrain et de la végétation. La carte nationale au 1:25’000
+                    est disponible sous forme analogique (carte papier) et
+                    numérique (Swiss Map Raster) auprès de l’Office fédéral de
+                    topographie (Swisstopo).
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith('environment/Photo aérienne')
+                  "
+                >
+                  <p>
+                    La mosaïque d'orthophotos SWISSIMAGE 10 cm est un assemblage
+                    des nouvelles images aériennes numériques en couleurs sur
+                    l'ensemble de la Suisse avec une résolution au sol de 10 cm
+                    dans les régions de plaine et les principales vallées
+                    alpines et de 25 cm dans les Alpes. Elle est mise à jour
+                    selon un cycle de 3 ans.
+                  </p>
+                </template>
+                <template
+                  v-if="
+                    lastSelectedLayerId.startsWith(
+                      'environment/Grille kilométrique'
+                    )
+                  "
+                >
+                  <p>
+                    Sur les cartes Swisstopo, les coordonnées nationales suisses
+                    sont indiquées sous forme d'un réseau de lignes
+                    perpendiculaires entre elles (le quadrillage). Aux échelles
+                    1:25’000 et 1:50’000, il s'agit d'une grille à 1 km avec un
+                    maillage de 4 cm, respectivement 2 cm comportant un axe
+                    ouest-est et un axe sud-nord. Cette grille orthogonale
+                    métrée est une projection cartographique particulière du
+                    globe terrestre adaptée au territoire suisse, elle ne
+                    correspond donc pas aux valeurs angulaires de latitude et
+                    longitude.
                   </p>
                 </template>
               </template>
@@ -1736,7 +1787,7 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
-          name: "Swisstopo",
+          name: "Carte Nationale",
           items: [
             {
               type: "tile",
@@ -1745,7 +1796,7 @@ export default class Plhebicite extends Vue {
           ],
         },
         {
-          name: "Image satellite",
+          name: "Photo aérienne",
           items: [{ type: "tile", ...tileLayerProps.swisstopo_photo_2056 }],
         },
         {
