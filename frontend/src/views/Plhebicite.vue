@@ -345,6 +345,7 @@
         <web-map
           ref="webMap"
           :center="center"
+          :base-layers="baseLayers"
           :dems="dems"
           :items="mapItems"
           :min-zoom="minZoom"
@@ -1044,12 +1045,13 @@ import WebMap, {
   MapGroupItem,
   MapItem,
   RasterTileMapItem,
+  TileLayerProps,
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
 import { Metadata } from "@/models/qgis";
 import { HeatLayerOptions } from "@/plugins/leaflet-heat";
-import { EPSG_2056, tileLayerProps } from "@/utils/leaflet";
+import { EPSG_2056, swisstopoCrs, tileLayerProps } from "@/utils/leaflet";
 import { getBooleanFromString } from "@/utils/utils";
 import { TreeviewItem } from "@/utils/vuetify";
 import axios from "axios";
@@ -1080,6 +1082,17 @@ import { mapMutations } from "vuex";
 })
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
+  readonly baseLayers: TileLayerProps[] = [
+    {
+      name: "None swisstopoCrs",
+      url: "",
+      visible: true,
+      options: {
+        crs: swisstopoCrs,
+        maxZoom: 27,
+      },
+    },
+  ];
   readonly center = [46.2107, 6.0946];
   readonly minZoom = 20;
   readonly maxZoom = 26;

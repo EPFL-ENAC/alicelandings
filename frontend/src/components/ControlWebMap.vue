@@ -2,7 +2,13 @@
   <v-row>
     <v-col cols="8">
       <v-responsive aspect-ratio="1">
-        <web-map ref="webMap" :items="mapItems" printable></web-map>
+        <web-map
+          ref="webMap"
+          :base-layers="baseLayers"
+          :center="center"
+          :items="mapItems"
+          printable
+        ></web-map>
       </v-responsive>
     </v-col>
     <v-col cols="4">
@@ -62,7 +68,9 @@ import WebMap, {
   FileMapItem,
   MapGroupItem,
   MapLayer,
+  TileLayerProps,
 } from "@/components/WebMap.vue";
+import { tileLayerProps } from "@/utils/leaflet";
 import { randomColor } from "@/utils/vuetify";
 import "vue-class-component/hooks";
 import { Component, Vue } from "vue-property-decorator";
@@ -77,6 +85,15 @@ export default class ControlWebMap extends Vue {
     webMap: WebMap;
   };
 
+  readonly center = [46.2107, 6.0946];
+  readonly baseLayers: TileLayerProps[] = [
+    {
+      name: "OpenStreetMap",
+      url: tileLayerProps.openStreetMap.url,
+      visible: true,
+      options: tileLayerProps.openStreetMap.options,
+    },
+  ];
   inputFiles: File[] = [];
   layerFiles: File[] = [];
   layerActives: boolean[] = [];
