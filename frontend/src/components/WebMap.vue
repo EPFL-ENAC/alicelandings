@@ -59,8 +59,10 @@ import L, {
   marker,
   PathOptions,
   Proj,
+  tileLayer,
   TileLayer,
   TileLayerOptions,
+  WMSOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import "leaflet.heat";
@@ -98,11 +100,11 @@ import colors, { Color } from "vuetify/lib/util/colors";
   },
 })
 export default class WebMap extends Vue {
-  readonly defaultCrs = CRS.EPSG3857;
-
   @Ref()
   readonly lMap!: LMap;
 
+  @Prop({ type: Object as () => CRS, default: () => CRS.EPSG3857 })
+  readonly defaultCrs!: CRS;
   @Prop({
     type: Array as () => TileLayerProps[],
     default: () => [],
@@ -114,10 +116,10 @@ export default class WebMap extends Vue {
   readonly dems!: string[];
   @Prop({ type: Array as () => MapGroupItem[], default: () => [] })
   readonly items!: MapGroupItem[];
-  @Prop({ type: Number, default: 0 })
-  readonly minZoom!: number;
-  @Prop({ type: Number, default: 19 })
-  readonly maxZoom!: number;
+  @Prop(Number)
+  readonly minZoom?: number;
+  @Prop(Number)
+  readonly maxZoom?: number;
   @PropSync("zoom", { type: Number, default: 11 })
   syncedZoom!: number;
   @Prop({ type: Boolean, default: false })
@@ -206,6 +208,7 @@ export default class WebMap extends Vue {
     // new DebugLayer().addTo(this.map).bringToFront();
 
     this.onDemsChanged();
+    this.onItemsChanged();
   }
 
   @Watch("dems")
@@ -529,6 +532,16 @@ export class RasterTileMapItem extends UrlMapItem {
 
   async getLayer(): Promise<LeafletLayer> {
     return new RasterTileLayer(this.url, this.crs, this.options);
+  }
+}
+
+export class WmsMapItem extends UrlMapItem {
+  constructor(url: string, private options: WMSOptions) {
+    super(url);
+  }
+
+  async getLayer(): Promise<LeafletLayer> {
+    return tileLayer.wms(this.url, this.options);
   }
 }
 

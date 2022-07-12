@@ -7,7 +7,11 @@
 </template>
 
 <script lang="ts">
-import WebMap, { MapItem, TileLayerProps } from "@/components/WebMap.vue";
+import WebMap, {
+  MapGroupItem,
+  TileLayerProps,
+  WmsMapItem,
+} from "@/components/WebMap.vue";
 import { tileLayerProps } from "@/utils/leaflet";
 import { Component, Vue } from "vue-property-decorator";
 import { mapMutations } from "vuex";
@@ -31,7 +35,22 @@ export default class Plhebicite extends Vue {
     },
   ];
   readonly center = [46.2107, 6.0946];
-  readonly mapItems: MapItem[] = [];
+  readonly mapItems: MapGroupItem[] = [
+    {
+      id: "wms",
+      zIndex: 1,
+      children: [
+        new WmsMapItem(
+          "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer?",
+          {
+            layers: "41",
+            format: "image/png",
+            transparent: true,
+          }
+        ),
+      ],
+    },
+  ];
 
   created(): void {
     this.openAppBar();
