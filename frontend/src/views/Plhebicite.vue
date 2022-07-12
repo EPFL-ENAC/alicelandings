@@ -1045,7 +1045,6 @@ import WebMap, {
   HeatmapMapItem,
   MapGroupItem,
   MapItem,
-  RasterTileMapItem,
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
@@ -1906,17 +1905,9 @@ export default class Plhebicite extends Vue {
         }
       }
       case "tile": {
-        if (layerItem.crs) {
-          return [
-            new RasterTileMapItem(
-              layerItem.url,
-              layerItem.crs,
-              layerItem.options
-            ),
-          ];
-        } else {
-          return [new TileMapItem(layerItem.url, layerItem.options)];
-        }
+        return [
+          new TileMapItem(layerItem.url, layerItem.options, layerItem.crs),
+        ];
       }
       case "heatmap":
         return [
