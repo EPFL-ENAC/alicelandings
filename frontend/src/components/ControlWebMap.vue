@@ -65,10 +65,10 @@
 
 <script lang="ts">
 import WebMap, {
+  BaseLayer,
   FileMapItem,
   MapGroupItem,
   MapLayer,
-  TileLayerProps,
 } from "@/components/WebMap.vue";
 import { tileLayerProps } from "@/utils/leaflet";
 import { randomColor } from "@/utils/vuetify";
@@ -86,12 +86,11 @@ export default class ControlWebMap extends Vue {
   };
 
   readonly center = [46.2107, 6.0946];
-  readonly baseLayers: TileLayerProps[] = [
+  readonly baseLayers: BaseLayer[] = [
     {
       name: "OpenStreetMap",
-      url: tileLayerProps.openStreetMap.url,
       visible: true,
-      options: tileLayerProps.openStreetMap.options,
+      ...tileLayerProps.openStreetMap,
     },
   ];
   inputFiles: File[] = [];
