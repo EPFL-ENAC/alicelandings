@@ -8,11 +8,11 @@
 
 <script lang="ts">
 import WebMap, {
+  BaseLayer,
   MapGroupItem,
-  TileLayerProps,
   WmsMapItem,
 } from "@/components/WebMap.vue";
-import { tileLayerProps } from "@/utils/leaflet";
+import { swisstopoCrs, tileLayerProps } from "@/utils/leaflet";
 import { Component, Vue } from "vue-property-decorator";
 import { mapMutations } from "vuex";
 
@@ -26,12 +26,17 @@ import { mapMutations } from "vuex";
 })
 export default class Plhebicite extends Vue {
   openAppBar!: () => void;
-  readonly baseLayers: TileLayerProps[] = [
+  readonly baseLayers: BaseLayer[] = [
     {
       name: "OpenStreetMap",
-      url: tileLayerProps.openStreetMap.url,
       visible: true,
-      options: tileLayerProps.openStreetMap.options,
+      ...tileLayerProps.openStreetMap,
+    },
+    {
+      name: "Swisstopo",
+      visible: false,
+      ...tileLayerProps.swisstopo_pixelkarte_farbe_2056,
+      crs: swisstopoCrs,
     },
   ];
   readonly center = [46.2107, 6.0946];
