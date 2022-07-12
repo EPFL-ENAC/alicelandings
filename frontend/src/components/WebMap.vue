@@ -425,6 +425,7 @@ export abstract class MapItem {
             resolution: 128,
           });
         });
+      case "application/zip":
       case "application/x-zip-compressed":
         return this.arrayBuffer()
           .then((arrayBuffer) => parseZip(arrayBuffer))
