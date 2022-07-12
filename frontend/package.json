@@ -29,6 +29,7 @@
     "mime-types": "^2.1.34",
     "proj4leaflet": "^1.0.2",
     "register-service-worker": "^1.7.1",
+    "rxjs": "^7.5.6",
     "shpjs": "^4.0.2",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

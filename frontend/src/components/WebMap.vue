@@ -58,6 +58,7 @@ import L, {
   MapOptions,
   marker,
   PathOptions,
+  Point,
   Proj,
   tileLayer,
   TileLayer,
@@ -71,6 +72,8 @@ import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
 import { Proj4GeoJSONFeature } from "proj4leaflet";
+import { concat, from, Subscription } from "rxjs";
+import { first, map } from "rxjs/operators";
 import { parseZip } from "shpjs";
 import "vue-class-component/hooks";
 import {
@@ -89,6 +92,16 @@ import {
   LTileLayer,
 } from "vue2-leaflet";
 import colors, { Color } from "vuetify/lib/util/colors";
+
+declare module "geoblaze" {
+  /**
+   * https://docs.geoblaze.io/#identify
+   */
+  function identify(
+    georaster: GeoRaster | ArrayBuffer | Blob | File | string,
+    geometry: string | Point
+  ): Promise<number[]> | null;
+}
 
 @Component({
   components: {
@@ -128,6 +141,7 @@ export default class WebMap extends Vue {
   loading = false;
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
+  mousemoveSubscription?: Subscription;
 
   get crs(): CRS {
     return (
@@ -156,29 +170,38 @@ export default class WebMap extends Vue {
 
   mounted(): void {
     const Coordinates = Control.extend({
-      onAdd: (map: Map) => {
+      onAdd: (leafletMap: Map) => {
         const container = DomUtil.create("div");
-        map.addEventListener("mousemove", (e: LeafletMouseEvent) => {
+        leafletMap.addEventListener("mousemove", (e: LeafletMouseEvent) => {
           const point = this.crs.project(e.latlng);
-          const altitudePromise: Promise<number | undefined> = Promise.all(
-            this.demGeorasters.map((georaster) =>
-              identify(georaster, [point.x, point.y])
-            )
-          ).then((altitudes) => {
-            return altitudes.flat().find((value) => value); // defined && !== 0
-          });
           const positionText = `Lat/Lon:
           (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
-          altitudePromise.then((altitude) => {
-            container.innerHTML =
-              altitude !== undefined
-                ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
-                    "<br>"
-                  )
-                : positionText;
-          });
+          container.innerHTML = positionText;
+          this.mousemoveSubscription?.unsubscribe();
+          this.mousemoveSubscription = concat(
+            ...this.demGeorasters
+              .map((georaster) => identify(georaster, [point.x, point.y]))
+              .filter(
+                (promise): promise is Promise<number[]> => promise !== null
+              )
+              .map((promise) => from(promise))
+          )
+            .pipe(
+              map((values) => values[0]),
+              first((altitude) => !!altitude, null) // defined && !== 0
+            )
+            .subscribe((altitude) => {
+              container.innerHTML =
+                altitude !== null
+                  ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
+                      "<br>"
+                    )
+                  : positionText;
+            });
         });
-        map.addEventListener("mouseout", () => {
+        leafletMap.addEventListener("mouseout", () => {
+          this.mousemoveSubscription?.unsubscribe();
+          this.mousemoveSubscription = undefined;
           container.innerHTML = "";
         });
         return container;
