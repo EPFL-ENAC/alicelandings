@@ -16,11 +16,9 @@
       <l-tile-layer
         v-for="item in baseLayers"
         :key="item.name"
-        :attribution="item.attribution"
         layer-type="base"
         :name="item.name"
-        :options="item.options"
-        :subdomains="item.subdomains"
+        :options="{ ...item.options, crs: item.crs }"
         :url="item.url"
         :visible="item.visible"
       ></l-tile-layer>
@@ -35,7 +33,12 @@
 
 <script lang="ts">
 import { HeatLayerOptions } from "@/plugins/leaflet-heat";
-import { EPSG_2056, EPSG_21781, RasterTileLayer } from "@/utils/leaflet";
+import {
+  EPSG_2056,
+  EPSG_21781,
+  RasterTileLayer,
+  TileLayerProp,
+} from "@/utils/leaflet";
 import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
 import axios from "axios";
 import interpolate from "color-interpolate";
@@ -52,6 +55,8 @@ import L, {
   GridLayer,
   icon,
   IconOptions,
+  Layer,
+  LayerEvent,
   LayerGroup,
   LeafletMouseEvent,
   Map,
@@ -119,10 +124,10 @@ export default class WebMap extends Vue {
   @Prop({ type: Object as () => CRS, default: () => CRS.EPSG3857 })
   readonly defaultCrs!: CRS;
   @Prop({
-    type: Array as () => TileLayerProps[],
+    type: Array as () => BaseLayer[],
     default: () => [],
   })
-  readonly baseLayers!: TileLayerProps[];
+  readonly baseLayers!: BaseLayer[];
   @Prop({ type: Array as () => number[] })
   readonly center!: [number, number];
   @Prop({ type: Array as () => string[], default: () => [] })
@@ -138,6 +143,7 @@ export default class WebMap extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly printable!: boolean;
 
+  selectedCrs: CRS | null = null;
   loading = false;
   layers: MapLayer[] = [];
   demGeorasters: GeoRaster[] = [];
@@ -145,7 +151,8 @@ export default class WebMap extends Vue {
 
   get crs(): CRS {
     return (
-      this.baseLayers.find((layer) => layer.visible)?.options?.crs ??
+      this.selectedCrs ??
+      this.baseLayers.find((layer) => layer.visible)?.crs ??
       this.defaultCrs
     );
   }
@@ -208,12 +215,11 @@ export default class WebMap extends Vue {
       },
     });
     this.map.addControl(new Coordinates({ position: "bottomleft" }));
-    // FIXME
-    // this.map.on("baselayerchange", (e: LayerEvent) => {
-    //   this.crs =
-    //     (e.layer as Layer & { options: BaseTileLayerOptions }).options.crs ??
-    //     this.defaultCrs;
-    // });
+    this.map.on("baselayerchange", (e: LayerEvent) => {
+      this.selectedCrs =
+        (e.layer as Layer & { options?: TileLayerOptions & { crs?: CRS } })
+          .options?.crs ?? null;
+    });
     if (this.printable) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (control as any).browserPrint().addTo(this.map);
@@ -619,20 +625,11 @@ interface ColorScale {
   valueMax: number;
 }
 
-/**
- * https://vue2-leaflet.netlify.app/components/LTileLayer.html#props
- */
-export interface TileLayerProps {
-  attribution?: string;
+export interface BaseLayer extends TileLayerProp {
   name: string;
   visible: boolean;
-  subdomains?: string | string[];
-  // https://leafletjs.com/reference.html#tilelayer
-  options?: BaseTileLayerOptions;
-  url: string;
+  crs?: CRS;
 }
-
-type BaseTileLayerOptions = TileLayerOptions & { crs?: CRS };
 
 interface ExtendedGeoRaster extends GeoRaster {
   mins: number[];

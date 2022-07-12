@@ -1041,11 +1041,11 @@ import LegendItem from "@/components/LegendItem.vue";
 import LegendSource from "@/components/LegendSource.vue";
 import SimpleDialog from "@/components/SimpleDialog.vue";
 import WebMap, {
+  BaseLayer,
   HeatmapMapItem,
   MapGroupItem,
   MapItem,
   RasterTileMapItem,
-  TileLayerProps,
   TileMapItem,
   UrlMapItem,
 } from "@/components/WebMap.vue";
@@ -1082,15 +1082,15 @@ import { mapMutations } from "vuex";
 })
 export default class Plhebicite extends Vue {
   toggleAppBar!: () => void;
-  readonly baseLayers: TileLayerProps[] = [
+  readonly baseLayers: BaseLayer[] = [
     {
       name: "None swisstopoCrs",
       url: "",
       visible: true,
       options: {
-        crs: swisstopoCrs,
         maxZoom: 27,
       },
+      crs: swisstopoCrs,
     },
   ];
   readonly center = [46.2107, 6.0946];
