@@ -250,6 +250,9 @@ export default class WebMap extends Vue {
     });
   }
 
+  /**
+   * Update only changed this.items to this.layers
+   */
   @Watch("items")
   onItemsChanged(): void {
     const newIds: Set<string> = new Set(this.items.map((item) => item.id));
@@ -541,26 +544,20 @@ export class UrlMapItem extends MapItem {
 }
 
 export class TileMapItem extends UrlMapItem {
-  constructor(url: string, private options?: TileLayerOptions) {
-    super(url);
-  }
-
-  async getLayer(): Promise<LeafletLayer> {
-    return new TileLayer(this.url, this.options);
-  }
-}
-
-export class RasterTileMapItem extends UrlMapItem {
   constructor(
     url: string,
-    private crs: Proj.CRS,
-    private options?: TileLayerOptions
+    private options?: TileLayerOptions,
+    private crs?: Proj.CRS
   ) {
     super(url);
   }
 
   async getLayer(): Promise<LeafletLayer> {
-    return new RasterTileLayer(this.url, this.crs, this.options);
+    if (this.crs) {
+      return new RasterTileLayer(this.url, this.crs, this.options);
+    } else {
+      return new TileLayer(this.url, this.options);
+    }
   }
 }
 
