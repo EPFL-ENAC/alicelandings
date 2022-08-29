@@ -48,7 +48,7 @@ export default class Plhebicite extends Vue {
         new WmsMapItem(
           "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer?",
           {
-            layers: "41",
+            layers: "47", // SIPV_ICA_ARBRE_ISOLE
             format: "image/png",
             transparent: true,
           }
