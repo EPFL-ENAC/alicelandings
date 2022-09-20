@@ -1535,7 +1535,7 @@ export default class Plhebicite extends Vue {
                         return `<b>De quoi s'agit-il?</b>
                     ${properties["what"]}
 
-                    <b>En quoi aide-t-il à la mobilité?</b>
+                    <b>En quoi entrave-t-il la mobilité?</b>
                     ${properties["why"]}`;
                       },
                       getIconOptions: function (): IconOptions {
