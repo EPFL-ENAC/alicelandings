@@ -1,0 +1,22 @@
+{
+  "packages": {
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false
+    },
+    "frontend": {
+      "component": "frontend",
+      "release-type": "node"
+    }
+  },
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "group-name": "alicelandings",
+      "components": ["root", "frontend"]
+    }
+  ]
+}
