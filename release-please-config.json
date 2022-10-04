@@ -16,7 +16,10 @@
     {
       "type": "linked-versions",
       "group-name": "alicelandings",
-      "components": ["root", "frontend"]
+      "components": [
+        "root",
+        "frontend"
+      ]
     }
   ]
 }
