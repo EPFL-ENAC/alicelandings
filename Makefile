@@ -1,4 +1,5 @@
 install:
+	npm install
 	$(MAKE) -C frontend install
 
 run:
