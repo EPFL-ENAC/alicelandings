@@ -208,6 +208,20 @@
               </div>
             </template>
           </simple-dialog>
+          <v-divider vertical></v-divider>
+          <simple-dialog class="flex-even">
+            <template #activator="{ on, attrs }">
+              <v-btn v-bind="attrs" class="flex-even" text v-on="on">
+                Tutoriel
+              </v-btn>
+            </template>
+            <template #default>
+              <h1>Chapitre 1, Cartographies affectives</h1>
+              <h1>Chapitre 2, Atlas des paysages de mobilités</h1>
+              <h1>Chapitre 3, Analyses de mobilité</h1>
+            </template>
+          </simple-dialog>
+          <v-divider vertical></v-divider>
           <simple-dialog class="flex-even">
             <template #activator="{ on, attrs }">
               <v-btn v-bind="attrs" class="flex-even btn-right" text v-on="on">
