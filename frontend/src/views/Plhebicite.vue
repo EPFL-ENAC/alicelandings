@@ -2074,5 +2074,13 @@ interface HeatmapLayerItem {
   .v-image {
     margin-right: 8px;
   }
+
+  // fix legend overflow issues on mobile TODO better solution
+  h4,
+  p,
+  span,
+  div {
+    overflow-wrap: anywhere;
+  }
 }
 </style>
