@@ -11,6 +11,16 @@
     <v-main>
       <router-view></router-view>
     </v-main>
+    <v-bottom-sheet v-model="mobileWarning" persistent>
+      <v-sheet class="text-center" height="512px">
+        <h1>Attention</h1>
+        <p>Ce site ne supporte pas les écrans mobiles</p>
+        <v-btn icon color="warning" @click="mobileWarning = false">
+          <v-icon left>mdi-close</v-icon>
+          Fermer
+        </v-btn>
+      </v-sheet>
+    </v-bottom-sheet>
   </v-app>
 </template>
 
@@ -25,6 +35,7 @@ import { mapState } from "vuex";
 })
 export default class App extends Vue {
   readonly appBar!: boolean;
+  mobileWarning = this.$vuetify.breakpoint.mobile;
 }
 </script>
 
