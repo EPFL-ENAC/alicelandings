@@ -69,6 +69,106 @@
           </v-list>
         </div>
         <v-divider></v-divider>
+        <simple-dialog button-text="Commencer" open>
+          <h1>Bienvenue sur alicelandings ! __________________</h1>
+          <br />
+          <p>
+            Cette plateforme vous permettra de visualiser les cartographies
+            développées par les laboratoires ALICE et LASIG de l'EPFL, qui ont
+            étudié en 2021-2022 les potentialités du paysage urbain pour
+            promouvoir les pratiques de mobilité douce et le bien-être des
+            habitants de Vernier. La recherche s’est construite au travers
+            d’entretiens en marchant avec des habitants de la commune et d’un
+            questionnaire en ligne.
+          </p>
+          <h2>C’est quoi ?</h2>
+          <p>
+            Vous verrez différentes cartes qui explorent le lien entre les
+            espaces construits de la commune et les usages des habitants à
+            travers des récits collectés. La plateforme est divisée en plusieurs
+            chapitres :
+          </p>
+          <ul>
+            <li>
+              Le chapitre
+              <v-tooltip bottom max-width="512">
+                <template #activator="{ on, attrs }">
+                  <span v-bind="attrs" v-on="on" class="font-weight-bold">
+                    Cartographies affectives
+                  </span>
+                </template>
+                <p>
+                  Ce chapitre représente l’espace urbain vécu dans Vernier à
+                  travers quinze entretiens réalisés avec des habitant.e.s nous
+                  guidant à travers la commune. Ces cartes tentent de dessiner
+                  les engagements affectifs des citoyens avec leur environnement
+                  quotidien (lieux pratiqués et parcourus par l'habitant et
+                  générant un archipel de lieux significatifs).
+                </p>
+                <p class="purple--text">
+                  À explorer et superposer sans modération !
+                </p>
+              </v-tooltip>
+            </li>
+            <li>
+              Le chapitre
+              <v-tooltip bottom max-width="512">
+                <template #activator="{ on, attrs }">
+                  <span v-bind="attrs" v-on="on" class="font-weight-bold">
+                    Atlas des paysages de mobilité
+                  </span>
+                </template>
+                <p>
+                  Ce chapitre rassemble par thématiques les témoignages des
+                  Verniolans, décrivant des expériences faites en se déplaçant à
+                  pied ou à vélo dans la commune de Vernier et alentours.
+                  L'Atlas inclut également quelques premiers résultats tirés du
+                  questionnaire en ligne et un index de marchabilité relatif à
+                  l'accessibilité piétonne.
+                </p>
+                <p class="purple--text">
+                  Soyez attentifs aux cercles, ils ont des choses à dire…
+                </p>
+              </v-tooltip>
+            </li>
+            <li>
+              Le chapitre
+              <v-tooltip bottom max-width="512">
+                <template #activator="{ on, attrs }">
+                  <span v-bind="attrs" v-on="on" class="font-weight-bold">
+                    Contexte et fonds de cartes
+                  </span>
+                </template>
+                <p>
+                  Ce chapitre contient des cartes plus classiques pour permettre
+                  de se repérer facilement.
+                </p>
+              </v-tooltip>
+            </li>
+          </ul>
+          <br />
+          <h2>Navigation sur le site</h2>
+          <p>
+            Les onglets sur la gauche sont extensibles et permettent d’afficher
+            et de superposer différentes couches d’informations. Vous pouvez
+            avoir plus d’informations sur l’onglet À PROPOS et des mini
+            tutoriels sur l’onglet TUTO.
+            <span class="font-weight-bold"
+              >On vous conseille d’accéder au site sur un ordinateur car
+              celui-ci n'a pas été optimisé sur téléphone.</span
+            >
+          </p>
+          <h2>Pourquoi ?</h2>
+          <p>
+            Pour rendre les villes plus résilientes et durables face aux défis
+            posés par le changement climatique dans nos villes, il est essentiel
+            de comprendre le rôle que joue l'environnement construit dans la vie
+            quotidienne de leurs habitants et de disposer de cartes capables
+            d'aborder les engagements affectifs, les imaginaires et les mémoires
+            collectives.
+          </p>
+          <h2>Bonne découverte !</h2>
+        </simple-dialog>
         <div class="d-flex">
           <simple-dialog class="flex-even">
             <template #activator="{ on, attrs }">
