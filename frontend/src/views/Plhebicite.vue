@@ -216,9 +216,17 @@
               </v-btn>
             </template>
             <template #default>
-              <h1>Chapitre 1, Cartographies affectives</h1>
-              <h1>Chapitre 2, Atlas des paysages de mobilités</h1>
-              <h1>Chapitre 3, Analyses de mobilité</h1>
+              <h1>TUTORIEL _________________________________</h1>
+              <br />
+              <h2>Chapitre 1_Cartographies affectives</h2>
+              <vimeo-player video-id="779612161" h="1b70e8ad36"></vimeo-player>
+              <br />
+              <h2>Chapitre 2_Atlas des paysages de mobilité</h2>
+              <vimeo-player video-id="779616745" h="90a6abd206"></vimeo-player>
+              <br />
+              <h2>Chapitre 2b_Analyses mobilité</h2>
+              <vimeo-player video-id="779617702" h="bfe20bd346"></vimeo-player>
+              <br />
             </template>
           </simple-dialog>
           <v-divider vertical></v-divider>
@@ -1054,6 +1062,7 @@ import ColorBox from "@/components/ColorBox.vue";
 import LegendItem from "@/components/LegendItem.vue";
 import LegendSource from "@/components/LegendSource.vue";
 import SimpleDialog from "@/components/SimpleDialog.vue";
+import VimeoPlayer from "@/components/VimeoPlayer.vue";
 import WebMap, {
   BaseLayer,
   HeatmapMapItem,
@@ -1087,6 +1096,7 @@ import { mapMutations } from "vuex";
     LegendItem,
     LegendSource,
     SimpleDialog,
+    VimeoPlayer,
     WebMap,
   },
   methods: {
