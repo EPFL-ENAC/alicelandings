@@ -10,7 +10,10 @@
         <slot></slot>
       </v-card-text>
       <v-card-actions class="justify-end">
-        <v-btn icon @click="dialog = false">
+        <v-btn v-if="buttonText" text @click="dialog = false">
+          {{ buttonText }}
+        </v-btn>
+        <v-btn v-else icon @click="dialog = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-actions>
@@ -28,7 +31,17 @@ export default class SimpleDialog extends Vue {
   readonly name?: string;
   @Prop({ type: Number, default: 1024 })
   readonly width!: number;
+  @Prop({ type: Boolean, default: false })
+  readonly open!: boolean;
+  @Prop({ type: String })
+  readonly buttonText?: string;
 
   dialog = false;
+
+  created() {
+    if (this.open) {
+      this.dialog = true;
+    }
+  }
 }
 </script>
