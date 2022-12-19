@@ -93,11 +93,18 @@
               Le chapitre
               <v-tooltip bottom max-width="512">
                 <template #activator="{ on, attrs }">
-                  <span v-bind="attrs" class="font-weight-bold" v-on="on">
-                    Cartographies affectives
+                  <span
+                    v-bind="attrs"
+                    class="d-inline-flex font-weight-bold"
+                    v-on="on"
+                  >
+                    Cartographies affectives&nbsp;
+                    <v-icon color="primary" small>
+                      mdi-information-outline
+                    </v-icon>
                   </span>
                 </template>
-                <p>
+                <p class="text-justify">
                   Ce chapitre représente l’espace urbain vécu dans Vernier à
                   travers quinze entretiens réalisés avec des habitant.e.s nous
                   guidant à travers la commune. Ces cartes tentent de dessiner
@@ -114,11 +121,18 @@
               Le chapitre
               <v-tooltip bottom max-width="512">
                 <template #activator="{ on, attrs }">
-                  <span v-bind="attrs" class="font-weight-bold" v-on="on">
-                    Atlas des paysages de mobilité
+                  <span
+                    v-bind="attrs"
+                    class="d-inline-flex font-weight-bold"
+                    v-on="on"
+                  >
+                    Atlas des paysages de mobilité&nbsp;
+                    <v-icon color="primary" small>
+                      mdi-information-outline
+                    </v-icon>
                   </span>
                 </template>
-                <p>
+                <p class="text-justify">
                   Ce chapitre rassemble par thématiques les témoignages des
                   Verniolans, décrivant des expériences faites en se déplaçant à
                   pied ou à vélo dans la commune de Vernier et alentours.
@@ -135,11 +149,18 @@
               Le chapitre
               <v-tooltip bottom max-width="512">
                 <template #activator="{ on, attrs }">
-                  <span v-bind="attrs" class="font-weight-bold" v-on="on">
-                    Contexte et fonds de cartes
+                  <span
+                    v-bind="attrs"
+                    class="d-inline-flex font-weight-bold"
+                    v-on="on"
+                  >
+                    Contexte et fonds de cartes&nbsp;
+                    <v-icon color="primary" small>
+                      mdi-information-outline
+                    </v-icon>
                   </span>
                 </template>
-                <p>
+                <p class="text-justify">
                   Ce chapitre contient des cartes plus classiques pour permettre
                   de se repérer facilement.
                 </p>
@@ -318,13 +339,19 @@
             <template #default>
               <h1>TUTORIEL _________________________________</h1>
               <br />
+              <br />
               <h2>Chapitre 1_Cartographies affectives</h2>
+              <br />
               <vimeo-player video-id="779612161" h="1b70e8ad36"></vimeo-player>
               <br />
+              <br />
               <h2>Chapitre 2_Atlas des paysages de mobilité</h2>
+              <br />
               <vimeo-player video-id="779616745" h="90a6abd206"></vimeo-player>
               <br />
+              <br />
               <h2>Chapitre 2b_Analyses mobilité</h2>
+              <br />
               <vimeo-player video-id="779617702" h="bfe20bd346"></vimeo-player>
               <br />
             </template>
