@@ -14,12 +14,12 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "plhebicite" */ "../views/Plhebicite.vue"),
   },
-  {
-    path: "/urbtrees",
-    name: "Urbtrees",
-    component: () =>
-      import(/* webpackChunkName: "urbtrees" */ "../views/Urbtrees.vue"),
-  },
+  // {
+  //   path: "/urbtrees",
+  //   name: "Urbtrees",
+  //   component: () =>
+  //     import(/* webpackChunkName: "urbtrees" */ "../views/Urbtrees.vue"),
+  // },
   {
     path: "/playground",
     name: "Playground",
