@@ -35,7 +35,7 @@ import { mapState } from "vuex";
 })
 export default class App extends Vue {
   readonly appBar!: boolean;
-  mobileWarning = this.$vuetify.breakpoint.mobile;
+  mobileWarning = this.$vuetify.breakpoint.xs;
 }
 </script>
 
