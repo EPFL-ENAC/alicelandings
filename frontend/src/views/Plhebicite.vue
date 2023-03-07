@@ -106,7 +106,7 @@
               <h2>Partenaires</h2>
               <p>
                 Commune de Vernier<br />
-                Canton de Genève <br />
+                Office de l'urbanisme du canton de Genève<br />
                 Hélène Mariéthoz<br />
                 <a
                   href="https://www.epfl.ch/schools/enac/about/data-at-enac/enac-it4research/"
