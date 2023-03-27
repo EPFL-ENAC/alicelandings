@@ -77,7 +77,8 @@
   "overrides": {
     "glob-parent": ">=5.1.2",
     "json5": ">=2.2.2",
-    "terser": ">=5.14.2"
+    "terser": ">=5.14.2",
+    "webpack": ">=5.76.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
