@@ -1,3 +1,50 @@
+<script setup lang="ts">
+import WebMap from "@/components/WebMap.vue";
+import { tileLayerProps } from "@/utils/leaflet";
+import { randomColor } from "@/utils/vuetify";
+import { BaseLayer, FileMapItem, MapGroupItem, MapLayer } from "@/utils/webMap";
+import { computed, ref } from "vue";
+
+const center: [number, number] = [46.2107, 6.0946];
+const baseLayers: BaseLayer[] = [
+  {
+    name: "OpenStreetMap",
+    visible: true,
+    ...tileLayerProps.openStreetMap,
+  },
+];
+
+const webMap = ref<InstanceType<typeof WebMap>>();
+const inputFiles = ref<File[]>([]);
+const layerFiles = ref<File[]>([]);
+const layerActives = ref<boolean[]>([]);
+
+const mapItems = computed<MapGroupItem[]>(() => {
+  let zIndex = 0;
+  return layerFiles.value.map((file) => ({
+    id: file.name,
+    zIndex: zIndex--,
+    children: [new FileMapItem(file, { color: randomColor() })],
+  }));
+});
+const layers = computed<MapLayer[]>(() => webMap.value?.getLayers() ?? []);
+
+function addLayers(): void {
+  layerFiles.value.push(...inputFiles.value);
+  layerActives.value.push(...inputFiles.value.map(() => true));
+  inputFiles.value = [];
+}
+
+function moveLayerToFront(id: string): void {
+  webMap.value?.moveLayerToFront(id);
+}
+
+function deleteLayer(id: string): void {
+  layerFiles.value = layerFiles.value.filter((file) => file.name != id);
+  webMap.value?.deleteLayer(id);
+}
+</script>
+
 <template>
   <v-row>
     <v-col cols="8">
@@ -8,7 +55,7 @@
           :center="center"
           :items="mapItems"
           printable
-        ></web-map>
+        />
       </v-responsive>
     </v-col>
     <v-col cols="4">
@@ -22,7 +69,7 @@
         multiple
         show-size
         @change="addLayers"
-      ></v-file-input>
+      />
       <v-list>
         <v-list-item
           v-for="(item, index) in layers"
@@ -30,7 +77,7 @@
           :input-value="layerActives[index]"
         >
           <v-list-item-action>
-            <v-checkbox v-model="layerActives[index]"></v-checkbox>
+            <v-checkbox v-model="layerActives[index]" />
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
@@ -62,72 +109,3 @@
     </v-col>
   </v-row>
 </template>
-
-<script lang="ts">
-import WebMap, {
-  BaseLayer,
-  FileMapItem,
-  MapGroupItem,
-  MapLayer,
-} from "@/components/WebMap.vue";
-import { tileLayerProps } from "@/utils/leaflet";
-import { randomColor } from "@/utils/vuetify";
-import "vue-class-component/hooks";
-import { Component, Vue } from "vue-property-decorator";
-
-@Component({
-  components: {
-    WebMap,
-  },
-})
-export default class ControlWebMap extends Vue {
-  $refs!: {
-    webMap: WebMap;
-  };
-
-  readonly center = [46.2107, 6.0946];
-  readonly baseLayers: BaseLayer[] = [
-    {
-      name: "OpenStreetMap",
-      visible: true,
-      ...tileLayerProps.openStreetMap,
-    },
-  ];
-  inputFiles: File[] = [];
-  layerFiles: File[] = [];
-  layerActives: boolean[] = [];
-  webMap: WebMap | null = null;
-
-  get mapItems(): MapGroupItem[] {
-    let zIndex = 0;
-    return this.layerFiles.map((file) => ({
-      id: file.name,
-      zIndex: zIndex--,
-      children: [new FileMapItem(file, { color: randomColor() })],
-    }));
-  }
-
-  get layers(): MapLayer[] {
-    return this.webMap?.layers ?? [];
-  }
-
-  mounted(): void {
-    this.webMap = this.$refs.webMap;
-  }
-
-  addLayers(): void {
-    this.layerFiles.push(...this.inputFiles);
-    this.layerActives.push(...this.inputFiles.map(() => true));
-    this.inputFiles = [];
-  }
-
-  moveLayerToFront(id: string): void {
-    this.$refs.webMap.moveLayerToFront(id);
-  }
-
-  deleteLayer(id: string): void {
-    this.layerFiles = this.layerFiles.filter((file) => file.name != id);
-    this.$refs.webMap.deleteLayer(id);
-  }
-}
-</script>

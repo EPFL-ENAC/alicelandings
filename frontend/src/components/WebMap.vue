@@ -1,276 +1,210 @@
-<template>
-  <div class="full-height" style="min-height: 200px">
-    <v-progress-linear :active="loading" indeterminate></v-progress-linear>
-    <l-map
-      ref="lMap"
-      :center="center"
-      :crs="crs"
-      :options="mapOptions"
-      :zoom.sync="syncedZoom"
-    >
-      <l-control-layers
-        v-if="baseLayers.length > 1"
-        position="topleft"
-        :auto-z-index="false"
-      ></l-control-layers>
-      <l-tile-layer
-        v-for="item in baseLayers"
-        :key="item.name"
-        layer-type="base"
-        :name="item.name"
-        :options="{ ...item.options, crs: item.crs }"
-        :url="item.url"
-        :visible="item.visible"
-      ></l-tile-layer>
-      <l-control-scale
-        position="bottomright"
-        :imperial="false"
-      ></l-control-scale>
-      <l-control-zoom position="topright"></l-control-zoom>
-    </l-map>
-  </div>
-</template>
-
-<script lang="ts">
-import { HeatLayerOptions } from "@/plugins/leaflet-heat";
-import {
-  EPSG_2056,
-  EPSG_21781,
-  RasterTileLayer,
-  TileLayerProp,
-} from "@/utils/leaflet";
-import { getPointToLayer, getStyle } from "@/utils/leaflet-sld";
-import axios from "axios";
-import interpolate from "color-interpolate";
+<script setup lang="ts">
+import { EPSG_2056, EPSG_21781 } from "@/utils/leaflet";
+import { BaseLayer, MapGroupItem, MapLayer } from "@/utils/webMap";
 import { identify } from "geoblaze";
-import { Feature, FeatureCollection } from "geojson";
 import parseGeoRaster from "georaster";
 import GeoRasterLayer, { GeoRaster } from "georaster-layer-for-leaflet";
-import L, {
+import {
   Control,
   control,
   CRS,
   DomUtil,
-  GeoJSON,
-  GridLayer,
-  icon,
-  IconOptions,
   Layer,
   LayerEvent,
   LayerGroup,
   LeafletMouseEvent,
   Map,
-  MapOptions,
-  marker,
-  PathOptions,
-  Point,
-  Proj,
   tileLayer,
-  TileLayer,
   TileLayerOptions,
-  WMSOptions,
 } from "leaflet";
 import "leaflet.browser.print/dist/leaflet.browser.print.min.js";
 import "leaflet.heat";
 import { clone, sortBy } from "lodash";
-import { lookup } from "mime-types";
 import proj4 from "proj4";
 import "proj4leaflet";
-import { Proj4GeoJSONFeature } from "proj4leaflet";
 import { concat, from, Subscription } from "rxjs";
 import { first, map } from "rxjs/operators";
-import { parseZip } from "shpjs";
-import "vue-class-component/hooks";
 import {
-  Component,
-  Prop,
-  PropSync,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  LControlLayers,
-  LControlScale,
-  LControlZoom,
-  LMap,
-  LTileLayer,
-} from "vue2-leaflet";
-import colors, { Color } from "vuetify/lib/util/colors";
+  computed,
+  defineExpose,
+  defineProps,
+  onMounted,
+  ref,
+  watch,
+  withDefaults,
+} from "vue";
 
-declare module "geoblaze" {
-  /**
-   * https://docs.geoblaze.io/#identify
-   */
-  function identify(
-    georaster: GeoRaster | ArrayBuffer | Blob | File | string,
-    geometry: string | Point
-  ): Promise<number[]> | null;
-}
+const props = withDefaults(
+  defineProps<{
+    defaultCrs?: CRS;
+    baseLayers?: BaseLayer[];
+    center?: [number, number];
+    dems?: string[];
+    items?: MapGroupItem[];
+    zoom?: number;
+    minZoom?: number;
+    maxZoom?: number;
+    printable?: boolean;
+  }>(),
+  {
+    defaultCrs: () => CRS.EPSG3857,
+    baseLayers: () => [],
+    center: () => [0, 0],
+    dems: () => [],
+    items: () => [],
+    zoom: 11,
+    minZoom: undefined,
+    maxZoom: undefined,
+    printable: false,
+  }
+);
+defineExpose({ deleteLayer, getLayers, moveLayerToFront });
 
-@Component({
-  components: {
-    LControlLayers,
-    LControlScale,
-    LControlZoom,
-    LMap,
-    LTileLayer,
-  },
-})
-export default class WebMap extends Vue {
-  @Ref()
-  readonly lMap!: LMap;
+let leafletMap: Map | undefined = undefined;
 
-  @Prop({ type: Object as () => CRS, default: () => CRS.EPSG3857 })
-  readonly defaultCrs!: CRS;
-  @Prop({
-    type: Array as () => BaseLayer[],
-    default: () => [],
-  })
-  readonly baseLayers!: BaseLayer[];
-  @Prop({ type: Array as () => number[] })
-  readonly center!: [number, number];
-  @Prop({ type: Array as () => string[], default: () => [] })
-  readonly dems!: string[];
-  @Prop({ type: Array as () => MapGroupItem[], default: () => [] })
-  readonly items!: MapGroupItem[];
-  @Prop(Number)
-  readonly minZoom?: number;
-  @Prop(Number)
-  readonly maxZoom?: number;
-  @PropSync("zoom", { type: Number, default: 11 })
-  syncedZoom!: number;
-  @Prop({ type: Boolean, default: false })
-  readonly printable!: boolean;
+const selectedCrs = ref<CRS>();
+const loading = ref<boolean>(false);
+const layers = ref<MapLayer[]>([]);
+const demGeorasters = ref<GeoRaster[]>([]);
+const mousemoveSubscription = ref<Subscription>();
 
-  selectedCrs: CRS | null = null;
-  loading = false;
-  layers: MapLayer[] = [];
-  demGeorasters: GeoRaster[] = [];
-  mousemoveSubscription?: Subscription;
+const crs = computed<CRS>(() => {
+  return (
+    selectedCrs.value ??
+    props.baseLayers.find((layer) => layer.visible)?.crs ??
+    props.defaultCrs
+  );
+});
 
-  get crs(): CRS {
-    return (
-      this.selectedCrs ??
-      this.baseLayers.find((layer) => layer.visible)?.crs ??
-      this.defaultCrs
+onMounted(() => {
+  proj4.defs("urn:ogc:def:crs:EPSG::2056", EPSG_2056);
+  proj4.defs("OGC:CRS84", proj4.defs("EPSG:4326"));
+  proj4.defs("EPSG:21781", EPSG_21781);
+
+  const Coordinates = Control.extend({
+    onAdd: (leafletMap: Map) => {
+      const container = DomUtil.create("div");
+      leafletMap.addEventListener("mousemove", (e: LeafletMouseEvent) => {
+        const point = crs.value.project(e.latlng);
+        const positionText = `Lat/Lon:
+          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
+        container.innerHTML = positionText;
+        mousemoveSubscription.value?.unsubscribe();
+        mousemoveSubscription.value = concat(
+          ...demGeorasters.value
+            .map((georaster) => identify(georaster, [point.x, point.y]))
+            .filter((promise): promise is Promise<number[]> => promise !== null)
+            .map((promise) => from(promise))
+        )
+          .pipe(
+            map((values) => values[0]),
+            first((altitude) => !!altitude, null) // defined && !== 0
+          )
+          .subscribe((altitude) => {
+            container.innerHTML =
+              altitude !== null
+                ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
+                    "<br>"
+                  )
+                : positionText;
+          });
+      });
+      leafletMap.addEventListener("mouseout", () => {
+        mousemoveSubscription.value?.unsubscribe();
+        mousemoveSubscription.value = undefined;
+        container.innerHTML = "";
+      });
+      return container;
+    },
+  });
+
+  leafletMap = new Map("leaflet-map", {
+    center: props.center,
+    crs: crs.value,
+    zoom: props.zoom,
+    zoomControl: false,
+    minZoom: props.minZoom,
+    maxZoom: props.maxZoom,
+  });
+
+  const layersControl = control.layers(undefined, undefined, {
+    position: "topleft",
+    autoZIndex: false,
+  });
+  props.baseLayers.forEach((baseLayer, index) => {
+    const baseTileLayer = tileLayer(baseLayer.url, {
+      ...baseLayer.options,
+      crs: baseLayer.crs,
+    } as TileLayerOptions);
+    if (index === 0) {
+      leafletMap?.addLayer(baseTileLayer);
+    }
+    layersControl.addBaseLayer(baseTileLayer, baseLayer.name);
+  });
+  if (props.baseLayers.length > 1) {
+    layersControl.addTo(leafletMap);
+  }
+
+  new Coordinates({ position: "bottomleft" }).addTo(leafletMap);
+  control.scale({ imperial: false, position: "bottomright" }).addTo(leafletMap);
+  control.zoom({ position: "topright" }).addTo(leafletMap);
+
+  leafletMap?.on("baselayerchange", (e: LayerEvent) => {
+    selectedCrs.value =
+      (e.layer as Layer & { options?: TileLayerOptions & { crs?: CRS } })
+        .options?.crs ?? undefined;
+  });
+  if (props.printable) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (control as any).browserPrint().addTo(leafletMap);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (Control as any).BrowserPrint.Utils.registerLayer(
+      GeoRasterLayer,
+      "GeoRasterLayer",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function (layer: any) {
+        return new GeoRasterLayer(layer.options);
+      }
     );
   }
 
-  get map(): Map {
-    return this.lMap.mapObject;
-  }
+  // new DebugLayer().addTo(this.map).bringToFront();
+});
 
-  get mapOptions(): MapOptions {
-    return {
-      zoomControl: false,
-      minZoom: this.minZoom,
-      maxZoom: this.maxZoom,
-    };
-  }
-
-  created(): void {
-    proj4.defs("urn:ogc:def:crs:EPSG::2056", EPSG_2056);
-    proj4.defs("OGC:CRS84", proj4.defs("EPSG:4326"));
-    proj4.defs("EPSG:21781", EPSG_21781);
-  }
-
-  mounted(): void {
-    const Coordinates = Control.extend({
-      onAdd: (leafletMap: Map) => {
-        const container = DomUtil.create("div");
-        leafletMap.addEventListener("mousemove", (e: LeafletMouseEvent) => {
-          const point = this.crs.project(e.latlng);
-          const positionText = `Lat/Lon:
-          (${e.latlng.lat.toFixed(4)}; ${e.latlng.lng.toFixed(4)})`;
-          container.innerHTML = positionText;
-          this.mousemoveSubscription?.unsubscribe();
-          this.mousemoveSubscription = concat(
-            ...this.demGeorasters
-              .map((georaster) => identify(georaster, [point.x, point.y]))
-              .filter(
-                (promise): promise is Promise<number[]> => promise !== null
-              )
-              .map((promise) => from(promise))
-          )
-            .pipe(
-              map((values) => values[0]),
-              first((altitude) => !!altitude, null) // defined && !== 0
-            )
-            .subscribe((altitude) => {
-              container.innerHTML =
-                altitude !== null
-                  ? [`Altitude: ${altitude.toFixed(0)} m`, positionText].join(
-                      "<br>"
-                    )
-                  : positionText;
-            });
-        });
-        leafletMap.addEventListener("mouseout", () => {
-          this.mousemoveSubscription?.unsubscribe();
-          this.mousemoveSubscription = undefined;
-          container.innerHTML = "";
-        });
-        return container;
-      },
-    });
-    this.map.addControl(new Coordinates({ position: "bottomleft" }));
-    this.map.on("baselayerchange", (e: LayerEvent) => {
-      this.selectedCrs =
-        (e.layer as Layer & { options?: TileLayerOptions & { crs?: CRS } })
-          .options?.crs ?? null;
-    });
-    if (this.printable) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (control as any).browserPrint().addTo(this.map);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (Control as any).BrowserPrint.Utils.registerLayer(
-        GeoRasterLayer,
-        "GeoRasterLayer",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function (layer: any) {
-          return new GeoRasterLayer(layer.options);
-        }
-      );
-    }
-
-    // new DebugLayer().addTo(this.map).bringToFront();
-
-    this.onDemsChanged();
-    this.onItemsChanged();
-  }
-
-  @Watch("dems")
-  onDemsChanged(): void {
-    this.demGeorasters = [];
-    this.dems.forEach((dem) => {
+watch(
+  () => props.dems,
+  (dems) => {
+    demGeorasters.value = [];
+    dems.forEach((dem) => {
       parseGeoRaster(dem).then((georaster: GeoRaster) => {
-        this.demGeorasters.push(georaster);
+        demGeorasters.value.push(georaster);
       });
     });
+  },
+  {
+    immediate: true,
   }
-
-  /**
-   * Update only changed this.items to this.layers
-   */
-  @Watch("items")
-  onItemsChanged(): void {
-    const newIds: Set<string> = new Set(this.items.map((item) => item.id));
-    const oldIds: Set<string> = new Set(this.layers.map((layer) => layer.id));
-    clone(this.layers).forEach((layer) => {
+);
+// Update only changed this.items to this.layers
+watch(
+  () => props.items,
+  (items) => {
+    const newIds: Set<string> = new Set(items.map((item) => item.id));
+    const oldIds: Set<string> = new Set(layers.value.map((layer) => layer.id));
+    clone(layers.value).forEach((layer) => {
       if (!newIds.has(layer.id)) {
-        this.deleteLayer(layer.id);
+        deleteLayer(layer.id);
       }
     });
-    const existingLayers: Promise<MapLayer>[] = this.items
+    const existingLayers: Promise<MapLayer>[] = items
       .filter((item) => oldIds.has(item.id))
       .map(async (item) => {
-        const layer = this.getLayer(item.id)[0];
+        const layer = getLayer(item.id)[0];
         layer.layerGroup.setZIndex(item.zIndex);
         layer.zIndex = item.zIndex;
         return layer;
       });
-    const newLayers: Promise<MapLayer>[] = this.items
+    const newLayers: Promise<MapLayer>[] = items
       .filter((item) => !oldIds.has(item.id))
       .map(async (item) => {
         const layerGroup: LayerGroup = new LayerGroup();
@@ -281,15 +215,15 @@ export default class WebMap extends Vue {
           layerGroup,
           item.zIndex
         );
-        this.map.addLayer(layerGroup);
-        this.layers.push(mapLayer);
+        leafletMap?.addLayer(layerGroup);
+        layers.value.push(mapLayer);
         return Promise.all(
           item.children.map((itemLayer) =>
             itemLayer.getLayer().then((layer) => layerGroup.addLayer(layer))
           )
         ).then(() => mapLayer);
       });
-    this.loading = true;
+    loading.value = true;
     Promise.all([...existingLayers, ...newLayers])
       .then((layers) => {
         // https://github.com/Leaflet/Leaflet/issues/3427
@@ -302,340 +236,53 @@ export default class WebMap extends Vue {
           });
         });
       })
-      .finally(() => (this.loading = false));
+      .finally(() => (loading.value = false));
+  },
+  {
+    immediate: true,
   }
+);
 
-  /**
-   * @deprecated use zIndex
-   */
-  public moveLayerToFront(id: string): void {
-    const [layer, index] = this.getLayer(id);
-    layer.layers.forEach((layer) => layer.bringToFront());
-    this.layers.unshift(...this.layers.splice(index, 1));
-  }
-
-  public deleteLayer(id: string): void {
-    const [layer, index] = this.getLayer(id);
-    this.map.removeLayer(layer.layerGroup);
-    this.layers.splice(index, 1);
-  }
-
-  private getLayer(id: string): [MapLayer, number] {
-    const index = this.layers.findIndex((layer) => layer.id === id);
-    if (index < 0) {
-      throw new Error(`Layer ${id} not found`);
-    }
-    const layer = this.layers[index];
-    return [layer, index];
-  }
+/**
+ * @deprecated use zIndex
+ */
+function moveLayerToFront(id: string): void {
+  const [layer, index] = getLayer(id);
+  layer.layers.forEach((layer) => layer.bringToFront());
+  layers.value.unshift(...layers.value.splice(index, 1));
 }
 
-export interface MapGroupItem {
-  id: string;
-  zIndex: number;
-  children: MapItem[];
+function deleteLayer(id: string): void {
+  const [layer, index] = getLayer(id);
+  leafletMap?.removeLayer(layer.layerGroup);
+  layers.value.splice(index, 1);
 }
 
-interface MapItemOption {
-  color?: Color;
-  popup?: string | ((properties: Record<string, string>) => string | undefined);
-  styleUrl?: string;
-  pathOptions?: PathOptions;
-  getIconOptions?: (feature: Feature) => IconOptions;
+function getLayer(id: string): [MapLayer, number] {
+  const index = layers.value.findIndex((layer) => layer.id === id);
+  if (index < 0) {
+    throw new Error(`Layer ${id} not found`);
+  }
+  const layer = layers.value[index] as MapLayer;
+  return [layer, index];
 }
 
-export abstract class MapItem {
-  constructor(protected option?: MapItemOption) {}
-
-  get color(): Color | undefined {
-    return this.option?.color;
-  }
-
-  get popup():
-    | string
-    | ((properties: Record<string, string>) => string | undefined)
-    | undefined {
-    return this.option?.popup;
-  }
-
-  get getIconOptions(): ((feature: Feature) => IconOptions) | undefined {
-    return this.option?.getIconOptions;
-  }
-
-  async style(): Promise<string | undefined> {
-    if (this.option?.styleUrl) {
-      try {
-        return await (
-          await axios.get(this.option?.styleUrl, { responseType: "text" })
-        ).data;
-      } catch (e) {
-        console.debug(e);
-      }
-    }
-    return undefined;
-  }
-
-  abstract get mimeType(): string;
-  abstract get filename(): string;
-  abstract arrayBuffer(): Promise<ArrayBuffer>;
-  abstract geoRaster(): Promise<ExtendedGeoRaster>;
-  abstract json<T>(): Promise<T>;
-
-  private async getGeoJsonLayer(
-    json: Proj4GeoJSONFeature
-  ): Promise<LeafletLayer> {
-    const popup = this.popup;
-    const styleText: string | undefined = await this.style();
-    const { style, onAdd, onRemove } = getStyle(styleText);
-    const getIconOptions = this.getIconOptions;
-    const geoJson = Proj.geoJson(json, {
-      onEachFeature: popup
-        ? (feature, l) => {
-            if (feature.properties) {
-              const property: string | undefined =
-                typeof popup === "string"
-                  ? feature.properties[popup]
-                  : popup(feature.properties);
-              if (property) {
-                l.bindPopup(property.replaceAll("\n", "<br>"), {
-                  autoPan: false,
-                });
-                l.on("mouseover", () => l.openPopup());
-                l.on("mouseout", () => l.closePopup());
-              }
-            }
-          }
-        : undefined,
-      style: style,
-      pointToLayer: getIconOptions
-        ? (feature: Feature, latlng) =>
-            marker(latlng, {
-              icon: icon(getIconOptions(feature)),
-            })
-        : styleText
-        ? getPointToLayer(styleText, this.option?.pathOptions)
-        : undefined,
-    });
-    if (onAdd) {
-      return geoJson.on("add", onAdd);
-    }
-    if (onRemove) {
-      return geoJson.on("remove", onRemove);
-    }
-    return geoJson;
-  }
-
-  async getLayer(): Promise<LeafletLayer> {
-    const color: Color | undefined = this.color;
-    switch (this.mimeType) {
-      case "image/tiff":
-        return this.geoRaster().then((georaster: ExtendedGeoRaster) => {
-          if (color && georaster.mins[0] === 0) {
-            georaster.noDataValue = 0;
-          }
-          const colorScale: ColorScale | undefined = color
-            ? {
-                colorMin: color.lighten5,
-                colorMax: color.darken4,
-                valueMin: georaster.mins[0],
-                valueMax: georaster.maxs[0],
-              }
-            : undefined;
-          return new GeoRasterLayer({
-            georaster: georaster,
-            pixelValuesToColorFn: colorScale
-              ? (values) => {
-                  if (values[0] === georaster.noDataValue) {
-                    return colors.shades.transparent;
-                  }
-                  const palette = interpolate([
-                    colorScale.colorMin,
-                    colorScale.colorMax,
-                  ]);
-                  const value =
-                    (values[0] - georaster.mins[0]) / georaster.ranges[0];
-                  return palette(value);
-                }
-              : undefined,
-            resolution: 128,
-          });
-        });
-      case "application/zip":
-      case "application/x-zip-compressed":
-        return this.arrayBuffer()
-          .then((arrayBuffer) => parseZip(arrayBuffer))
-          .then((geojson) =>
-            this.getGeoJsonLayer(geojson as unknown as Proj4GeoJSONFeature)
-          );
-    }
-    const extension = this.filename.split(".").pop();
-    switch (extension) {
-      case "geojson":
-      case "json":
-        return this.json<Proj4GeoJSONFeature>().then((json) =>
-          this.getGeoJsonLayer(json)
-        );
-    }
-    return Promise.reject(
-      `unsupported type ${this.mimeType} for file ${this.filename}`
-    );
-  }
-}
-
-export class FileMapItem extends MapItem {
-  constructor(public file: File, option?: MapItemOption) {
-    super(option);
-  }
-
-  get mimeType(): string {
-    return this.file.type;
-  }
-
-  get filename(): string {
-    return this.file.name;
-  }
-
-  arrayBuffer(): Promise<ArrayBuffer> {
-    return this.file.arrayBuffer();
-  }
-
-  async geoRaster(): Promise<ExtendedGeoRaster> {
-    const arrayBuffer: ArrayBuffer = await this.file.arrayBuffer();
-    return parseGeoRaster(arrayBuffer);
-  }
-
-  async json<T>(): Promise<T> {
-    const text = await this.file.text();
-    return JSON.parse(text);
-  }
-}
-
-export class UrlMapItem extends MapItem {
-  constructor(public url: string, option?: MapItemOption) {
-    super(option);
-  }
-
-  get mimeType(): string {
-    const type = lookup(this.url);
-    return type ? type : "";
-  }
-
-  get filename(): string {
-    return this.url;
-  }
-
-  async arrayBuffer(): Promise<ArrayBuffer> {
-    const response = await axios.get(this.url, {
-      responseType: "arraybuffer",
-    });
-    return response.data;
-  }
-
-  geoRaster(): Promise<ExtendedGeoRaster> {
-    return parseGeoRaster(this.url);
-  }
-
-  async json<T>(): Promise<T> {
-    const response = await axios.get(this.url, {
-      responseType: "json",
-    });
-    return response.data;
-  }
-}
-
-export class TileMapItem extends UrlMapItem {
-  constructor(
-    url: string,
-    private options?: TileLayerOptions,
-    private crs?: Proj.CRS
-  ) {
-    super(url);
-  }
-
-  async getLayer(): Promise<LeafletLayer> {
-    if (this.crs) {
-      return new RasterTileLayer(this.url, this.crs, this.options);
-    } else {
-      return new TileLayer(this.url, this.options);
-    }
-  }
-}
-
-export class WmsMapItem extends UrlMapItem {
-  constructor(url: string, private options: WMSOptions) {
-    super(url);
-  }
-
-  async getLayer(): Promise<LeafletLayer> {
-    return tileLayer.wms(this.url, this.options);
-  }
-}
-
-export class HeatmapMapItem extends UrlMapItem {
-  constructor(
-    geojsonUrl: string,
-    private latitude = "lat",
-    private longitude = "lng",
-    private options?: HeatLayerOptions
-  ) {
-    super(geojsonUrl);
-  }
-
-  async getLayer(): Promise<LeafletLayer> {
-    const json = await this.json<FeatureCollection>();
-    const points = json.features
-      .map((feature) =>
-        feature.properties
-          ? [
-              feature.properties[this.latitude],
-              feature.properties[this.longitude],
-              5,
-            ]
-          : undefined
-      )
-      .filter((point) => point !== undefined);
-    // https://github.com/Leaflet/Leaflet.heat
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (L as any).heatLayer(points, this.options);
-  }
-}
-
-export class MapLayer {
-  constructor(
-    public id: string,
-    public name: string,
-    public layerGroup: LayerGroup,
-    public zIndex: number
-  ) {}
-
-  get layers(): LeafletLayer[] {
-    return this.layerGroup.getLayers() as LeafletLayer[];
-  }
-}
-
-type LeafletLayer = GridLayer | GeoJSON | TileLayer;
-
-interface ColorScale {
-  colorMin: string;
-  colorMax: string;
-  valueMin: number;
-  valueMax: number;
-}
-
-export interface BaseLayer extends TileLayerProp {
-  name: string;
-  visible: boolean;
-  crs?: CRS;
-}
-
-interface ExtendedGeoRaster extends GeoRaster {
-  mins: number[];
-  maxs: number[];
-  ranges: number[];
+function getLayers(): MapLayer[] {
+  return layers.value as MapLayer[];
 }
 </script>
 
-<style scoped>
+<template>
+  <div class="full-height" style="min-height: 200px">
+    <v-progress-linear :active="loading" indeterminate />
+    <div id="leaflet-map" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+#leaflet-map {
+  height: 100%;
+}
 .leaflet-container {
   background-color: unset;
   z-index: 0;

@@ -42,9 +42,9 @@ html {
 }
 
 .text-point-tooltip {
-  background: none;
-  border: none;
-  box-shadow: none;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .v-treeview-node__label {

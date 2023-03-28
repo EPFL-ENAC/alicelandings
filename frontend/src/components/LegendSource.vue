@@ -1,14 +1,11 @@
-<template>
-  <p class="text-caption">Sources : {{ text }}</p>
-</template>
+<script setup lang="ts">
+import { defineProps } from "vue";
 
-<script lang="ts">
-import "vue-class-component/hooks";
-import { Component, Prop, Vue } from "vue-property-decorator";
-
-@Component
-export default class LegendSource extends Vue {
-  @Prop({ type: String })
-  readonly text!: string;
-}
+const props = defineProps<{
+  text: string;
+}>();
 </script>
+
+<template>
+  <p class="text-caption">Sources : {{ props.text }}</p>
+</template>
