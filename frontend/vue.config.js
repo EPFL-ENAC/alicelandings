@@ -17,4 +17,12 @@ module.exports = {
       title: "Alice Landings",
     },
   },
+
+  pwa: {
+    workboxPluginMode: "GenerateSW",
+    workboxOptions: {
+      skipWaiting: true,
+      clientsClaim: true,
+    },
+  },
 };
