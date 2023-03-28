@@ -12,7 +12,9 @@ const routes: Array<RouteConfig> = [
     path: "/plhebicite",
     name: "Plhebicite",
     component: () =>
-      import(/* webpackChunkName: "plhebicite" */ "../views/Plhebicite.vue"),
+      import(
+        /* webpackChunkName: "plhebicite" */ "../views/PlhebiciteView.vue"
+      ),
   },
   // {
   //   path: "/urbtrees",
@@ -24,13 +26,15 @@ const routes: Array<RouteConfig> = [
     path: "/playground",
     name: "Playground",
     component: () =>
-      import(/* webpackChunkName: "playground" */ "../views/Playground.vue"),
+      import(
+        /* webpackChunkName: "playground" */ "../views/PlaygroundView.vue"
+      ),
   },
   {
     path: "/about",
     name: "About",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
 ];
 

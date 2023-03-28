@@ -1,13 +1,40 @@
+<script setup lang="ts">
+import { defineProps, onMounted, ref, withDefaults } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    name?: string;
+    width?: string;
+    open?: boolean;
+    buttonText?: string;
+  }>(),
+  {
+    name: undefined,
+    width: "1024",
+    open: false,
+    buttonText: undefined,
+  }
+);
+
+const dialog = ref<boolean>(false);
+
+onMounted(() => {
+  if (props.open) {
+    dialog.value = true;
+  }
+});
+</script>
+
 <template>
   <v-dialog v-model="dialog" :width="width">
     <template #activator="{ on, attrs }">
-      <slot name="activator" :on="on" :attrs="attrs"></slot>
+      <slot name="activator" :on="on" :attrs="attrs" />
     </template>
     <v-card class="text-justify">
       <v-card-title v-if="name">{{ name }}</v-card-title>
       <v-card-text>
         <br v-if="!name" />
-        <slot></slot>
+        <slot />
       </v-card-text>
       <v-card-actions class="justify-end">
         <v-btn v-if="buttonText" text @click="dialog = false">
@@ -20,28 +47,3 @@
     </v-card>
   </v-dialog>
 </template>
-
-<script lang="ts">
-import "vue-class-component/hooks";
-import { Component, Prop, Vue } from "vue-property-decorator";
-
-@Component
-export default class SimpleDialog extends Vue {
-  @Prop(String)
-  readonly name?: string;
-  @Prop({ type: Number, default: 1024 })
-  readonly width!: number;
-  @Prop({ type: Boolean, default: false })
-  readonly open!: boolean;
-  @Prop({ type: String })
-  readonly buttonText?: string;
-
-  dialog = false;
-
-  created() {
-    if (this.open) {
-      this.dialog = true;
-    }
-  }
-}
-</script>

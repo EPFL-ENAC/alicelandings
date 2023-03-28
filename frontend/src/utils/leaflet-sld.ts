@@ -3,6 +3,7 @@ import { Feature, Point } from "geojson";
 import L, {
   circleMarker,
   CircleMarkerOptions,
+  divIcon,
   LatLng,
   Layer,
   LeafletEvent,
@@ -404,15 +405,16 @@ export function getPointToLayer(
         const properties = geoJsonPoint.properties;
         if (properties) {
           const text: string = properties[property];
-          return marker(latlng, { opacity: 0 }).bindTooltip(
-            `<div style='${styleText}'>${text}</div>`,
-            {
-              className: "text-point-tooltip",
-              direction: "center",
-              permanent: true,
-              offset: [-16, 16],
-            }
-          );
+          return marker(latlng, {
+            opacity: 0,
+            icon: divIcon({
+              iconSize: [0, 0],
+            }),
+          }).bindTooltip(`<div style='${styleText}'>${text}</div>`, {
+            className: "text-point-tooltip",
+            direction: "center",
+            permanent: true,
+          });
         } else {
           return marker(latlng);
         }

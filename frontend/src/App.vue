@@ -1,6 +1,16 @@
+<script setup lang="ts">
+import vuetify from "@/plugins/vuetify";
+import { useAppStore } from "@/stores/app";
+import { ref } from "vue";
+
+const appStore = useAppStore();
+
+const mobileWarning = ref(vuetify.framework.breakpoint.xs);
+</script>
+
 <template>
   <v-app>
-    <v-app-bar v-if="appBar" app dense>
+    <v-app-bar v-if="appStore.appBar" app dense>
       <v-app-bar-title>Alice Landings</v-app-bar-title>
       <v-tabs>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
@@ -9,7 +19,7 @@
       </v-tabs>
     </v-app-bar>
     <v-main>
-      <router-view></router-view>
+      <router-view />
     </v-main>
     <v-bottom-sheet v-model="mobileWarning" persistent>
       <v-sheet class="text-center" height="512px">
@@ -23,21 +33,6 @@
     </v-bottom-sheet>
   </v-app>
 </template>
-
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapState } from "vuex";
-
-@Component({
-  computed: {
-    ...mapState(["appBar"]),
-  },
-})
-export default class App extends Vue {
-  readonly appBar!: boolean;
-  mobileWarning = this.$vuetify.breakpoint.xs;
-}
-</script>
 
 <style lang="scss" scoped>
 .v-toolbar__title {
