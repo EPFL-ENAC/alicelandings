@@ -2124,6 +2124,10 @@ interface HeatmapLayerItem {
       </ul>
       <br />
       <h2>Navigation sur le site</h2>
+      <p class="font-weight-bold">
+        En passant avec le curseur sur les croix/cercles vous verrez apparaître
+        les citations des habitant.e.s.
+      </p>
       <p>
         Les onglets sur la gauche sont extensibles et permettent d’afficher et
         de superposer différentes couches d’informations. Vous pouvez avoir plus
