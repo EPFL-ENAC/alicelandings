@@ -14,7 +14,7 @@ const mobileWarning = ref(vuetify.framework.breakpoint.xs);
       <v-app-bar-title>Alice Landings</v-app-bar-title>
       <v-tabs>
         <v-tab to="/plhebicite">Plhebicite</v-tab>
-        <!-- <v-tab to="/urbtrees">Urbtrees</v-tab> -->
+        <v-tab to="/urbtrees">Urbtrees</v-tab>
         <v-tab to="/about">A Propos</v-tab>
       </v-tabs>
     </v-app-bar>

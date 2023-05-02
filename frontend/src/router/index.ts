@@ -16,12 +16,12 @@ const routes: Array<RouteConfig> = [
         /* webpackChunkName: "plhebicite" */ "../views/PlhebiciteView.vue"
       ),
   },
-  // {
-  //   path: "/urbtrees",
-  //   name: "Urbtrees",
-  //   component: () =>
-  //     import(/* webpackChunkName: "urbtrees" */ "../views/Urbtrees.vue"),
-  // },
+  {
+    path: "/urbtrees",
+    name: "Urbtrees",
+    component: () =>
+      import(/* webpackChunkName: "urbtrees" */ "../views/Urbtrees.vue"),
+  },
   {
     path: "/playground",
     name: "Playground",
