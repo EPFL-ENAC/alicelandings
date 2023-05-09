@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/EPFL-ENAC/it4r-webmap/main/schema/parameters.schema.json",
+  "center": {
+    "lat": 46.204229,
+    "lng": 6.151748
+  },
+  "zoom": 17,
+  "permanentLayerIds": [
+    "background"
+  ],
+  "selectableItems": [
+    {
+      "label": "arbre_isole",
+      "ids": [
+        "arbre_isole"
+      ],
+      "selected": true
+    }
+  ]
+}
