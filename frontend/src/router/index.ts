@@ -20,7 +20,7 @@ const routes: Array<RouteConfig> = [
     path: "/urbtrees",
     name: "Urbtrees",
     component: () =>
-      import(/* webpackChunkName: "urbtrees" */ "../views/Urbtrees.vue"),
+      import(/* webpackChunkName: "urbtrees" */ "../views/UrbtreesView.vue"),
   },
   {
     path: "/playground",
