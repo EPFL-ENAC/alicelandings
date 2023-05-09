@@ -38,15 +38,14 @@ export default class Plhebicite extends Vue {
   readonly mapItems: MapGroupItem[] = [
     {
       id: "wms",
-      zIndex: 10,
+      zIndex: 1,
       children: [
         new WmsMapItem(
-          "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer",
+          "https://ge.ch/sitgags1/rest/services/VECTOR/SITG_GEOSERVICEDATA/MapServer/4913",
           {
-            layers: "46", // SIPV_ICA_ARBRE_ISOLE
+            layers: "4913", // SIPV_ICA_ARBRE_ISOLE
             format: "image/png",
             transparent: true,
-            dpiMode: 7,
           }
         ),
       ],
@@ -57,29 +56,4 @@ export default class Plhebicite extends Vue {
     appStore.openAppBar();
   }
 }
-
-/*
-const center = [46.2107, 6.0946];
-/* Found in qgis
-
-crs=CRS:84&dpiMode=7&format=image/png&layers=46&styles&url=https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer
-*/
-// const mapItems: MapGroupItem[] = [
-//   {
-//     id: "wms",
-//     zIndex: 1,
-//     children: [
-//       new WmsMapItem(
-//         "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer?",
-//         {
-//           layers: "46", // SIPV_ICA_ARBRE_ISOLE
-//           format: "image/png",
-//           transparent: true,
-//           dpiMode: 7,
-//         }
-//       ),
-//     ],
-//   },
-// ];
-// */
 </script>
