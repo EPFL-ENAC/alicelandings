@@ -1,85 +1,12 @@
-<template>
-  <web-map
-    :center="center"
-    :base-layers="baseLayers"
-    :items="mapItems"
-  ></web-map>
-</template>
+<script setup lang="ts">
+import JsonWebMap from "@/components/JsonWebMap.vue";
 
-<script lang="ts">
-import WebMap from "@/components/WebMap.vue";
-import { useAppStore } from "@/stores/app";
-import { swisstopoCrs, tileLayerProps } from "@/utils/leaflet";
-import { BaseLayer, MapGroupItem, WmsMapItem } from "@/utils/webMap";
-import { Component, Vue } from "vue-property-decorator";
-
-const appStore = useAppStore();
-
-@Component({
-  components: {
-    WebMap,
-  },
-})
-export default class Plhebicite extends Vue {
-  readonly baseLayers: BaseLayer[] = [
-    {
-      name: "OpenStreetMap",
-      visible: true,
-      ...tileLayerProps.openStreetMap,
-    },
-    {
-      name: "Swisstopo",
-      visible: false,
-      ...tileLayerProps.swisstopo_pixelkarte_farbe_2056,
-      crs: swisstopoCrs,
-    },
-  ];
-  readonly center = [46.2107, 6.0946];
-  readonly mapItems: MapGroupItem[] = [
-    {
-      id: "wms",
-      zIndex: 10,
-      children: [
-        new WmsMapItem(
-          "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer",
-          {
-            layers: "46", // SIPV_ICA_ARBRE_ISOLE
-            format: "image/png",
-            transparent: true,
-            dpiMode: 7,
-          }
-        ),
-      ],
-    },
-  ];
-
-  created(): void {
-    appStore.openAppBar();
-  }
-}
-
-/*
-const center = [46.2107, 6.0946];
-/* Found in qgis
-
-crs=CRS:84&dpiMode=7&format=image/png&layers=46&styles&url=https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer
-*/
-// const mapItems: MapGroupItem[] = [
-//   {
-//     id: "wms",
-//     zIndex: 1,
-//     children: [
-//       new WmsMapItem(
-//         "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WMSServer?",
-//         {
-//           layers: "46", // SIPV_ICA_ARBRE_ISOLE
-//           format: "image/png",
-//           transparent: true,
-//           dpiMode: 7,
-//         }
-//       ),
-//     ],
-//   },
-// ];
-// */
+const parametersUrl = process.env.VUE_APP_PARAMETERS_URL;
+const styleUrl = process.env.VUE_APP_STYLE_URL;
+console.log(styleUrl);
+console.log(parametersUrl);
 </script>
+
+<template>
+  <JsonWebMap :parameters-url="parametersUrl" :style-url="styleUrl" />
+</template>
