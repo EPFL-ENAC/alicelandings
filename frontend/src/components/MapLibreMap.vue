@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { DivControl } from "@/utils/control";
 import {
   FullscreenControl,
   GeolocateControl,
   Map,
+  MapMouseEvent,
   NavigationControl,
   Popup,
   ScaleControl,
@@ -30,7 +32,8 @@ const props = withDefaults(
     aspectRatio?: number;
     minZoom?: number;
     maxZoom?: number;
-    filterIds?: string[];
+    selectableLayerIds?: string[];
+    selectedLayerIds?: string[];
     popupLayerIds?: string[];
     areaLayerIds?: string[];
   }>(),
@@ -40,7 +43,8 @@ const props = withDefaults(
     aspectRatio: undefined,
     minZoom: undefined,
     maxZoom: undefined,
-    filterIds: undefined,
+    selectableLayerIds: () => [],
+    selectedLayerIds: () => [],
     popupLayerIds: () => [],
     areaLayerIds: () => [],
   }
@@ -55,16 +59,32 @@ onMounted(() => {
     style: props.styleSpec,
     center: props.center,
     zoom: props.zoom,
+    trackResize: true,
   });
   map.addControl(new NavigationControl({}));
   map.addControl(new GeolocateControl({}));
   map.addControl(new ScaleControl({}));
   map.addControl(new FullscreenControl({}));
+  const positionControl = new DivControl({ id: "map-position" });
+  map.addControl(positionControl, "bottom-left");
+
+  map.on("mousemove", function (event: MapMouseEvent) {
+    if (positionControl.container) {
+      positionControl.container.innerHTML = `Lat/Lon: (${event.lngLat.lat.toFixed(
+        4
+      )}; ${event.lngLat.lng.toFixed(4)})`;
+    }
+  });
+  map.on("mouseout", function () {
+    if (positionControl.container) {
+      positionControl.container.innerHTML = "";
+    }
+  });
 
   map.once("load", () => {
-    filterLayers(props.filterIds);
+    filterLayers();
+    loading.value = false;
   });
-  loading.value = false;
 });
 
 watch(
@@ -106,30 +126,34 @@ watch(
   { immediate: true }
 );
 watch(
-  () => props.filterIds,
-  (filterIds) => filterLayers(filterIds),
-  { immediate: true }
+  [() => props.selectableLayerIds, () => props.selectedLayerIds],
+  () => filterLayers(),
+  {
+    immediate: true,
+  }
 );
 
 function update(center?: LngLatLike, zoom?: number) {
-  if (center !== undefined) {
-    map?.setCenter(center);
-  }
-  if (zoom !== undefined) {
-    map?.setZoom(zoom);
+  if (map) {
+    if (center !== undefined) {
+      map.setCenter(center);
+    }
+    if (zoom !== undefined) {
+      map.setZoom(zoom);
+    }
   }
 }
 
-function filterLayers(filterIds?: string[]) {
-  if (filterIds) {
+function filterLayers() {
+  if (map?.loaded()) {
     map
-      ?.getStyle()
-      .layers.filter((layer) => !layer.id.startsWith("gl-draw"))
+      .getStyle()
+      .layers.filter((layer) => props.selectableLayerIds.includes(layer.id))
       .forEach((layer) => {
         map?.setLayoutProperty(
           layer.id,
           "visibility",
-          filterIds.includes(layer.id) ? "visible" : "none"
+          props.selectedLayerIds.includes(layer.id) ? "visible" : "none"
         );
       });
   }
