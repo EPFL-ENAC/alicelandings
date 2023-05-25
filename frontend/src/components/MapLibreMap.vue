@@ -61,6 +61,21 @@ onMounted(() => {
     zoom: props.zoom,
     trackResize: true,
   });
+
+  // Create the source
+  /*
+
+    "diurne": {
+      "type": "raster",
+      "tileSize": 256,
+      "info": "https://ge.ch/sitg/sitg_catalog/sitg_donnees?keyword=TEMP%C3%89RATURE%20DE%20L%27AIR&topic=tous&service=tous&datatype=tous&distribution=tous&sort=auto",
+      "tiles": [
+        "https://ge.ch/sitgags1/services/VECTOR/SITG_OPENDATA_04/MapServer/WmsServer?request=GetMap&version=1.3.0&format=image/png&layers=46&transparent=true&width=256&height=256&bbox={bbox-epsg-3857}&styles=default&crs=EPSG:3857"
+      ]
+    }
+    // Température réelle (°C) (période 2020-2049) (ID: 8) situation diurne
+  */
+
   map.addControl(new NavigationControl({}));
   map.addControl(new GeolocateControl({}));
   map.addControl(new ScaleControl({}));
@@ -146,6 +161,22 @@ function update(center?: LngLatLike, zoom?: number) {
 
 function filterLayers() {
   if (map?.loaded()) {
+    // ge.ch/sitgags1/rest/services/THEMATIC/CLIMAT_PARAMETRES/MapServer/export?dpi=96&transparent=true&format=png32&layers=show%3A1%2C5%2C7&bbox=669049.4168089365%2C5810077.037729114%2C695496.628595572%2C5814835.24273986&bboxSR=102100&imageSR=102100&size=1384%2C249&f=image
+
+    new TiledMapService("diurne", map, {
+      url: "https://ge.ch/sitgags1/rest/services/THEMATIC/CLIMAT_PARAMETRES/MapServer",
+    });
+    map.addLayer({
+      source: "diurne",
+      id: "imagery-layer",
+      type: "raster",
+
+      minzoom: 14,
+      paint: {},
+      layout: {
+        visibility: "visible",
+      },
+    });
     map
       .getStyle()
       .layers.filter((layer) => props.selectableLayerIds.includes(layer.id))
