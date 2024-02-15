@@ -3,6 +3,7 @@ import { Feature, Point } from "geojson";
 import L, {
   circleMarker,
   CircleMarkerOptions,
+  Class,
   divIcon,
   LatLng,
   Layer,
@@ -373,6 +374,16 @@ export function getPointToLayer(
     const wellKnownName = getText("./se:Mark/se:WellKnownName", graphicNode);
     switch (wellKnownName) {
       case "circle": {
+        const circleMarkerOptions: CircleMarkerOptions = {
+          ...pathOptions,
+          radius: ratio(getNumber("./se:Size", graphicNode)),
+          ...options,
+        };
+        return (_, latlng) => circleMarker(latlng, circleMarkerOptions);
+      }
+      // ...
+
+      case "cross": {
         const circleMarkerOptions: CircleMarkerOptions = {
           ...pathOptions,
           radius: ratio(getNumber("./se:Size", graphicNode)),
