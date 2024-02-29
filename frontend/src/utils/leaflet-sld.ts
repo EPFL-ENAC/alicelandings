@@ -3,7 +3,6 @@ import { Feature, Point } from "geojson";
 import L, {
   circleMarker,
   CircleMarkerOptions,
-  Class,
   divIcon,
   LatLng,
   Layer,
