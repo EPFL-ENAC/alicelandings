@@ -54,13 +54,7 @@ const dems: string[] = [
 function popupFnParticipative(
   properties: Record<string, string>
 ): string | undefined {
-  return `
-          ${
-            properties["Quelle raison / activité vous y amène ?"]
-              ? `<p style="margin:0;padding:0;"> ${properties["Quelle raison / activité vous y amène ?"]}</p>`
-              : ""
-          }
-         `;
+  return `${ properties["Quelle raison / activité vous y amène ?"] ? `<p style="margin:0;padding:0;"> ${properties["Quelle raison / activité vous y amène ?"]}</p>` : ""}`;
 }
 
 function getIconOptionsParticipative(feature: Feature): IconOptions {
@@ -1732,6 +1726,9 @@ interface HeatmapLayerItem {
                 ><br />
                 <a href="https://people.epfl.ch/david.tang" target="_blank"
                   >David Tang (IT4R)</a
+                ><br />
+                <a href="https://people.epfl.ch/pierre.guilbert" target="_blank"
+                  >Pierre guilbert (IT4R)</a
                 ><br />
                 <a href="https://people.epfl.ch/charlotte.weil" target="_blank"
                   >Charlotte Weil (IT4R)</a
