@@ -50,6 +50,29 @@ const maxZoom = 26;
 const dems: string[] = [
   "general/dem_altitude/swisssurface3d-raster_2019_merged.tif",
 ].map((filename) => getDataUrl(filename));
+
+function popupFnParticipative(
+  properties: Record<string, string>
+): string | undefined {
+  return `${ properties["Quelle raison / activité vous y amène ?"] ? `<p style="margin:0;padding:0;"> ${properties["Quelle raison / activité vous y amène ?"]}</p>` : ""}`;
+}
+
+function getIconOptionsParticipative(feature: Feature): IconOptions {
+  const properties = feature.properties as Record<string, string>;
+  if (properties["Quelle raison / activité vous y amène ?"]) {
+    const popupAnchor = point(186, 0);
+    return {
+      iconUrl: "img/legends/voices.png",
+      iconSize: [36, 36],
+      popupAnchor: popupAnchor,
+    };
+  }
+  return {
+    iconUrl: "img/legends/voices-out.png",
+    iconSize: [0, 0],
+  };
+}
+
 const categories: Category[] = [
   {
     id: "mapping",
@@ -463,6 +486,581 @@ const categories: Category[] = [
             id: "social",
           },
         ]),
+      },
+    ],
+  },
+  {
+    id: "participative",
+    name: "Cartographie participative",
+    description: "Cette cartographie particative est en cours de construction.",
+    active: false,
+    layers: [
+      {
+        name: "01 Aïre et Libellules",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `aire_libellules/limites/aire_libellules_limites.geojson`,
+                style: `aire_libellules/limites/aire_libellules_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `aire_libellules/parcours/aire_libellules_parcours_pieton.geojson`,
+                    style: `aire_libellules/parcours/aire_libellules_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `aire_libellules/parcours/aire_libellules_parcours_velo.geojson`,
+                    style: `aire_libellules/parcours/aire_libellules_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `aire_libellules/voix/aire_libellules_voix.geojson`,
+                // style: `aire_libellules/voix/aire_libellules_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `aire_libellules/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `aire_libellules/symboles/aire_libellules_symboles_etiquette.geojson`,
+                style: `aire_libellules/symboles/aire_libellules_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `aire_libellules/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `aire_libellules/lieux_vecus/aire_libellules_lieux_vecus_etiquette.geojson`,
+                style: `aire_libellules/lieux_vecus/aire_libellules_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "02 Avanchets",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `avanchets/limites/avanchets_limites.geojson`,
+                style: `avanchets/limites/avanchets_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `avanchets/parcours/avanchets_parcours_pieton.geojson`,
+                    style: `avanchets/parcours/avanchets_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `avanchets/parcours/avanchets_parcours_velo.geojson`,
+                    style: `avanchets/parcours/avanchets_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `avanchets/voix/avanchets_voix.geojson`,
+                // style: `avanchets/voix/avanchets_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `avanchets/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `avanchets/symboles/avanchets_symboles_etiquette.geojson`,
+                style: `avanchets/symboles/avanchets_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `avanchets/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `avanchets/lieux_vecus/avanchets_lieux_vecus_etiquette.geojson`,
+                style: `avanchets/lieux_vecus/avanchets_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "03 Châtelaine",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `chatelaine/limites/chatelaine_limites.geojson`,
+                style: `chatelaine/limites/chatelaine_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `chatelaine/parcours/chatelaine_parcours_pieton.geojson`,
+                    style: `chatelaine/parcours/chatelaine_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `chatelaine/parcours/chatelaine_parcours_velo.geojson`,
+                    style: `chatelaine/parcours/chatelaine_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `chatelaine/voix/chatelaine_voix.geojson`,
+                // style: `chatelaine/voix/chatelaine_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `chatelaine/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `chatelaine/symboles/chatelaine_symboles_etiquette.geojson`,
+                style: `chatelaine/symboles/chatelaine_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `chatelaine/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `chatelaine/lieux_vecus/chatelaine_lieux_vecus_etiquette.geojson`,
+                style: `chatelaine/lieux_vecus/chatelaine_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "04 Cointrin",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `cointrin/limites/cointrin_limites.geojson`,
+                style: `cointrin/limites/cointrin_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `cointrin/parcours/cointrin_parcours_pieton.geojson`,
+                    style: `cointrin/parcours/cointrin_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `cointrin/parcours/cointrin_parcours_velo.geojson`,
+                    style: `cointrin/parcours/cointrin_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `cointrin/voix/cointrin_voix.geojson`,
+                // style: `cointrin/voix/cointrin_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `cointrin/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `cointrin/symboles/cointrin_symboles_etiquette.geojson`,
+                style: `cointrin/symboles/cointrin_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `cointrin/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `cointrin/lieux_vecus/cointrin_label_lieux_vecus.geojson`,
+                style: `cointrin/lieux_vecus/cointrin_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "05 L'Étang",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `etang/limites/etang_limites.geojson`,
+                style: `etang/limites/etang_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `etang/parcours/etang_parcours_pieton.geojson`,
+                    style: `etang/parcours/etang_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `etang/parcours/etang_parcours_velo.geojson`,
+                    style: `etang/parcours/etang_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `etang/voix/etang_voix.geojson`,
+                // style: `etang/voix/etang_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `etang/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `etang/symboles/etang_symboles_etiquette.geojson`,
+                style: `etang/symboles/etang_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `etang/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `etang/lieux_vecus/etang_lieux_vecus_etiquette.geojson`,
+                style: `etang/lieux_vecus/etang_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "06 Lignon",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `lignon/limites/lignon_limites.geojson`,
+                style: `lignon/limites/lignon_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `lignon/parcours/lignon_parcours_pieton.geojson`,
+                    style: `lignon/parcours/lignon_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `lignon/parcours/lignon_parcours_velo.geojson`,
+                    style: `lignon/parcours/lignon_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `lignon/voix/lignon_voix.geojson`,
+                // style: `lignon/voix/lignon_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `lignon/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `lignon/symboles/lignon_symboles_etiquette.geojson`,
+                style: `lignon/symboles/lignon_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `lignon/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `lignon/lieux_vecus/lignon_lieux_vecus_etiquette.geojson`,
+                style: `lignon/lieux_vecus/lignon_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "07 Vernier-Village",
+        children: [
+          {
+            name: "Limites",
+            items: [
+              {
+                type: "url",
+                url: `village/limites/village_limites.geojson`,
+                style: `village/limites/village_limites.sld`,
+              },
+            ],
+          },
+          {
+            name: "Itinéraires",
+            children: [
+              {
+                name: "Piétons",
+                items: [
+                  {
+                    type: "url",
+                    url: `village/parcours/village_parcours_pieton.geojson`,
+                    style: `village/parcours/village_parcours_pieton.sld`,
+                  },
+                ],
+              },
+              {
+                name: "Cyclables",
+                items: [
+                  {
+                    type: "url",
+                    url: `village/parcours/village_parcours_velo.geojson`,
+                    style: `village/parcours/village_parcours_velo.sld`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Voix",
+            items: [
+              {
+                type: "url",
+                url: `village/voix/village_voix.geojson`,
+                // style: `village/voix/village_voix.sld`,
+                // popup: "Text Content",
+                popup: popupFnParticipative,
+                getIconOptions: getIconOptionsParticipative,
+              },
+            ],
+          },
+          {
+            name: "Symboles",
+            items: [
+              {
+                type: "url",
+                url: `village/symboles/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `village/symboles/village_symboles_etiquette.geojson`,
+                style: `village/symboles/village_symboles_etiquette.sld`,
+              },
+            ],
+          },
+          {
+            name: "Lieux vécus",
+            items: [
+              {
+                type: "url",
+                url: `village/lieux_vecus/bulk_export/metadata.json`,
+              },
+              {
+                type: "url",
+                url: `village/lieux_vecus/village_lieux_vecus_etiquette.geojson`,
+                style: `village/lieux_vecus/village_lieux_vecus_etiquette.sld`,
+              },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -927,7 +1525,7 @@ watch(
   }
 );
 
-type CategoryId = "mapping" | "atlas" | "environment";
+type CategoryId = "mapping" | "atlas" | "environment" | "participative";
 
 interface Category {
   id: CategoryId;
@@ -1128,6 +1726,9 @@ interface HeatmapLayerItem {
                 ><br />
                 <a href="https://people.epfl.ch/david.tang" target="_blank"
                   >David Tang (IT4R)</a
+                ><br />
+                <a href="https://people.epfl.ch/pierre.guilbert" target="_blank"
+                  >Pierre guilbert (IT4R)</a
                 ><br />
                 <a href="https://people.epfl.ch/charlotte.weil" target="_blank"
                   >Charlotte Weil (IT4R)</a
@@ -1569,6 +2170,31 @@ interface HeatmapLayerItem {
                   </p>
                 </template>
               </template>
+              <template v-if="selectedCategoryId === 'participative'">
+                <h4>Description de la thématique</h4>
+                <p>
+                  Comprendre le sens du lieu et la manière dont les citoyens
+                  sont affectés par leur environnement bâti joue un rôle crucial
+                  pour aborder les questions socio-écologiques, les engagements
+                  collectifs et parvenir à des villes plus humaines et plus
+                  résilientes. Ce projet développera des méthodologies
+                  transdisciplinaires pour rassembler, engager et transférer les
+                  intelligences locales des communautés. Dans le but
+                  d'intensifier la connexion entre la culture et le territoire,
+                  un ensemble de besoins interdépendants entre les différents
+                  acteurs de la commune de Vernier sera développé afin de
+                  valoriser le territoire en tant que ressource partagée.
+                </p>
+                <p>
+                  Le projet, en collaboration avec le service de la culture de
+                  Vernier et la curatrice Hélène Mariéthoz, entend activer des
+                  échanges transversaux entre les chercheurs, les travailleurs
+                  qui façonnent le territoire de la commune, les habitants et
+                  les artistes. Le territoire en tant qu'interface sera un
+                  terrain de jeu pour aborder et explorer la notion
+                  d'attachement à un lieu et de portée affective.
+                </p>
+              </template>
               <template v-if="selectedCategoryId === 'environment'" />
             </div>
           </div>
@@ -1601,6 +2227,15 @@ interface HeatmapLayerItem {
                   points de vue visibles depuis l’itinéraire. Révèle la
                   profondeur de l’espace affecté par notre mobilité et l’étendue
                   variable du regard selon les lieux.
+                </legend-item>
+              </template>
+              <template v-if="selectedCategoryId === 'participative'">
+                <h4>Légende du cadre</h4>
+                <legend-item image-src="img/legends/voices.png">
+                  <span class="font-weight-bold">Voix. </span>Recueille des
+                  fragments de récits tout au long du parcours effectué, parlant
+                  de lieux directement visibles, proches ou lointains qui
+                  apparaissent dans la discussion.
                 </legend-item>
               </template>
               <template v-if="selectedCategoryId === 'atlas'">
@@ -2099,6 +2734,25 @@ interface HeatmapLayerItem {
             </p>
             <p class="purple--text">
               Soyez attentifs aux cercles, ils ont des choses à dire…
+            </p>
+          </v-tooltip>
+        </li>
+        <li>
+          Le chapitre
+          <v-tooltip bottom max-width="512">
+            <template #activator="{ on, attrs }">
+              <span
+                v-bind="attrs"
+                class="d-inline-flex font-weight-bold"
+                v-on="on"
+              >
+                Cartographie participative&nbsp;
+                <v-icon color="primary" small> mdi-information-outline </v-icon>
+              </span>
+            </template>
+            <p class="text-justify">
+              Ce chapitre contient des cartes “maptionnaire” permettant
+              d’afficher les résultats de notre enquête participative.
             </p>
           </v-tooltip>
         </li>
