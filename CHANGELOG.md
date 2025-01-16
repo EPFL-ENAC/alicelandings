@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/EPFL-ENAC/alicelandings/compare/v1.0.0...v1.0.1) (2025-01-16)
+
+
+### Bug Fixes
+
+* **ghactions:** fix ci after branch renaming ([307a78f](https://github.com/EPFL-ENAC/alicelandings/commit/307a78fcf8d1b683101c59c90c952cedd88f2739))
+* **ghactions:** fix ci/cd for k8s ([cdccc53](https://github.com/EPFL-ENAC/alicelandings/commit/cdccc539f038e3bb50fd367ea19ecceb8dee634b))
+
 ## 1.0.0 (2023-05-25)
 
 
