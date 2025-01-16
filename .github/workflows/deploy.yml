@@ -1,17 +1,20 @@
----
-# https://github.com/EPFL-ENAC/github-actions-runner#readme
-name: deploy-prod
+# https://github.com/EPFL-ENAC/epfl-enac-build-push-deploy-action#readme
+name: deploy
+
 "on":
   push:
     branches:
-      - main
+      - dev
+      - test
+      - stage
+    tags: ["v*.*.*"]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: EPFL-ENAC/epfl-enac-deploy-action@main
-        with:
-          ENAC_IT4R_CD_environment: "prod"
-          ENAC_IT4R_CD_deployment_id: "alicelandings.epfl.ch"
-          ENAC_IT4R_CD_deployment_secret: ${{ secrets.DEPLOYMENT_PROD_SECRET }}
+    uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@v2.0.0
+    secrets:
+      token: ${{ secrets.CD_TOKEN }}
+    with:
+      org: epfl-alice
+      repo: alicelandings
+      build_context: '["./frontend"]'
